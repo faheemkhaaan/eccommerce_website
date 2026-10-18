@@ -1,4 +1,4 @@
-const ids = {
+export const ids = {
     trench: "L0UEzixY27s",
     rack: "my5cwTzhmNI",
     jackets: "KBE_Bvq1U30",
@@ -7,13 +7,15 @@ const ids = {
     greyKnit: "b4pfclnkxJU",
 } as const;
 
-const u = (id: string, w = 1600) =>
+export const u = (id: string, w = 1600) =>
     `https://unsplash.com/photos/${id}/download?force=true&w=${w}`;
 
 export const images = {
     hero: u(ids.trench, 2000),
-    hero2: u(ids.trench, 2000),
-    hero3: u(ids.trench, 2000),
+    hero2: u(ids.greyKnit, 2000),
+    hero3: u(ids.jackets, 2000),
+    hero4: u(ids.hangers, 2000),
+    hero5: u(ids.knitStack, 2000),
     avatar: u(ids.trench, 200),
     catOuterwear: u(ids.rack),
     catCeramics: u(ids.jackets),
@@ -30,4 +32,6 @@ export const images = {
         ids.trench, ids.knitStack, ids.rack, ids.greyKnit,
         ids.jackets, ids.hangers, ids.trench, ids.knitStack,
     ].map((id) => u(id, 600)),
+    provenance: u(ids.hangers, 1200),
+
 };

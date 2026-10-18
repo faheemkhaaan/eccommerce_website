@@ -19,7 +19,7 @@ export default function Home() {
         <Philosophy />
         <Press />
         <Community />
-        <Appointment />
+        {/* <Appointment /> */}
       </main>
       <Footer />
     </>

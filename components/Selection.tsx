@@ -1,6 +1,7 @@
 import { images } from "@/lib/images";
 import Image from "next/image";
 import Link from "next/link";
+import Carousel from "./Carousel";
 import { HeartIcon, ArrowIcon } from "./Icons";
 
 type Product = {
@@ -13,6 +14,8 @@ const products: Product[] = [
   { name: "Asymmetric Turtleneck Knit", price: "$320", material: "Virgin Cashmere", image: images.p2, swatches: ["#8a5a3b", "#c9b9a0", "#2b2824"] },
   { name: "Pleated Atelier Trouser", price: "$340", material: "Belgian Linen", image: images.p3, swatches: ["#d9cdb8", "#2b2824"] },
   { name: "Kyoto Fume Vase No. 3", price: "$460", material: "Hand-fired Stoneware", image: images.p4, badge: "Studio Only", swatches: ["#2b2824", "#8a7f70"] },
+  { name: "Boiled Wool Cardigan", price: "$410", material: "Boiled Merino", image: images.p5, swatches: ["#8a7f70", "#2b2824"] },
+  { name: "Draped Linen Overshirt", price: "$260", material: "Belgian Linen", image: images.p6, swatches: ["#d9cdb8", "#c9b9a0"] },
 ];
 
 export default function Selection() {
@@ -29,11 +32,14 @@ export default function Selection() {
           </Link>
         </div>
 
-        <ul className="grid grid-cols-2 gap-5 lg:grid-cols-4">
+        <Carousel label="New release products">
           {products.map((p) => (
-            <li key={p.name}>
+            <li
+              key={p.name}
+              className="w-[68%] shrink-0 snap-start sm:w-[44%] lg:w-[calc((100%-3.75rem)/4)]"
+            >
               <div className="relative aspect-3/4 overflow-hidden rounded bg-[#d8d0c2]">
-                <Image src={p.image} alt={p.name} fill sizes="(max-width:1024px) 50vw, 25vw" className="object-cover" />
+                <Image src={p.image} alt={p.name} fill sizes="(max-width:640px) 68vw, (max-width:1024px) 44vw, 25vw" className="object-cover" />
                 {p.badge && (
                   <span className="label-sm absolute left-3 top-3 rounded-full bg-white px-2.5 py-0.5 text-[9px] tracking-widest">{p.badge}</span>
                 )}
@@ -53,7 +59,7 @@ export default function Selection() {
               </div>
             </li>
           ))}
-        </ul>
+        </Carousel>
       </div>
     </section>
   );

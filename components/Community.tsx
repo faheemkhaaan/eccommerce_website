@@ -1,6 +1,7 @@
 import { images } from "@/lib/images";
 import Image from "next/image";
 import Link from "next/link";
+import Carousel from "./Carousel";
 
 const shots = images.community;
 
@@ -15,13 +16,17 @@ export default function Community() {
           </div>
           <Link href="#" className="label-sm text-[11px] tracking-[0.12em] text-muted hover:text-ink">Follow @epure.atelier</Link>
         </div>
-        <ul className="grid grid-cols-3 gap-3 lg:grid-cols-5">
+
+        <Carousel label="Community photos" gap="gap-3">
           {shots.map((src, i) => (
-            <li key={`${src}-${i}`} className={`relative aspect-square overflow-hidden rounded-[3px] bg-[#d8d0c2] ${i > 2 ? "hidden lg:block" : ""}`}>
-              <Image src={src} alt={`Community photo ${i + 1}`} fill sizes="(max-width:1024px) 33vw, 20vw" className="object-cover" />
+            <li
+              key={`${src}-${i}`}
+              className="relative aspect-square w-[42%] shrink-0 snap-start overflow-hidden rounded-[3px] bg-[#d8d0c2] sm:w-[30%] lg:w-[calc((100%_-_3rem)/5)]"
+            >
+              <Image src={src} alt={`Community photo ${i + 1}`} fill sizes="(max-width:640px) 42vw, (max-width:1024px) 30vw, 20vw" className="object-cover" />
             </li>
           ))}
-        </ul>
+        </Carousel>
       </div>
     </section>
   );

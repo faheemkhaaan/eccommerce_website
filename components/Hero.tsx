@@ -26,11 +26,18 @@ const HERO_IMAGES = [
     src: images.hero3 || images.hero, // Replace with your tertiary images
     alt: "Edition No. 08 - Slide 3",
     subtitle: "Edition No. 10 — 2026",
-    title: "The Minimalist Edit",
+    title: "The Minimalistsp Edit",
     description: "Fluid drapery meets structured tailoring. Crafted with sustainable luxury and uncompromising attention to detail.",
   },
   {
-    src: images.hero2 || images.hero, // Replace with your secondary images
+    src: images.hero4 || images.hero, // Replace with your secondary images
+    alt: "Edition No. 08 - Slide 2",
+    subtitle: "Edition No. 09 — 2025",
+    title: "Raw & Refined",
+    description: "Organic textures and earthy palettes reflecting architectural silhouettes designed for effortless transitional wear.",
+  },
+  {
+    src: images.hero5 || images.hero, // Replace with your secondary images
     alt: "Edition No. 08 - Slide 2",
     subtitle: "Edition No. 09 — 2025",
     title: "Raw & Refined",
@@ -102,7 +109,7 @@ export default function Hero() {
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
-                href="#"
+                href="collections"
                 className="label-sm inline-flex h-10 items-center rounded-full bg-white px-6 text-ink transition hover:bg-sand"
               >
                 Explore Collection
