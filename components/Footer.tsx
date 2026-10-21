@@ -1,8 +1,25 @@
 import Link from "next/link";
 
+// Links point only at pages that exist; the rest stay as plain text rather than dead links.
 const cols = [
-  { title: "Collections", links: ["Spring Summer 2025", "Tailored Apparel", "Objects & Living", "Past Archives"] },
-  { title: "Client Care", links: ["Concierge Support", "Shipping & Returns", "Atelier Boutiques", "Sourcing & Ethics"] },
+  {
+    title: "Collections",
+    links: [
+      { label: "Spring Summer 2025", href: "/collections" },
+      { label: "Tailored Apparel", href: "/collections?category=Apparel" },
+      { label: "Objects & Living", href: "/collections?category=Objects%20%26%20Living" },
+      { label: "Past Archives", href: "/journal#archive" },
+    ],
+  },
+  {
+    title: "Client Care",
+    links: [
+      { label: "Concierge Support" },
+      { label: "Shipping & Returns", href: "/track-order" },
+      { label: "Atelier Boutiques" },
+      { label: "Sourcing & Ethics", href: "/journal" },
+    ],
+  },
 ];
 
 const h4 = "label-sm mb-4 text-[10px] font-medium tracking-[0.14em] text-muted";
@@ -30,7 +47,13 @@ export default function Footer() {
         {cols.map((c) => (
           <div key={c.title}>
             <h4 className={h4}>{c.title}</h4>
-            <ul>{c.links.map((l) => (<li key={l} className={li}><Link href="#" className={hover}>{l}</Link></li>))}</ul>
+            <ul>
+              {c.links.map((l) => (
+                <li key={l.label} className={li}>
+                  {l.href ? <Link href={l.href} className={hover}>{l.label}</Link> : <span className="text-muted">{l.label}</span>}
+                </li>
+              ))}
+            </ul>
           </div>
         ))}
 
@@ -40,7 +63,9 @@ export default function Footer() {
             Galerie Vivienne, 75002 Paris<br />Omotesando, Shibuya, Tokyo
           </address>
           <ul className="flex gap-4 text-[0.8rem]">
-            {["Editorial", "Journal", "Instagram"].map((l) => (<li key={l}><Link href="#" className={hover}>{l}</Link></li>))}
+            {[{ label: "Editorial", href: "/journal" }, { label: "Journal", href: "/journal#archive" }, { label: "Instagram" }].map((l) => (
+              <li key={l.label}>{l.href ? <Link href={l.href} className={hover}>{l.label}</Link> : <span className="text-muted">{l.label}</span>}</li>
+            ))}
           </ul>
         </div>
       </div>
@@ -48,7 +73,7 @@ export default function Footer() {
       <div className="wrap label-sm flex flex-wrap justify-between gap-4 border-t border-line py-5 text-[10px] tracking-[0.08em] text-muted">
         <span>© 2025 ÉPURE ATELIER S.A. All rights reserved.</span>
         <ul className="flex gap-6">
-          {["Privacy Policy", "Terms of Service", "Accessibility"].map((l) => (<li key={l}><Link href="#">{l}</Link></li>))}
+          {["Privacy Policy", "Terms of Service", "Accessibility"].map((l) => (<li key={l}>{l}</li>))}
         </ul>
       </div>
     </footer>

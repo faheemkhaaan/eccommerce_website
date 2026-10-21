@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { Reveal } from "@/components/Motion";
 import RegisterTrust from "@/components/auth/RegisterTrust";
 import RegisterForm from "@/components/auth/RegisterForm";
 import RegisterPromo from "@/components/auth/RegisterPromo";
+import { safeNext } from "@/lib/safe-next";
 
 export const metadata: Metadata = { title: "Create your account — ÉPURE Atelier" };
 
-export default function RegisterPage() {
+type Props = { searchParams: Promise<{ next?: string }> };
+
+export default function RegisterPage({ searchParams }: Props) {
     return (
         <>
             <header className="flex justify-center py-8 md:py-10">
@@ -20,7 +24,10 @@ export default function RegisterPage() {
                         <RegisterPromo />
                     </Reveal>
                     <Reveal delay={0.08} className="order-1 lg:order-2">
-                        <RegisterForm />
+                        {/* Wrap the component relying on searchParams in Suspense */}
+                        <Suspense fallback={<div className="h-100 animate-pulse rounded-lg bg-muted/20" />}>
+                            <ResolvedRegisterForm searchParams={searchParams} />
+                        </Suspense>
                     </Reveal>
                 </div>
 
@@ -34,4 +41,9 @@ export default function RegisterPage() {
             </footer>
         </>
     );
+}
+
+async function ResolvedRegisterForm({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
+    const { next } = await searchParams;
+    return <RegisterForm next={safeNext(next)} />;
 }

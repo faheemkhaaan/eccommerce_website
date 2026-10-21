@@ -2,7 +2,7 @@ import { images } from "@/lib/images";
 import Image from "next/image";
 import Link from "next/link";
 import Carousel from "./Carousel";
-import { HeartIcon, ArrowIcon } from "./Icons";
+import { ArrowIcon } from "./Icons";
 
 type Product = {
   name: string; price: string; material: string; image: string;
@@ -27,7 +27,7 @@ export default function Selection() {
             <p className="eyebrow mb-2">New Release</p>
             <h2 className="font-serif text-[clamp(1.9rem,3.2vw,2.6rem)] leading-tight tracking-tight">The Édition 08 Selection</h2>
           </div>
-          <Link href="#" className="label-sm inline-flex items-center gap-2 border-b border-transparent pb-0.5 text-[11px] tracking-[0.12em] transition hover:border-current">
+          <Link href="/collections" className="label-sm inline-flex items-center gap-2 border-b border-transparent pb-0.5 text-[11px] tracking-[0.12em] transition hover:border-current">
             View all 32 pieces <ArrowIcon size={12} />
           </Link>
         </div>
@@ -43,9 +43,6 @@ export default function Selection() {
                 {p.badge && (
                   <span className="label-sm absolute left-3 top-3 rounded-full bg-white px-2.5 py-0.5 text-[9px] tracking-widest">{p.badge}</span>
                 )}
-                <button type="button" aria-label={`Save ${p.name}`} className="absolute right-2.5 top-2.5 grid size-8 place-items-center rounded-full bg-white transition hover:scale-110">
-                  <HeartIcon size={14} />
-                </button>
               </div>
               <div className="grid grid-cols-[1fr_auto] gap-y-0.5 pt-3">
                 <small className="label-sm text-[10px] text-muted">{p.material}</small>

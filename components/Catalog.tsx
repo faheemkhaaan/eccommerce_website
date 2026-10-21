@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { PRODUCTS, PALETTE } from "@/lib/products";
+import { PRODUCTS, PALETTE, BADGES, CATEGORIES, MATERIALS } from "@/lib/products";
 import ProductCard from "./ProductCard";
 import { ChevronIcon, CloseIcon, GridIcon, RowsIcon } from "./Icons";
 
@@ -27,9 +27,15 @@ const toOptions = (list: string[]): Option[] => [
     { value: "All", label: "All" },
     ...list.map((v) => ({ value: v, label: v })),
 ];
-const categoryOptions = toOptions(["Apparel", "Objects & Living", "Accessories"]);
-const materialOptions = toOptions(Array.from(new Set(PRODUCTS.map((p) => p.material))));
+const categoryOptions = toOptions(CATEGORIES);
+const materialOptions = toOptions(MATERIALS);
+const badgeOptions = toOptions(BADGES);
 const paletteOptions = toOptions(Object.keys(PALETTE));
+
+// Header links deep-link into the catalogue, so the incoming param must match a real facet.
+// Anything unrecognised falls back to "All" instead of emptying the grid.
+const seed = (value: string | undefined, options: Option[]): string =>
+    value && options.some((o) => o.value === value) ? value : "All";
 
 const inBand = (price: number, band: PriceBand) =>
     band === "all" ||
@@ -55,9 +61,12 @@ function FilterSelect({
     );
 }
 
-export default function Catalog() {
-    const [category, setCategory] = useState("All");
-    const [material, setMaterial] = useState("All");
+export default function Catalog({
+    initialCategory, initialMaterial, initialBadge,
+}: { initialCategory?: string; initialMaterial?: string; initialBadge?: string }) {
+    const [category, setCategory] = useState(() => seed(initialCategory, categoryOptions));
+    const [material, setMaterial] = useState(() => seed(initialMaterial, materialOptions));
+    const [badge, setBadge] = useState(() => seed(initialBadge, badgeOptions));
     const [palette, setPalette] = useState("All");
     const [price, setPrice] = useState<PriceBand>("all");
     const [sort, setSort] = useState<Sort>("featured");
@@ -72,23 +81,25 @@ export default function Catalog() {
             (p) =>
                 (category === "All" || p.category === category) &&
                 (material === "All" || p.material === material) &&
+                (badge === "All" || p.badge === badge) &&
                 (palette === "All" || p.palette.includes(palette as keyof typeof PALETTE)) &&
                 inBand(p.price, price),
         );
         if (sort === "low") return [...list].sort((a, b) => a.price - b.price);
         if (sort === "high") return [...list].sort((a, b) => b.price - a.price);
         return list;
-    }, [category, material, palette, price, sort]);
+    }, [category, material, badge, palette, price, sort]);
 
     const chips = [
         category !== "All" && { key: "category", label: `Category: ${category}`, clear: () => setCategory("All") },
         material !== "All" && { key: "material", label: `Material: ${material}`, clear: () => setMaterial("All") },
+        badge !== "All" && { key: "badge", label: `Edit: ${badge}`, clear: () => setBadge("All") },
         palette !== "All" && { key: "palette", label: `Tone: ${palette}`, clear: () => setPalette("All") },
         price !== "all" && { key: "price", label: `Price: ${labelOf(priceOptions, price)}`, clear: () => setPrice("all") },
     ].filter(Boolean) as { key: string; label: string; clear: () => void }[];
 
     const clearAll = () => apply(() => {
-        setCategory("All"); setMaterial("All"); setPalette("All"); setPrice("all");
+        setCategory("All"); setMaterial("All"); setBadge("All"); setPalette("All"); setPrice("all");
     });
 
     const shown = filtered.slice(0, visible);
@@ -102,6 +113,7 @@ export default function Catalog() {
                 <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 scrollbar-none [&::-webkit-scrollbar]:hidden lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0 lg:pb-0">
                     <FilterSelect label="Category" value={category} options={categoryOptions} onChange={(v) => apply(() => setCategory(v))} />
                     <FilterSelect label="Material" value={material} options={materialOptions} onChange={(v) => apply(() => setMaterial(v))} />
+                    <FilterSelect label="Edit" value={badge} options={badgeOptions} onChange={(v) => apply(() => setBadge(v))} />
                     <FilterSelect label="Palette" value={palette} options={paletteOptions} onChange={(v) => apply(() => setPalette(v))} />
                     <FilterSelect label="Price" value={price} options={priceOptions} onChange={(v) => apply(() => setPrice(v as PriceBand))} />
                 </div>

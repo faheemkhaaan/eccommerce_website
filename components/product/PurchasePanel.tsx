@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowIcon, CheckIcon, ChevronIcon, HeartIcon, MinusIcon, PlusIcon, RulerIcon, StarIcon } from "../Icons";
+import { ArrowIcon, CheckIcon, ChevronIcon, MinusIcon, PlusIcon, RulerIcon, StarIcon } from "../Icons";
 import { Detail } from "@/lib/product-details";
 import { useCart } from "../cart/CartProvider";
 
@@ -17,7 +17,6 @@ export default function PurchasePanel({ product: p }: { product: Detail }) {
     const [color, setColor] = useState(p.colorways[0].name);
     const [size, setSize] = useState(p.defaultSize);
     const [qty, setQty] = useState(1);
-    const [wished, setWished] = useState(false);
     const [added, setAdded] = useState(false);
     const [open, setOpen] = useState<number | null>(0);
     const [showBar, setShowBar] = useState(false);
@@ -186,17 +185,6 @@ export default function PurchasePanel({ product: p }: { product: Detail }) {
                             </motion.span>
                         </AnimatePresence>
                     </motion.button>
-
-                    <motion.button
-                        type="button"
-                        whileTap={{ scale: 0.85 }}
-                        aria-pressed={wished}
-                        aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-                        onClick={() => setWished((w) => !w)}
-                        className={`grid size-12 shrink-0 place-items-center rounded-full bg-sand ${wished ? "[&_svg]:fill-current" : ""}`}
-                    >
-                        <HeartIcon size={16} />
-                    </motion.button>
                 </div>
 
                 {/* Perks */}
@@ -278,12 +266,5 @@ export default function PurchasePanel({ product: p }: { product: Detail }) {
             </AnimatePresence>
         </div>
     );
-}
-
-function add(arg0: { id: string; name: string; image: string; options: string[]; price: number; qty: number; }) {
-    throw new Error("Function not implemented.");
-}
-function openBag() {
-    throw new Error("Function not implemented.");
 }
 

@@ -3,22 +3,32 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCart } from "./CartProvider";
+import { useAuthStore } from "@/stores/auth-store";
 import { GIFT_PACKAGING_FROM, money, summarize } from "@/lib/cart-math";
-import { ArrowIcon, CheckIcon, CloseIcon, GiftIcon, LeafIcon, LockIcon, MinusIcon, PlusIcon, ReturnIcon } from "../Icons";
+import { ArrowIcon, CashIcon, CheckIcon, CloseIcon, GiftIcon, LeafIcon, LockIcon, MinusIcon, PlusIcon, ReturnIcon } from "../Icons";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const FOCUSABLE = 'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])';
 
 export default function CartDrawer() {
     const { items, count, subtotal, isOpen, close, setQty, remove } = useCart();
+    const user = useAuthStore((s) => s.user);
+    const router = useRouter();
     const panel = useRef<HTMLElement>(null);
     const closeBtn = useRef<HTMLButtonElement>(null);
 
     const { shipping, tax, total } = summarize(subtotal);
     const pct = Math.min(100, Math.round((subtotal / GIFT_PACKAGING_FROM) * 100));
     const unlocked = subtotal >= GIFT_PACKAGING_FROM;
+
+    // Buying needs an account, so guests are sent to sign in and straight back to checkout.
+    const goToCheckout = () => {
+        close();
+        router.push(user ? "/checkout" : "/login?next=%2Fcheckout");
+    };
 
     // Scroll lock, Escape to close, focus trap, restore focus
     useEffect(() => {
@@ -200,22 +210,28 @@ export default function CartDrawer() {
                                     </motion.span>
                                 </div>
 
-                                {/* Express checkout: placeholders, swap for the providers' official buttons */}
-                                <div className="mt-4 grid grid-cols-3 gap-2">
-                                    <button type="button" aria-label="Pay with Apple Pay" className="h-10 rounded-full bg-white text-xs font-medium transition hover:shadow-md">Apple Pay</button>
-                                    <button type="button" aria-label="Pay with Google Pay" className="h-10 rounded-full bg-white text-xs font-medium transition hover:shadow-md">G Pay</button>
-                                    <button type="button" aria-label="Pay with Shop Pay" className="h-10 rounded-full bg-[#5a31f4] text-xs font-bold italic text-white transition hover:brightness-110">shop Pay</button>
-                                </div>
+                                {/* COD only — payment happens at the door, never up front */}
+                                <p className="mt-4 flex items-start gap-2.5 rounded-2xl bg-white px-4 py-3 text-[11px] leading-relaxed text-muted">
+                                    <span className="mt-0.5 text-accent"><CashIcon size={14} /></span>
+                                    Cash on Delivery — inspect the parcel, then pay the rider {money(total)}.
+                                </p>
 
-                                <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} className="mt-3">
-                                    <Link
-                                        href="/checkout"
-                                        onClick={close}
-                                        className="label-sm flex h-12 items-center justify-center gap-2 rounded-full bg-ink text-[11px] text-white"
-                                    >
-                                        Proceed to secure checkout <ArrowIcon size={14} />
-                                    </Link>
-                                </motion.div>
+                                <motion.button
+                                    type="button"
+                                    onClick={goToCheckout}
+                                    whileHover={{ y: -2 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="label-sm mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-[11px] text-white"
+                                >
+                                    {user ? "Proceed to checkout" : "Sign in to checkout"} <ArrowIcon size={14} />
+                                </motion.button>
+
+                                {!user && (
+                                    <p className="mt-2.5 text-center text-[11px] text-muted">
+                                        New here? You’ll create an account in seconds —{" "}
+                                        <Link href="/register?next=%2Fcheckout" onClick={close} className="text-ink underline underline-offset-4">sign up</Link>
+                                    </p>
+                                )}
 
                                 <ul className="label-sm mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[9px] text-muted">
                                     <li className="inline-flex items-center gap-1.5"><span className="text-accent"><LockIcon size={11} /></span>256-bit encrypted</li>

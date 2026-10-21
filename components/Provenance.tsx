@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { images } from "@/lib/images";
 import { ArrowIcon } from "./Icons";
+import { FEATURED } from "@/lib/journal";
 import { Reveal } from "./Motion";
 // import { Reveal } from "../Motion";
 // import { ArrowIcon } from "../Icons";
@@ -19,8 +20,8 @@ export default function Provenance() {
                         Every ceramic creation and textile piece in our collection is produced in small, numbered
                         artisan batches between Kyoto’s historic pottery kilns and our atelier in Biella, Italy.
                     </p>
-                    <Link href="#" className="label-sm inline-flex items-center gap-2 border-b border-transparent pb-0.5 text-[11px] tracking-[0.12em] transition hover:border-current">
-                        Read Atelier Journal 08 <ArrowIcon size={12} />
+                    <Link href={`/journal/${FEATURED.slug}`} className="label-sm inline-flex items-center gap-2 border-b border-transparent pb-0.5 text-[11px] tracking-[0.12em] transition hover:border-current">
+                        Read Atelier Journal {FEATURED.issue} <ArrowIcon size={12} />
                     </Link>
                 </div>
 

@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Field, { inputCls } from "./Field";
 import { ArrowIcon, BoxIcon, CashIcon, CheckIcon, ChevronIcon, EyeIcon, EyeOffIcon } from "../Icons";
 import { registerAccount } from "@/lib/auth-client";
+import VerifyEmailNotice from "./VerifyEmailNotification";
 
 const COUNTRIES = {
     PK: { code: "+92", label: "+92 (PK)", name: "Pakistan", placeholder: "300 1234567", re: /^3\d{9}$/ },
@@ -36,7 +37,9 @@ function validate(v: Values): Partial<Record<Key, string>> {
     const c = COUNTRIES[v.country];
     if (v.name.trim().length < 2) e.name = "Enter your full name.";
     if (!c.re.test(v.phone)) e.phone = `Enter a valid mobile number for ${c.name}.`;
-    if (v.email && !EMAIL_RE.test(v.email)) e.email = "Enter a valid email address, or leave it blank.";
+    // Email is the account itself — it carries the confirmation link.
+    if (!v.email.trim()) e.email = "Enter your email address.";
+    else if (!EMAIL_RE.test(v.email)) e.email = "Enter a valid email address.";
     if (v.city.trim().length < 2) e.city = "Enter your delivery city.";
     if (v.address.trim().length < 10) e.address = "Add your house number, street and a landmark.";
     if (v.password.length < 8 || !/[a-z]/i.test(v.password) || !/\d/.test(v.password))
@@ -63,9 +66,11 @@ function PasswordInput(props: InputHTMLAttributes<HTMLInputElement>) {
     );
 }
 
-export default function RegisterForm() {
+export default function RegisterForm({ next = "/" }: { next?: string }) {
     const router = useRouter();
     const uid = useId();
+    // Arriving from the bag: registration continues straight to checkout.
+    const fromCheckout = next.startsWith("/checkout");
 
     const [v, setV] = useState<Values>({
         name: "", country: "PK", phone: "", email: "", size: "M",
@@ -76,6 +81,8 @@ export default function RegisterForm() {
     const [submitting, setSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
+    const [sentTo, setSentTo] = useState<string | null>(null);
+
 
     const set = <K extends keyof Values>(k: K, val: Values[K]) => setV((p) => ({ ...p, [k]: val }));
     const errors = useMemo(() => validate(v), [v]);
@@ -102,26 +109,31 @@ export default function RegisterForm() {
             return;
         }
 
+
+
         setSubmitting(true);
         try {
             await registerAccount({
                 name: v.name.trim(),
                 phone: `${country.code}${v.phone}`,
-                email: v.email.trim() || undefined,
+                email: v.email.trim(),
                 size: v.size,
                 city: v.city.trim(),
                 address: v.address.trim(),
                 password: v.password,
                 notifyWhatsApp: v.notify,
             });
+            setSentTo(v.email.trim());
             setSuccess(true);
             setTimeout(() => router.push("/"), 900); // TODO: send to your account or welcome page
-        } catch {
-            setFormError("We couldn’t create your account. Please try again.");
+        } catch (err) {
+            setFormError(err instanceof Error ? err.message : "We couldn’t create your account. Please try again.");
         } finally {
             setSubmitting(false);
         }
     };
+
+    if (sentTo) return <VerifyEmailNotice email={sentTo} onEdit={() => setSentTo(null)} />;
 
     return (
         <div className="rounded-4xl bg-white p-6 shadow-[0_30px_70px_-40px_rgba(60,40,20,0.35)] sm:p-10 md:rounded-[2.5rem]">
@@ -135,6 +147,13 @@ export default function RegisterForm() {
                 Join ÉPURE Studio to unlock seamless Cash on Delivery ordering, save your measurements &amp;
                 delivery addresses, and track festive drops before Eid.
             </p>
+
+            {fromCheckout && (
+                <p className="mt-5 flex items-start gap-3 rounded-2xl bg-sand px-4 py-3.5 text-xs leading-relaxed text-muted">
+                    <span className="mt-0.5 text-accent"><CashIcon size={16} /></span>
+                    Your bag is waiting. Confirm your email, sign in, and we’ll finish your order.
+                </p>
+            )}
 
             <form onSubmit={submit} noValidate className="mt-9 space-y-6">
                 <Field id={`${uid}-name`} label="Full name" required error={shown("name")}>
@@ -175,7 +194,13 @@ export default function RegisterForm() {
                     </div>
                 </Field>
 
-                <Field id={`${uid}-email`} label="Email address" hint={<span className="label-sm text-[10px] tracking-[0.14em]">Optional</span>} error={shown("email")}>
+                <Field
+                    id={`${uid}-email`}
+                    label="Email address"
+                    required
+                    hint={<span className="text-accent">Verifies your account</span>}
+                    error={shown("email")}
+                >
                     <input {...f("email")} type="email" autoComplete="email" value={v.email} onChange={(e) => set("email", e.target.value)} placeholder="ayla@example.com" className={inputCls} />
                 </Field>
 
@@ -293,7 +318,7 @@ export default function RegisterForm() {
 
             <p className="mt-7 text-center text-[0.85rem] text-muted">
                 Already have an account?{" "}
-                <Link href="/login" className="text-ink underline underline-offset-4">Sign In</Link>
+                <Link href={fromCheckout ? "/login?next=%2Fcheckout" : "/login"} className="text-ink underline underline-offset-4">Sign In</Link>
             </p>
         </div>
     );

@@ -44,3 +44,8 @@ export const PRODUCTS: Product[] = [
     { id: "kaya-leather-slide", name: "Kaya Leather Slide", price: 290, detail: "Unlined calfskin on a cork footbed", category: "Accessories", material: "Leather", palette: ["Tan", "Cocoa", "Noir"], image: img(10) },
     { id: "bellow-merino-cardigan", name: "Bellow Merino Cardigan", price: 430, detail: "Boiled merino with horn buttons", category: "Apparel", material: "Wool", palette: ["Stone", "Oat"], image: img(11) },
 ];
+
+// Facet values, derived from the catalogue so filters can never drift from the data.
+export const CATEGORIES: Category[] = ["Apparel", "Objects & Living", "Accessories"];
+export const MATERIALS: string[] = Array.from(new Set(PRODUCTS.map((p) => p.material)));
+export const BADGES: Badge[] = Array.from(new Set(PRODUCTS.map((p) => p.badge).filter((b): b is Badge => Boolean(b))));

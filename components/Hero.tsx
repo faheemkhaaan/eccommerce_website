@@ -115,7 +115,7 @@ export default function Hero() {
                 Explore Collection
               </Link>
               <Link
-                href="#"
+                href="/journal"
                 className="label-sm inline-flex h-10 items-center rounded-full bg-ink/55 px-6 backdrop-blur-md transition hover:bg-ink/75"
               >
                 Read the Journal

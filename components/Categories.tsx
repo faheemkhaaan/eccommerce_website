@@ -33,7 +33,7 @@ export default function Categories() {
               <p className="mb-4 text-xs opacity-85">
                 Unlined double-faced cashmere blazers, oversized trench coats with hand-stitched closures, and structured linen jackets.
               </p>
-              <Link href="#" className={linkCls}>Discover Outerwear <ArrowIcon size={12} /></Link>
+              <Link href="/collections?category=Apparel" className={linkCls}>Discover Outerwear <ArrowIcon size={12} /></Link>
             </div>
           </article>
 
@@ -43,7 +43,7 @@ export default function Categories() {
             <div className="relative p-6">
               <small className="label-sm mb-1 block text-[10px] opacity-80">Series 02</small>
               <h3 className="mb-3 font-serif text-2xl leading-snug">Artisanal Ceramics &amp; Living</h3>
-              <Link href="#" className={linkCls}>View Objects <ArrowIcon size={12} /></Link>
+              <Link href="/collections?category=Objects%20%26%20Living" className={linkCls}>View Objects <ArrowIcon size={12} /></Link>
             </div>
           </article>
 
@@ -53,7 +53,7 @@ export default function Categories() {
             <div className="relative p-6">
               <small className="label-sm mb-1 block text-[10px] opacity-80">Series 03</small>
               <h3 className="mb-3 font-serif text-2xl leading-snug">Leather Goods &amp; Footwear</h3>
-              <Link href="#" className={linkCls}>Browse Accessories <ArrowIcon size={12} /></Link>
+              <Link href="/collections?category=Accessories" className={linkCls}>Browse Accessories <ArrowIcon size={12} /></Link>
             </div>
           </article>
         </div>

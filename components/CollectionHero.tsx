@@ -9,7 +9,7 @@ export default function CollectionHero({ count }: { count: number }) {
                     <ol className="flex flex-wrap items-center gap-2">
                         <li><Link href="/" className="hover:text-ink">Home</Link></li>
                         <li aria-hidden>/</li>
-                        <li><Link href="#" className="hover:text-ink">Collections</Link></li>
+                        <li><Link href="/collections" className="hover:text-ink">Collections</Link></li>
                         <li aria-hidden>/</li>
                         <li aria-current="page" className="text-ink">Spring Summer ’25</li>
                     </ol>

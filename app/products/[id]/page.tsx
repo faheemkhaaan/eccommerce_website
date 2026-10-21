@@ -7,6 +7,7 @@ import { MotionProvider, Reveal } from "@/components/Motion";
 import Gallery from "@/components/product/Gallery";
 import PurchasePanel from "@/components/product/PurchasePanel";
 import CompleteTheLook from "@/components/product/CompleteTheLook";
+import { CATEGORIES, MATERIALS, type Category } from "@/lib/products";
 import { allDetailIds, getDetail } from "@/lib/product-details";
 
 type Props = { params: Promise<{ id: string }> };
@@ -14,6 +15,16 @@ type Props = { params: Promise<{ id: string }> };
 export function generateStaticParams() {
     return allDetailIds().map((id) => ({ id }));
 }
+
+// Trail crumbs that map onto a catalogue facet become links; ranges we cannot filter by stay text.
+const crumbHref = (crumb: string) =>
+    crumb === "Archive"
+        ? "/collections"
+        : CATEGORIES.includes(crumb as Category)
+            ? `/collections?category=${encodeURIComponent(crumb)}`
+            : MATERIALS.includes(crumb)
+                ? `/collections?material=${encodeURIComponent(crumb)}`
+                : null;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { id } = await params;
@@ -33,12 +44,15 @@ export default async function ProductPage({ params }: Props) {
                 <div className="wrap pb-16 pt-6 md:pb-24">
                     <nav aria-label="Breadcrumb" className="label-sm text-[10px] tracking-[0.14em] text-muted">
                         <ol className="flex flex-wrap items-center gap-2">
-                            {p.breadcrumb.map((b) => (
-                                <li key={b} className="flex items-center gap-2">
-                                    <Link href="#" className="hover:text-ink">{b}</Link>
-                                    <span aria-hidden>/</span>
-                                </li>
-                            ))}
+                            {p.breadcrumb.map((b) => {
+                                const href = crumbHref(b);
+                                return (
+                                    <li key={b} className="flex items-center gap-2">
+                                        {href ? <Link href={href} className="hover:text-ink">{b}</Link> : <span>{b}</span>}
+                                        <span aria-hidden>/</span>
+                                    </li>
+                                );
+                            })}
                             <li aria-current="page" className="text-ink">{p.name}</li>
                         </ol>
                     </nav>

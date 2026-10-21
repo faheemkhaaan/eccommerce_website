@@ -1,15 +1,20 @@
 import Link from "next/link";
-import Image from "next/image";
-import { images } from "@/lib/images";
-import { SearchIcon, HeartIcon } from "./Icons";
+import SearchField from "./SearchField";
 import BagButton from "./cart/BagButton";
+import AccountMenu from "./auth/AccountMenu";
 
-const links = ["New In", "Apparel", "Objects & Living", "Editorial", "Archive"];
-const WISHLIST_COUNT = 2; // replace with real state
+// Every entry maps onto a real destination: the catalogue facets, or the journal archive.
+const links = [
+  { label: "New In", href: "/collections?badge=New%20In" },
+  { label: "Apparel", href: "/collections?category=Apparel" },
+  { label: "Objects & Living", href: "/collections?category=Objects%20%26%20Living" },
+  { label: "Editorial", href: "/journal" },
+  { label: "Archive", href: "/journal#archive" },
+];
 
-type Props = { variant?: "overlay" | "solid"; active?: string, loggedIn?: boolean };
+type Props = { variant?: "overlay" | "solid"; active?: string };
 
-export default function Header({ variant = "overlay", active, loggedIn = false }: Props) {
+export default function Header({ variant = "overlay", active }: Props) {
   const solid = variant === "solid";
   const badge = `absolute -right-1.5 -top-1.5 grid size-4 place-items-center rounded-full text-[9px] ${solid ? "bg-ink text-white" : "bg-white text-ink"}`;
 
@@ -24,13 +29,13 @@ export default function Header({ variant = "overlay", active, loggedIn = false }
         <nav aria-label="Primary" className="hidden lg:block">
           <ul className="flex gap-7 text-[11px] uppercase tracking-[0.12em]">
             {links.map((l) => (
-              <li key={l}>
+              <li key={l.label}>
                 <Link
-                  href="#"
-                  aria-current={active === l ? "page" : undefined}
-                  className={`pb-1 transition ${active === l ? "border-b border-current" : "opacity-80 hover:opacity-100"}`}
+                  href={l.href}
+                  aria-current={active === l.label ? "page" : undefined}
+                  className={`pb-1 transition ${active === l.label ? "border-b border-current" : "opacity-80 hover:opacity-100"}`}
                 >
-                  {l}
+                  {l.label}
                 </Link>
               </li>
             ))}
@@ -38,37 +43,15 @@ export default function Header({ variant = "overlay", active, loggedIn = false }
         </nav>
 
         <div className="ml-auto flex items-center gap-4">
-          <label
-            className={`hidden items-center gap-2 rounded-full border px-3.5 py-1.5 md:flex ${solid ? "border-line bg-sand" : "border-white/25 bg-white/15 backdrop-blur-md"
-              }`}
-          >
-            <SearchIcon size={14} />
-            <input
-              type="search"
-              placeholder="Search atelier collection…"
-              aria-label="Search"
-              className={`w-36 bg-transparent text-xs outline-none lg:w-44 ${solid ? "placeholder:text-muted" : "text-white placeholder:text-white/70"}`}
-            />
-          </label>
+          <SearchField solid={solid} />
 
-
-          {
-            loggedIn ? (
-              <div className="flex gap-4">
-                <button type="button" className="hidden text-[11px] tracking-wider md:block">USD ($)</button>
-                <button type="button" aria-label={`Wishlist, ${WISHLIST_COUNT} items`} className="relative">
-                  <HeartIcon /><span className={badge}>{WISHLIST_COUNT}</span>
-                </button>
-                <BagButton badgeClass={badge} />
-                <Image src={images.avatar} alt="Your account" width={28} height={28} className="size-7 rounded-full bg-[#d8d0c2] object-cover" />
-              </div>
-            ) : (
-              <div className="flex gap-4 text-white">
-                <Link className="text-white uppercase text-[11px] tracking-[0.12em] cursor-pointer opacity-80 hover:opacity-100 " href={"/login"}>signin</Link>
-                <Link className="text-white uppercase text-[11px] tracking-[0.12em] cursor-pointer opacity-80 hover:opacity-100" href={"/register"}>signup</Link>
-              </div>
-            )
-          }
+          {/* Guests see the bag too, so browsing → basket → sign-in works from any page.
+              AccountMenu renders the sign-in state and swaps to the avatar once signed in. */}
+          <div className="flex items-center gap-4">
+            <span className="hidden text-[11px] tracking-wider md:block">USD ($)</span>
+            <BagButton badgeClass={badge} />
+            <AccountMenu solid={solid} />
+          </div>
 
         </div>
       </div >

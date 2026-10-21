@@ -1,0 +1,836 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="./"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>ÉPURE Atelier</title><meta name="description" content="Documentation for ÉPURE Atelier"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container"><a href="index.html" class="title">ÉPURE Atelier</a>
+<div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/>
+<ul role="listbox" id="tsd-search-results"></ul>
+<div id="tsd-search-status" aria-live="polite" aria-atomic="true">
+<div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></header>
+<div class="container container-main">
+<div class="col-content">
+<div class="tsd-page-title">
+<h1>ÉPURE Atelier</h1></div>
+<div class="tsd-panel tsd-typography"><h1 id="épure-atelier-code-wiki" class="tsd-anchor-link">ÉPURE Atelier — Code Wiki<a href="#épure-atelier-code-wiki" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1>
+<p>Structured technical documentation for the <code>eccomerce_website</code> repository: a luxury
+fashion/lifestyle <strong>e-commerce storefront</strong> built with <strong>Next.js 16 (App Router)</strong>,
+<strong>React 19</strong>, <strong>Tailwind CSS v4</strong>, <strong>Supabase</strong> (auth) and <strong>Zustand</strong> (client state).</p>
+<hr>
+<h2 id="1-overview" class="tsd-anchor-link">1. Overview<a href="#1-overview" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Project name</td>
+<td><code>eccomerce_website</code> (brand: <strong>ÉPURE Atelier</strong>)</td>
+</tr>
+<tr>
+<td>Framework</td>
+<td>Next.js <code>16.4.1</code> (App Router, Turbopack)</td>
+</tr>
+<tr>
+<td>UI runtime</td>
+<td>React <code>19.3.0</code> / React DOM <code>19.3.0</code></td>
+</tr>
+<tr>
+<td>Language</td>
+<td>TypeScript <code>^5</code> (strict)</td>
+</tr>
+<tr>
+<td>Styling</td>
+<td>Tailwind CSS <code>^4</code> via <code>@tailwindcss/turbopack</code></td>
+</tr>
+<tr>
+<td>Animation</td>
+<td><code>framer-motion</code> <code>^14</code></td>
+</tr>
+<tr>
+<td>Icons</td>
+<td>Custom SVG set (<code>components/Icons.tsx</code>) + <code>lucide-react</code> <code>^1.59</code> (404 shell only)</td>
+</tr>
+<tr>
+<td>Client state</td>
+<td><code>zustand</code> <code>^5</code></td>
+</tr>
+<tr>
+<td>Backend / auth</td>
+<td>Supabase — <code>@supabase/ssr</code> <code>^0.12</code>, <code>@supabase/supabase-js</code> <code>^2.118</code></td>
+</tr>
+<tr>
+<td>Package manager</td>
+<td><code>pnpm@12.4.1</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="scripts-packagejsonfilehomefaheemprojectseccomerce_websitepackagejson" class="tsd-anchor-link">Scripts ([package.json](file:///home/faheem/projects/eccomerce_website/package.json))<a href="#scripts-packagejsonfilehomefaheemprojectseccomerce_websitepackagejson" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<pre><code class="bash"><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-2">dev</span><span class="hl-1">     </span><span class="hl-3"># next dev      — start dev server on http://localhost:3000</span><br/><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-2">build</span><span class="hl-1">   </span><span class="hl-3"># next build    — production build</span><br/><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-2">start</span><span class="hl-1">   </span><span class="hl-3"># next start    — serve the production build</span><br/><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-2">lint</span><span class="hl-1">    </span><span class="hl-3"># eslint        — run ESLint (flat config)</span>
+</code><button type="button">Copy</button></pre>
+
+<blockquote>
+<p><strong>Next.js version caveat:</strong> This repo pins <strong>Next.js 16</strong>, which reintroduced
+breaking conventions. Notably the request interceptor formerly called
+<code>middleware.ts</code> is now <strong><code>proxy.ts</code></strong> exporting a <code>proxy()</code> function
+([proxy.ts](file:///home/faheem/projects/eccomerce_website/proxy.ts)). See the note in
+[<a href="http://AGENTS.md">AGENTS.md</a>](file:///home/faheem/projects/eccomerce_website/AGENTS.md) and consult
+<code>node_modules/next/dist/docs/</code> before changing framework code.</p>
+</blockquote>
+<hr>
+<h2 id="2-high-level-architecture" class="tsd-anchor-link">2. High-Level Architecture<a href="#2-high-level-architecture" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>The app is a classic <strong>layered App Router</strong> project with four concerns:</p>
+<pre><code><span class="hl-1">┌──────────────────────────────────────────────────────────────┐</span><br/><span class="hl-1">│ </span><span class="hl-4">app</span><span class="hl-1">/            </span><span class="hl-4">Routing</span><span class="hl-1">, </span><span class="hl-4">pages</span><span class="hl-1">, </span><span class="hl-4">route</span><span class="hl-1"> </span><span class="hl-4">handlers</span><span class="hl-1">, </span><span class="hl-4">layout</span><span class="hl-1">, </span><span class="hl-5">CSS</span><span class="hl-1">  │  ← </span><span class="hl-4">delivery</span><span class="hl-1"> </span><span class="hl-4">layer</span><br/><span class="hl-1">├──────────────────────────────────────────────────────────────┤</span><br/><span class="hl-1">│ </span><span class="hl-4">components</span><span class="hl-1">/     </span><span class="hl-4">Presentational</span><span class="hl-1"> + </span><span class="hl-4">interactive</span><span class="hl-1"> </span><span class="hl-0">UI</span><span class="hl-1"> (</span><span class="hl-4">client</span><span class="hl-1">/     │  ← </span><span class="hl-4">view</span><span class="hl-1"> </span><span class="hl-4">layer</span><br/><span class="hl-1">│                 </span><span class="hl-4">server</span><span class="hl-1"> </span><span class="hl-4">components</span><span class="hl-1">)                           │</span><br/><span class="hl-1">├──────────────────────────────────────────────────────────────┤</span><br/><span class="hl-1">│ </span><span class="hl-4">lib</span><span class="hl-1">/            </span><span class="hl-4">Domain</span><span class="hl-1"> </span><span class="hl-4">data</span><span class="hl-1">, </span><span class="hl-4">business</span><span class="hl-1"> </span><span class="hl-4">logic</span><span class="hl-1">, </span><span class="hl-4">Supabase</span><span class="hl-1">        │  ← </span><span class="hl-4">domain</span><span class="hl-1"> </span><span class="hl-4">layer</span><br/><span class="hl-1">│                 </span><span class="hl-4">clients</span><span class="hl-1">, </span><span class="hl-4">helpers</span><span class="hl-1">                             │</span><br/><span class="hl-1">├──────────────────────────────────────────────────────────────┤</span><br/><span class="hl-1">│ </span><span class="hl-4">stores</span><span class="hl-1">/         </span><span class="hl-4">Global</span><span class="hl-1"> </span><span class="hl-4">client</span><span class="hl-1"> </span><span class="hl-0">state</span><span class="hl-1"> (</span><span class="hl-4">Zustand</span><span class="hl-1">)                │  ← </span><span class="hl-4">state</span><span class="hl-1"> </span><span class="hl-4">layer</span><br/><span class="hl-1">└──────────────────────────────────────────────────────────────┘</span><br/><span class="hl-1">            ▲                                        ▲</span><br/><span class="hl-1">            │ </span><span class="hl-4">cross</span><span class="hl-1">-</span><span class="hl-4">cutting</span><span class="hl-1">                          │ </span><span class="hl-4">request</span><span class="hl-1"> </span><span class="hl-4">interception</span><br/><span class="hl-1">        </span><span class="hl-4">proxy</span><span class="hl-1">.</span><span class="hl-0">ts</span><span class="hl-1"> (</span><span class="hl-4">session</span><span class="hl-1"> </span><span class="hl-4">refresh</span><span class="hl-1"> + </span><span class="hl-4">route</span><span class="hl-1"> </span><span class="hl-4">guard</span><span class="hl-1">)   </span><span class="hl-4">globals</span><span class="hl-1">.</span><span class="hl-0">css</span><span class="hl-1"> (</span><span class="hl-4">design</span><span class="hl-1"> </span><span class="hl-4">tokens</span><span class="hl-1">)</span>
+</code><button>Copy</button></pre>
+
+<p><strong>Data flow, in one sentence:</strong> <code>app/*</code> pages compose <code>components/*</code>, which read static
+catalog data from <code>lib/*</code> and interactive state from the <code>CartProvider</code> / <code>AuthProvider</code>
+React contexts; authentication is brokered by Supabase through the browser client
+(<code>lib/supabase/client.ts</code>), refreshed per-request by <code>proxy.ts</code>
+(<code>lib/supabase/proxy.ts</code>), and mirrored into a Zustand store
+([stores/auth-store.ts](file:///home/faheem/projects/eccomerce_website/stores/auth-store.ts)).</p>
+<h3 id="directory-map" class="tsd-anchor-link">Directory map<a href="#directory-map" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<pre><code><span class="hl-4">eccomerce_website</span><span class="hl-1">/</span><br/><span class="hl-1">├── </span><span class="hl-4">app</span><span class="hl-1">/                      # </span><span class="hl-4">Next</span><span class="hl-1">.</span><span class="hl-4">js</span><span class="hl-1"> </span><span class="hl-4">App</span><span class="hl-1"> </span><span class="hl-4">Router</span><br/><span class="hl-1">│   ├── </span><span class="hl-4">layout</span><span class="hl-1">.</span><span class="hl-4">tsx</span><span class="hl-1">            # </span><span class="hl-4">Root</span><span class="hl-1"> </span><span class="hl-4">layout</span><span class="hl-1"> + </span><span class="hl-4">global</span><span class="hl-1"> </span><span class="hl-4">providers</span><br/><span class="hl-1">│   ├── </span><span class="hl-4">page</span><span class="hl-1">.</span><span class="hl-4">tsx</span><span class="hl-1">              # </span><span class="hl-2">&quot;/&quot;</span><span class="hl-1"> </span><span class="hl-4">marketing</span><span class="hl-1"> </span><span class="hl-4">homepage</span><br/><span class="hl-1">│   ├── </span><span class="hl-4">globals</span><span class="hl-1">.</span><span class="hl-4">css</span><span class="hl-1">           # </span><span class="hl-4">Tailwind</span><span class="hl-1"> </span><span class="hl-4">theme</span><span class="hl-1"> </span><span class="hl-4">tokens</span><span class="hl-1"> &amp; @</span><span class="hl-4">utility</span><span class="hl-1"> </span><span class="hl-4">classes</span><br/><span class="hl-1">│   ├── </span><span class="hl-4">not</span><span class="hl-1">-</span><span class="hl-4">found</span><span class="hl-1">.</span><span class="hl-4">tsx</span><span class="hl-1">         # </span><span class="hl-4">Custom</span><span class="hl-1"> </span><span class="hl-6">404</span><span class="hl-1"> (</span><span class="hl-4">atelier</span><span class="hl-1"> </span><span class="hl-4">shell</span><span class="hl-1">)</span><br/><span class="hl-1">│   ├── </span><span class="hl-4">collections</span><span class="hl-1">/</span><span class="hl-4">page</span><span class="hl-1">.</span><span class="hl-4">tsx</span><span class="hl-1">  # </span><span class="hl-2">&quot;/collections&quot;</span><span class="hl-1"> </span><span class="hl-4">catalog</span><br/><span class="hl-1">│   ├── </span><span class="hl-4">products</span><span class="hl-1">/[</span><span class="hl-4">id</span><span class="hl-1">]/</span><span class="hl-4">page</span><span class="hl-1">.</span><span class="hl-4">tsx</span><span class="hl-1"># </span><span class="hl-2">&quot;/products/:id&quot;</span><span class="hl-1"> </span><span class="hl-0">detail</span><span class="hl-1"> (</span><span class="hl-5">SSG</span><span class="hl-1">)</span><br/><span class="hl-1">│   ├── </span><span class="hl-4">login</span><span class="hl-1">/</span><span class="hl-4">page</span><span class="hl-1">.</span><span class="hl-4">tsx</span><span class="hl-1">        # </span><span class="hl-2">&quot;/login&quot;</span><br/><span class="hl-1">│   ├── </span><span class="hl-4">register</span><span class="hl-1">/</span><span class="hl-4">page</span><span class="hl-1">.</span><span class="hl-4">tsx</span><span class="hl-1">     # </span><span class="hl-2">&quot;/register&quot;</span><br/><span class="hl-1">│   └── </span><span class="hl-4">auth</span><span class="hl-1">/</span><br/><span class="hl-1">│       ├── </span><span class="hl-4">confirm</span><span class="hl-1">/</span><span class="hl-4">route</span><span class="hl-1">.</span><span class="hl-4">ts</span><span class="hl-1">  # </span><span class="hl-5">GET</span><span class="hl-1"> </span><span class="hl-4">email</span><span class="hl-1">-</span><span class="hl-5">OTP</span><span class="hl-1"> </span><span class="hl-4">verification</span><span class="hl-1"> </span><span class="hl-4">handler</span><br/><span class="hl-1">│       └── </span><span class="hl-4">error</span><span class="hl-1">/</span><span class="hl-4">page</span><span class="hl-1">.</span><span class="hl-4">tsx</span><span class="hl-1">    # </span><span class="hl-4">Expired</span><span class="hl-1">-</span><span class="hl-4">link</span><span class="hl-1"> </span><span class="hl-4">page</span><br/><span class="hl-1">├── </span><span class="hl-4">components</span><span class="hl-1">/               # </span><span class="hl-0">UI</span><span class="hl-1"> (</span><span class="hl-4">see</span><span class="hl-1"> §</span><span class="hl-6">4</span><span class="hl-1">)</span><br/><span class="hl-1">│   ├── </span><span class="hl-4">atelier</span><span class="hl-1">/              # </span><span class="hl-6">404</span><span class="hl-1">-</span><span class="hl-4">page</span><span class="hl-1"> </span><span class="hl-4">specific</span><span class="hl-1"> </span><span class="hl-4">components</span><br/><span class="hl-1">│   ├── </span><span class="hl-4">auth</span><span class="hl-1">/                 # </span><span class="hl-4">Auth</span><span class="hl-1"> </span><span class="hl-4">forms</span><span class="hl-1"> + </span><span class="hl-4">providers</span><br/><span class="hl-1">│   ├── </span><span class="hl-4">cart</span><span class="hl-1">/                 # </span><span class="hl-4">Cart</span><span class="hl-1"> </span><span class="hl-4">context</span><span class="hl-1">, </span><span class="hl-4">drawer</span><span class="hl-1">, </span><span class="hl-4">bag</span><span class="hl-1"> </span><span class="hl-4">button</span><br/><span class="hl-1">│   ├── </span><span class="hl-4">product</span><span class="hl-1">/              # </span><span class="hl-4">Product</span><span class="hl-1">-</span><span class="hl-4">detail</span><span class="hl-1"> </span><span class="hl-4">widgets</span><br/><span class="hl-1">│   └── *.</span><span class="hl-4">tsx</span><span class="hl-1">                 # </span><span class="hl-4">Homepage</span><span class="hl-1"> </span><span class="hl-4">sections</span><span class="hl-1"> &amp; </span><span class="hl-4">shared</span><span class="hl-1"> </span><span class="hl-4">widgets</span><br/><span class="hl-1">├── </span><span class="hl-4">lib</span><span class="hl-1">/                      # </span><span class="hl-4">Domain</span><span class="hl-1"> </span><span class="hl-4">logic</span><span class="hl-1"> &amp; </span><span class="hl-0">data</span><span class="hl-1"> (</span><span class="hl-4">see</span><span class="hl-1"> §</span><span class="hl-6">3</span><span class="hl-1">)</span><br/><span class="hl-1">│   └── </span><span class="hl-4">supabase</span><span class="hl-1">/             # </span><span class="hl-4">Browser</span><span class="hl-1"> / </span><span class="hl-4">server</span><span class="hl-1"> / </span><span class="hl-4">proxy</span><span class="hl-1"> </span><span class="hl-4">clients</span><br/><span class="hl-1">├── </span><span class="hl-4">stores</span><span class="hl-1">/</span><span class="hl-4">auth</span><span class="hl-1">-</span><span class="hl-4">store</span><span class="hl-1">.</span><span class="hl-4">ts</span><span class="hl-1">      # </span><span class="hl-4">Zustand</span><span class="hl-1"> </span><span class="hl-4">auth</span><span class="hl-1"> </span><span class="hl-4">store</span><br/><span class="hl-1">├── </span><span class="hl-4">proxy</span><span class="hl-1">.</span><span class="hl-4">ts</span><span class="hl-1">                  # </span><span class="hl-4">Next</span><span class="hl-1"> </span><span class="hl-6">16</span><span class="hl-1"> </span><span class="hl-4">request</span><span class="hl-1"> </span><span class="hl-0">interceptor</span><span class="hl-1"> (</span><span class="hl-4">session</span><span class="hl-1">)</span><br/><span class="hl-1">├── </span><span class="hl-4">next</span><span class="hl-1">.</span><span class="hl-4">config</span><span class="hl-1">.</span><span class="hl-4">ts</span><span class="hl-1">            # </span><span class="hl-4">cacheComponents</span><span class="hl-1">, </span><span class="hl-4">turbopack</span><span class="hl-1">, </span><span class="hl-4">image</span><span class="hl-1"> </span><span class="hl-4">hosts</span><br/><span class="hl-1">├── </span><span class="hl-4">tsconfig</span><span class="hl-1">.</span><span class="hl-4">json</span><span class="hl-1">             # </span><span class="hl-4">Path</span><span class="hl-1"> </span><span class="hl-4">alias</span><span class="hl-1"> @</span><span class="hl-3">/* -&gt; ./*</span><br/><span class="hl-3">└── eslint.config.mjs         # next/core-web-vitals + typescript</span>
+</code><button>Copy</button></pre>
+
+<hr>
+<h2 id="3-domain-layer-" class="tsd-anchor-link">3. Domain Layer — <code>lib/</code><a href="#3-domain-layer-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<h3 id="31-supabase-clients-" class="tsd-anchor-link">3.1 Supabase clients (<code>lib/supabase/</code>)<a href="#31-supabase-clients-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Export</th>
+<th>Runtime</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[client.ts](file:///home/faheem/projects/eccomerce_website/lib/supabase/client.ts)</td>
+<td><code>createClient()</code></td>
+<td>Browser</td>
+<td><code>createBrowserClient</code> for Client Components (auth, realtime).</td>
+</tr>
+<tr>
+<td>[server.ts](file:///home/faheem/projects/eccomerce_website/lib/supabase/server.ts)</td>
+<td><code>createClient()</code> (async)</td>
+<td>Server</td>
+<td><code>createServerClient</code> bound to <code>next/headers</code> cookies. <code>setAll</code> is wrapped in <code>try/catch</code> because Server Components cannot write cookies; refresh is delegated to <code>proxy.ts</code>.</td>
+</tr>
+<tr>
+<td>[proxy.ts](file:///home/faheem/projects/eccomerce_website/lib/supabase/proxy.ts)</td>
+<td><code>updateSession(request)</code></td>
+<td>Edge/Node (proxy)</td>
+<td>Refreshes the auth token via <code>supabase.auth.getClaims()</code>, rewrites response cookies, and redirects unauthenticated users away from <code>PROTECTED</code> paths.</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>updateSession()</code> behaviour</strong></p>
+<ul>
+<li><code>PROTECTED = [&quot;/account&quot;]</code> — only <code>/account*</code> is gated; guests may still checkout/track COD orders.</li>
+<li>Uses <code>getClaims()</code> (never <code>getSession()</code>) so the JWT is verified server-side.</li>
+<li>On a protected path with no session, redirects to <code>/login?next=&lt;originalPath&gt;</code> and re-attaches refreshed cookies so the browser's session is not lost.</li>
+</ul>
+<p><strong>Note on config:</strong> the request interceptor is [proxy.ts](file:///home/faheem/projects/eccomerce_website/proxy.ts)
+at the repo root, which simply re-exports <code>updateSession</code> and declares the matcher
+(excludes <code>_next/static</code>, <code>_next/image</code>, <code>favicon.ico</code>, and image extensions).</p>
+<h3 id="32-catalog-data" class="tsd-anchor-link">3.2 Catalog data<a href="#32-catalog-data" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>There are <strong>three distinct product data sources</strong> (a maintainability caveat — see §7):</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+<th>Currency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[products.ts](file:///home/faheem/projects/eccomerce_website/lib/products.ts)</td>
+<td>Canonical storefront catalog used by <code>/collections</code> and <code>/products/[id]</code>.</td>
+<td>USD</td>
+</tr>
+<tr>
+<td>[atelier-data.ts](file:///home/faheem/projects/eccomerce_website/lib/atelier-data.ts)</td>
+<td>Content for the <strong>404 shell</strong> (<code>hero-404</code>, <code>product-showcase</code>, <code>site-footer</code>).</td>
+<td>PKR (strings)</td>
+</tr>
+<tr>
+<td>[Selection.tsx](file:///home/faheem/projects/eccomerce_website/components/Selection.tsx)</td>
+<td>Homepage &quot;Édition 08 Selection&quot; carousel has its own inline array.</td>
+<td>USD (strings)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>[products.ts](file:///home/faheem/projects/eccomerce_website/lib/products.ts)</strong></p>
+<ul>
+<li><code>PALETTE</code> — 8 named colorway hex values (<code>Noir</code>, <code>Ivory</code>, <code>Sand</code>, <code>Stone</code>, <code>Tan</code>, <code>Brass</code>, <code>Oat</code>, <code>Cocoa</code>).</li>
+<li>Types: <code>PaletteName</code>, <code>Category</code> (<code>&quot;Apparel&quot; | &quot;Objects &amp; Living&quot; | &quot;Accessories&quot;</code>), <code>Badge</code> (<code>&quot;New In&quot; | &quot;Bestseller&quot; | &quot;Only 2 Left&quot;</code>), and <code>Product</code>.</li>
+<li><code>PRODUCTS: Product[]</code> — 12 items, each with <code>id</code>, <code>name</code>, <code>price</code>, <code>detail</code>, <code>image</code>, optional <code>badge</code>, <code>category</code>, <code>material</code>, <code>palette[]</code>.</li>
+<li>Images are generated by cycling a fixed Unsplash pool via <code>img(i) = u(pool[i % len], 800)</code>.</li>
+</ul>
+<p><strong>[product-details.ts](file:///home/faheem/projects/eccomerce_website/lib/product-details.ts)</strong></p>
+<ul>
+<li><code>Detail</code> type — the rich shape consumed by the product page (<code>colorways</code>, <code>sizes</code>, <code>gallery</code>, <code>sections</code>, <code>ensemble</code>, <code>stockLeft</code>, <code>rating</code>, …).</li>
+<li><code>trench</code> — a hand-authored exemplar detail object (<code>sculptural-wool-trench</code>).</li>
+<li><code>fromListing(id)</code> — <em>(private)</em> programmatically derives a <code>Detail</code> from any <code>PRODUCTS</code> entry so every catalog card resolves on <code>/products/[id]</code>. Reuses the <code>trench</code> template and substitutes name/price/palette/gallery.</li>
+<li><code>getDetail(id)</code> — lookup: returns <code>trench</code> for its id, else <code>fromListing(id)</code>.</li>
+<li><code>allDetailIds()</code> — <code>[trench.id, ...PRODUCTS ids]</code>; feeds <code>generateStaticParams</code> for static generation.</li>
+</ul>
+<p><strong>[images.ts](file:///home/faheem/projects/eccomerce_website/lib/images.ts)</strong></p>
+<ul>
+<li><code>ids</code> — 6 hard-coded Unsplash photo IDs (<code>trench</code>, <code>rack</code>, <code>jackets</code>, <code>hangers</code>, <code>knitStack</code>, <code>greyKnit</code>).</li>
+<li><code>u(id, w)</code> — builds the <code>unsplash.com/photos/&lt;id&gt;/download?force=true&amp;w=&lt;w&gt;</code> URL.</li>
+<li><code>images</code> — a named map of pre-built URLs (<code>hero</code>…<code>hero5</code>, <code>p1</code>…<code>p6</code>, <code>craftHands</code>, <code>craftLoom</code>, <code>community[]</code>, <code>provenance</code>, <code>cat*</code>, <code>avatar</code>).</li>
+</ul>
+<h3 id="33-cart-math-cart-mathtsfilehomefaheemprojectseccomerce_websitelibcart-mathts" class="tsd-anchor-link">3.3 Cart math — [cart-math.ts](file:///home/faheem/projects/eccomerce_website/lib/cart-math.ts)<a href="#33-cart-math-cart-mathtsfilehomefaheemprojectseccomerce_websitelibcart-mathts" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<pre><code class="ts"><span class="hl-5">FREE_SHIPPING_FROM</span><span class="hl-1"> = </span><span class="hl-6">250</span><span class="hl-1">   </span><span class="hl-3">// free shipping threshold (USD)</span><br/><span class="hl-5">SHIPPING_FLAT</span><span class="hl-1">      = </span><span class="hl-6">18</span><span class="hl-1">    </span><span class="hl-3">// flat rate below threshold</span><br/><span class="hl-5">TAX_RATE</span><span class="hl-1">           = </span><span class="hl-6">0.08</span><span class="hl-1">  </span><span class="hl-3">// 8% estimated tax</span><br/><span class="hl-5">GIFT_PACKAGING_FROM</span><span class="hl-1">= </span><span class="hl-6">1000</span><span class="hl-1">  </span><span class="hl-3">// gift-packaging progress target</span><br/><br/><span class="hl-0">money</span><span class="hl-1">(</span><span class="hl-4">n</span><span class="hl-1">)                 </span><span class="hl-3">// Intl &quot;en-US&quot; currency formatter</span><br/><span class="hl-0">summarize</span><span class="hl-1">(</span><span class="hl-4">subtotal</span><span class="hl-1">)      </span><span class="hl-3">// -&gt; { subtotal, shipping, tax, total }</span>
+</code><button type="button">Copy</button></pre>
+
+<p><code>summarize</code> applies free shipping at <code>0</code> or <code>&gt;= FREE_SHIPPING_FROM</code>, rounds tax to 2dp, and returns the total. Consumed by [CartDrawer](file:///home/faheem/projects/eccomerce_website/components/cart/CartDrawer.tsx).</p>
+<h3 id="34-auth-helpers-auth-clienttsfilehomefaheemprojectseccomerce_websitelibauth-clientts" class="tsd-anchor-link">3.4 Auth helpers — [auth-client.ts](file:///home/faheem/projects/eccomerce_website/lib/auth-client.ts)<a href="#34-auth-helpers-auth-clienttsfilehomefaheemprojectseccomerce_websitelibauth-clientts" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>registerAccount(payload)</code></td>
+<td><code>supabase.auth.signUp</code> with profile metadata (<code>full_name</code>, <code>phone</code>, <code>size</code>, <code>city</code>, <code>address</code>, <code>notify_whatsapp</code>). Maps Supabase errors to friendly messages; detects already-registered emails via <code>identities.length === 0</code>. Comment notes a <strong>SQL trigger</strong> turns metadata into profile + default address rows.</td>
+</tr>
+<tr>
+<td><code>signInWithPassword(email, pw)</code></td>
+<td>Email/password sign-in with a dedicated <code>email_not_confirmed</code> message.</td>
+</tr>
+<tr>
+<td><code>requestOtp(phone)</code></td>
+<td><strong>Dev stub</strong> — 700 ms delay, logs a debug line in non-production.</td>
+</tr>
+<tr>
+<td><code>verifyOtp(phone, code)</code></td>
+<td><strong>Dev stub</strong> — accepts only the hard-coded code <code>&quot;1234&quot;</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="35-open-redirect-guard-safe-nexttsfilehomefaheemprojectseccomerce_websitelibsafe-nextts" class="tsd-anchor-link">3.5 Open-redirect guard — [safe-next.ts](file:///home/faheem/projects/eccomerce_website/lib/safe-next.ts)<a href="#35-open-redirect-guard-safe-nexttsfilehomefaheemprojectseccomerce_websitelibsafe-nextts" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p><code>safeNext(n)</code> returns <code>n</code> only if it is a same-site path (<code>startsWith(&quot;/&quot;)</code> and not <code>&quot;//&quot;</code>),
+otherwise <code>&quot;/&quot;</code>. Blocks <code>https://evil.com</code> and <code>//evil.com</code> post-login redirects. Used by
+[login/page.tsx](file:///home/faheem/projects/eccomerce_website/app/login/page.tsx) and
+[auth/confirm/route.ts](file:///home/faheem/projects/eccomerce_website/app/auth/confirm/route.ts).</p>
+<hr>
+<h2 id="4-state-layer-" class="tsd-anchor-link">4. State Layer — <code>stores/</code><a href="#4-state-layer-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<h3 id="auth-storetsfilehomefaheemprojectseccomerce_websitestoresauth-storets" class="tsd-anchor-link">[auth-store.ts](file:///home/faheem/projects/eccomerce_website/stores/auth-store.ts)<a href="#auth-storetsfilehomefaheemprojectseccomerce_websitestoresauth-storets" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<pre><code class="ts"><span class="hl-7">type</span><span class="hl-1"> </span><span class="hl-8">Status</span><span class="hl-1"> = </span><span class="hl-2">&quot;loading&quot;</span><span class="hl-1"> | </span><span class="hl-2">&quot;authenticated&quot;</span><span class="hl-1"> | </span><span class="hl-2">&quot;guest&quot;</span><span class="hl-1">;</span><br/><span class="hl-4">useAuthStore</span><span class="hl-1"> = </span><span class="hl-0">create</span><span class="hl-1">&lt;</span><span class="hl-8">AuthState</span><span class="hl-1">&gt;(...)</span><br/><span class="hl-3">// { user: User | null, status: Status, setUser(user) }</span>
+</code><button type="button">Copy</button></pre>
+
+<p>A minimal Zustand store. <code>setUser(null | user)</code> derives <code>status</code> automatically
+(<code>&quot;guest&quot;</code> when null, <code>&quot;authenticated&quot;</code> otherwise; initial <code>&quot;loading&quot;</code>). It is the single
+source of truth for client-side auth UI (e.g. [AccountMenu](file:///home/faheem/projects/eccomerce_website/components/auth/AccountMenu.tsx)).</p>
+<hr>
+<h2 id="5-routing-pages-" class="tsd-anchor-link">5. Routing &amp; Pages — <code>app/</code><a href="#5-routing-pages-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<h3 id="51-root-layout-layouttsxfilehomefaheemprojectseccomerce_websiteapplayouttsx" class="tsd-anchor-link">5.1 Root layout — [layout.tsx](file:///home/faheem/projects/eccomerce_website/app/layout.tsx)<a href="#51-root-layout-layouttsxfilehomefaheemprojectseccomerce_websiteapplayouttsx" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Loads two Google fonts (Playfair Display → <code>--font-playfair</code>, Inter → <code>--font-inter</code>),
+imports <code>globals.css</code>, and nests the global providers:</p>
+<pre><code><span class="hl-0">MotionProvider</span><span class="hl-1">  (</span><span class="hl-4">prefers</span><span class="hl-1">-</span><span class="hl-4">reduced</span><span class="hl-1">-</span><span class="hl-4">motion</span><span class="hl-1"> </span><span class="hl-4">aware</span><span class="hl-1">)</span><br/><span class="hl-1">└── </span><span class="hl-0">AuthProvider</span><span class="hl-1"> (</span><span class="hl-4">Supabase</span><span class="hl-1"> </span><span class="hl-4">onAuthStateChange</span><span class="hl-1"> → </span><span class="hl-4">Zustand</span><span class="hl-1">)</span><br/><span class="hl-1">    └── </span><span class="hl-0">CartProvider</span><span class="hl-1"> (</span><span class="hl-4">useReducer</span><span class="hl-1"> + </span><span class="hl-4">localStorage</span><span class="hl-1">)</span><br/><span class="hl-1">        ├── {</span><span class="hl-4">children</span><span class="hl-1">}</span><br/><span class="hl-1">        └── &lt;</span><span class="hl-4">CartDrawer</span><span class="hl-1"> /&gt;  (</span><span class="hl-4">global</span><span class="hl-1"> </span><span class="hl-4">slide</span><span class="hl-1">-</span><span class="hl-4">over</span><span class="hl-1">)</span>
+</code><button>Copy</button></pre>
+
+<p>Metadata: title &quot;ÉPURE Atelier&quot;.</p>
+<h3 id="52-route-table" class="tsd-anchor-link">5.2 Route table<a href="#52-route-table" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>File</th>
+<th>Type</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/</code></td>
+<td>[page.tsx](file:///home/faheem/projects/eccomerce_website/app/page.tsx)</td>
+<td>Server</td>
+<td>Marketing homepage: Header → Hero → Categories → Selection → Philosophy → Press → Community → Footer. <code>Appointment</code> is imported but commented out.</td>
+</tr>
+<tr>
+<td><code>/collections</code></td>
+<td>[collections/page.tsx](file:///home/faheem/projects/eccomerce_website/app/collections/page.tsx)</td>
+<td>Server</td>
+<td><code>CollectionHero</code> + <code>Catalog</code> + <code>Provenance</code>, wrapped in its own <code>MotionProvider</code>.</td>
+</tr>
+<tr>
+<td><code>/products/[id]</code></td>
+<td>[products/[id]/page.tsx](file:///home/faheem/projects/eccomerce_website/app/products/[id]/page.tsx)</td>
+<td>Server (SSG)</td>
+<td><code>generateStaticParams()</code> from <code>allDetailIds()</code>; <code>generateMetadata()</code> from <code>getDetail()</code>; calls <code>notFound()</code> for unknown ids. Renders breadcrumb, <code>Gallery</code>, <code>PurchasePanel</code>, <code>CompleteTheLook</code>.</td>
+</tr>
+<tr>
+<td><code>/login</code></td>
+<td>[login/page.tsx](file:///home/faheem/projects/eccomerce_website/app/login/page.tsx)</td>
+<td>Server</td>
+<td><code>LoginPromo</code> + <code>LoginCard</code> (wrapped in <code>Suspense</code> because it reads async <code>searchParams</code>), <code>TrustStrip</code>.</td>
+</tr>
+<tr>
+<td><code>/register</code></td>
+<td>[register/page.tsx](file:///home/faheem/projects/eccomerce_website/app/register/page.tsx)</td>
+<td>Server</td>
+<td><code>RegisterPromo</code> + <code>RegisterForm</code> + <code>RegisterTrust</code>.</td>
+</tr>
+<tr>
+<td><code>/auth/confirm</code></td>
+<td>[auth/confirm/route.ts](file:///home/faheem/projects/eccomerce_website/app/auth/confirm/route.ts)</td>
+<td>Route handler (<code>GET</code>)</td>
+<td>Verifies email OTP (<code>token_hash</code> + <code>type</code>) then redirects to <code>safeNext(next)</code>; on failure redirects to <code>/auth/error</code>.</td>
+</tr>
+<tr>
+<td><code>/auth/error</code></td>
+<td>[auth/error/page.tsx](file:///home/faheem/projects/eccomerce_website/app/auth/error/page.tsx)</td>
+<td>Server</td>
+<td>&quot;This link has expired&quot; + link back to <code>/login</code>.</td>
+</tr>
+<tr>
+<td><code>*</code> (404)</td>
+<td>[not-found.tsx](file:///home/faheem/projects/eccomerce_website/app/not-found.tsx)</td>
+<td>Server</td>
+<td>Renders the atelier 404 shell (see §5.3).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="53-the-404-shell-" class="tsd-anchor-link">5.3 The 404 shell (<code>components/atelier/</code>)<a href="#53-the-404-shell-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>A visually distinct &quot;Atelier Archive&quot; 404 experience assembled from dedicated
+components and content in [atelier-data.ts](file:///home/faheem/projects/eccomerce_website/lib/atelier-data.ts):</p>
+<ul>
+<li>[announcement-bar.tsx](file:///home/faheem/projects/eccomerce_website/components/atelier/announcement-bar.tsx) — <code>AnnouncementBar</code></li>
+<li>[hero-404.tsx](file:///home/faheem/projects/eccomerce_website/components/atelier/hero-404.tsx) — <code>Hero404</code> (ghost &quot;404&quot; watermark, search, CTAs, quick links)</li>
+<li>[product-showcase.tsx](file:///home/faheem/projects/eccomerce_website/components/atelier/product-showcase.tsx) — <code>ProductShowcase</code> (4 &quot;curated&quot; cards from <code>atelier-data</code>)</li>
+<li>[client-care.tsx](file:///home/faheem/projects/eccomerce_website/components/atelier/client-care.tsx) — <code>ClientCare</code> (WhatsApp / track-order CTAs)</li>
+<li>[site-footer.tsx](file:///home/faheem/projects/eccomerce_website/components/atelier/site-footer.tsx) — <code>SiteFooter</code> (newsletter, link columns, boutiques, policies)</li>
+</ul>
+<p>These use <code>lucide-react</code> icons and plain <code>&lt;img&gt;</code> tags (not <code>next/image</code>), and the
+showcase images point at an external CDN defined in <code>atelier-data.ts</code>.</p>
+<hr>
+<h2 id="6-view-layer-" class="tsd-anchor-link">6. View Layer — <code>components/</code><a href="#6-view-layer-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<h3 id="61-providers-shared-widgets" class="tsd-anchor-link">6.1 Providers &amp; shared widgets<a href="#61-providers-shared-widgets" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>File</th>
+<th>Kind</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MotionProvider</code></td>
+<td>[Motion.tsx](file:///home/faheem/projects/eccomerce_website/components/Motion.tsx)</td>
+<td>Client</td>
+<td>Wraps children in <code>MotionConfig reducedMotion=&quot;user&quot;</code>.</td>
+</tr>
+<tr>
+<td><code>Reveal</code></td>
+<td>[Motion.tsx](file:///home/faheem/projects/eccomerce_website/components/Motion.tsx)</td>
+<td>Client</td>
+<td>Fade/slide-in-on-scroll wrapper (<code>whileInView</code>, once).</td>
+</tr>
+<tr>
+<td><code>Carousel</code></td>
+<td>[Carousel.tsx](file:///home/faheem/projects/eccomerce_website/components/Carousel.tsx)</td>
+<td>Client</td>
+<td>Generic snap-scroll track with prev/next buttons, <code>ResizeObserver</code> edge detection, a11y <code>role=&quot;region&quot;</code>.</td>
+</tr>
+<tr>
+<td><code>ProductCard</code></td>
+<td>[ProductCard.tsx](file:///home/faheem/projects/eccomerce_website/components/ProductCard.tsx)</td>
+<td>Client</td>
+<td>Catalog grid card → links to <code>/products/[id]</code>; badge styling map; palette swatches.</td>
+</tr>
+<tr>
+<td><code>Icons</code></td>
+<td>[Icons.tsx](file:///home/faheem/projects/eccomerce_website/components/Icons.tsx)</td>
+<td>Shared</td>
+<td>~30 inline SVG icons (<code>SearchIcon</code>, <code>BagIcon</code>, <code>ArrowIcon</code>, <code>CheckIcon</code>, …), each <code>({ size })</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="62-homepage-sections" class="tsd-anchor-link">6.2 Homepage sections<a href="#62-homepage-sections" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>File</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Header</code></td>
+<td>[Header.tsx](file:///home/faheem/projects/eccomerce_website/components/Header.tsx)</td>
+<td><code>variant: &quot;overlay&quot; | &quot;solid&quot;</code>, <code>active</code>, <code>loggedIn</code>. Announcement bar + primary nav + search + wishlist + <code>BagButton</code> + <code>AccountMenu</code> (or Sign in/Sign up).</td>
+</tr>
+<tr>
+<td><code>Hero</code></td>
+<td>[Hero.tsx](file:///home/faheem/projects/eccomerce_website/components/Hero.tsx)</td>
+<td>5-slide auto-rotating (6 s) image carousel with progress bar &amp; dot indicators.</td>
+</tr>
+<tr>
+<td><code>Categories</code></td>
+<td>[Categories.tsx](file:///home/faheem/projects/eccomerce_website/components/Categories.tsx)</td>
+<td>3-tile editorial category grid.</td>
+</tr>
+<tr>
+<td><code>Selection</code></td>
+<td>[Selection.tsx](file:///home/faheem/projects/eccomerce_website/components/Selection.tsx)</td>
+<td>&quot;Édition 08&quot; product carousel (inline product array).</td>
+</tr>
+<tr>
+<td><code>Philosophy</code></td>
+<td>[Philosophy.tsx](file:///home/faheem/projects/eccomerce_website/components/Philosophy.tsx)</td>
+<td>Brand story with stats.</td>
+</tr>
+<tr>
+<td><code>Press</code></td>
+<td>[Press.tsx](file:///home/faheem/projects/eccomerce_website/components/Press.tsx)</td>
+<td>3 press quotes.</td>
+</tr>
+<tr>
+<td><code>Community</code></td>
+<td>[Community.tsx](file:///home/faheem/projects/eccomerce_website/components/Community.tsx)</td>
+<td>UGC photo carousel.</td>
+</tr>
+<tr>
+<td><code>Appointment</code></td>
+<td>[Appointment.tsx](file:///home/faheem/projects/eccomerce_website/components/Appointment.tsx)</td>
+<td>Private-appointment CTA band (<strong>currently commented out</strong> in <code>app/page.tsx</code>).</td>
+</tr>
+<tr>
+<td><code>Footer</code></td>
+<td>[Footer.tsx](file:///home/faheem/projects/eccomerce_website/components/Footer.tsx)</td>
+<td>Newsletter + link columns + presence + policies.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="63-cart-" class="tsd-anchor-link">6.3 Cart (<code>components/cart/</code>)<a href="#63-cart-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>File</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CartProvider</code> / <code>useCart</code></td>
+<td>[CartProvider.tsx](file:///home/faheem/projects/eccomerce_website/components/cart/CartProvider.tsx)</td>
+<td><code>useReducer</code> cart; localStorage persistence (<code>epure-bag-v1</code>); exposes <code>items, count, subtotal, isOpen, open, close, add, setQty, remove</code>.</td>
+</tr>
+<tr>
+<td><code>CartDrawer</code></td>
+<td>[CartDrawer.tsx](file:///home/faheem/projects/eccomerce_website/components/cart/CartDrawer.tsx)</td>
+<td>Slide-over dialog: scroll-lock, <code>Escape</code> to close, manual <strong>focus trap</strong>, gift-packaging progress, shipping/tax/total, express-checkout placeholders, checkout CTA.</td>
+</tr>
+<tr>
+<td><code>BagButton</code></td>
+<td>[BagButton.tsx](file:///home/faheem/projects/eccomerce_website/components/cart/BagButton.tsx)</td>
+<td>Header bag icon with animated count badge.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Cart model</strong></p>
+<pre><code class="ts"><span class="hl-7">type</span><span class="hl-1"> </span><span class="hl-8">CartItem</span><span class="hl-1"> = { </span><span class="hl-4">key</span><span class="hl-1">; </span><span class="hl-4">id</span><span class="hl-1">; </span><span class="hl-4">name</span><span class="hl-1">; </span><span class="hl-4">image</span><span class="hl-1">; </span><span class="hl-4">options</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">[]; </span><span class="hl-4">price</span><span class="hl-1">; </span><span class="hl-4">qty</span><span class="hl-1"> };</span><br/><span class="hl-7">type</span><span class="hl-1"> </span><span class="hl-8">NewItem</span><span class="hl-1">  = </span><span class="hl-8">Omit</span><span class="hl-1">&lt;</span><span class="hl-8">CartItem</span><span class="hl-1">, </span><span class="hl-2">&quot;key&quot;</span><span class="hl-1"> | </span><span class="hl-2">&quot;qty&quot;</span><span class="hl-1">&gt; &amp; { </span><span class="hl-4">qty</span><span class="hl-1">?: </span><span class="hl-8">number</span><span class="hl-1"> };</span><br/><span class="hl-0">keyOf</span><span class="hl-1">(</span><span class="hl-4">item</span><span class="hl-1">) = [</span><span class="hl-4">id</span><span class="hl-1">, ...</span><span class="hl-4">options</span><span class="hl-1">].</span><span class="hl-0">join</span><span class="hl-1">(</span><span class="hl-2">&quot;|&quot;</span><span class="hl-1">);   </span><span class="hl-3">// line-item identity</span><br/><span class="hl-5">MAX_QTY</span><span class="hl-1"> = </span><span class="hl-6">9</span><span class="hl-1">;                                 </span><span class="hl-3">// per line cap</span>
+</code><button type="button">Copy</button></pre>
+
+<p>Reducer actions: <code>hydrate</code>, <code>add</code> (merges by key, caps qty), <code>qty</code>, <code>remove</code>.
+Hydration runs <strong>after mount</strong> so SSR and client markup match.</p>
+<h3 id="64-authentication-" class="tsd-anchor-link">6.4 Authentication (<code>components/auth/</code>)<a href="#64-authentication-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>File</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AuthProvider</code></td>
+<td>[AuthProvider.tsx](file:///home/faheem/projects/eccomerce_website/components/auth/AuthProvider.tsx)</td>
+<td>Subscribes to <code>onAuthStateChange</code> and pushes the user into <code>useAuthStore</code>. Fires <code>INITIAL_SESSION</code> on mount.</td>
+</tr>
+<tr>
+<td><code>AccountMenu</code></td>
+<td>[AccountMenu.tsx](file:///home/faheem/projects/eccomerce_website/components/auth/AccountMenu.tsx)</td>
+<td>Avatar/initials dropdown; outside-click + <code>Escape</code> handling; <code>signOut()</code> calls <code>supabase.auth.signOut()</code> then routes home. Placeholder nav to <code>/account*</code>.</td>
+</tr>
+<tr>
+<td><code>LoginCard</code></td>
+<td>[LoginCard.tsx](file:///home/faheem/projects/eccomerce_website/components/auth/LoginCard.tsx)</td>
+<td>Tabbed sign-in (Email <strong>or</strong> WhatsApp OTP). OTP path gated behind <code>ENABLE_WHATSAPP_OTP = false</code>; includes a 4-box <code>OtpInput</code> (paste/arrow handling).</td>
+</tr>
+<tr>
+<td><code>RegisterForm</code></td>
+<td>[RegisterForm.tsx](file:///home/faheem/projects/eccomerce_website/components/auth/RegisterForm.tsx)</td>
+<td>Multi-field registration with client validation (<code>validate()</code>), per-country phone rules (<code>COUNTRIES</code>), size/city pickers; on success shows <code>VerifyEmailNotice</code>.</td>
+</tr>
+<tr>
+<td><code>Field</code></td>
+<td>[Field.tsx](file:///home/faheem/projects/eccomerce_website/components/auth/Field.tsx)</td>
+<td>Form-field wrapper (label, hint, animated error) + shared <code>inputCls</code>.</td>
+</tr>
+<tr>
+<td><code>VerifyEmailNotification</code></td>
+<td>[VerifyEmailNotification.tsx](file:///home/faheem/projects/eccomerce_website/components/auth/VerifyEmailNotification.tsx)</td>
+<td>&quot;Check your inbox&quot; screen with resend cooldown (<code>auth.resend</code>).</td>
+</tr>
+<tr>
+<td><code>LoginPromo</code> / <code>RegisterPromo</code></td>
+<td>[LoginPromo.tsx](file:///home/faheem/projects/eccomerce_website/components/auth/LoginPromo.tsx) / [RegisterPromo.tsx](file:///home/faheem/projects/eccomerce_website/components/auth/RegisterPromo.tsx)</td>
+<td>Editorial side panels.</td>
+</tr>
+<tr>
+<td><code>TrustStrip</code> / <code>RegisterTrust</code></td>
+<td>[TrustStrip.tsx](file:///home/faheem/projects/eccomerce_website/components/auth/TrustStrip.tsx) / [RegisterTrust.tsx](file:///home/faheem/projects/eccomerce_website/components/auth/RegisterTrust.tsx)</td>
+<td>Trust/USP strips.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="65-product-detail-" class="tsd-anchor-link">6.5 Product detail (<code>components/product/</code>)<a href="#65-product-detail-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>File</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Gallery</code></td>
+<td>[Gallery.tsx](file:///home/faheem/projects/eccomerce_website/components/product/Gallery.tsx)</td>
+<td>Thumbnail rail + main image with fade transitions, badge, and a full-screen zoom dialog (<code>Escape</code> + scroll-lock).</td>
+</tr>
+<tr>
+<td><code>PurchasePanel</code></td>
+<td>[PurchasePanel.tsx](file:///home/faheem/projects/eccomerce_website/components/product/PurchasePanel.tsx)</td>
+<td>Colorway/size/qty selectors, wishlist toggle, perks, accordions, mobile sticky add-to-bag bar (driven by <code>IntersectionObserver</code>), calls <code>useCart().add</code>.</td>
+</tr>
+<tr>
+<td><code>CompleteTheLook</code></td>
+<td>[CompleteTheLook.tsx](file:///home/faheem/projects/eccomerce_website/components/product/CompleteTheLook.tsx)</td>
+<td>&quot;Curated Ensemble&quot; carousel with per-item <code>QuickAdd</code> (nested component) that adds to the cart.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="7-dependency-relationships" class="tsd-anchor-link">7. Dependency Relationships<a href="#7-dependency-relationships" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<h3 id="import-graph-simplified" class="tsd-anchor-link">Import graph (simplified)<a href="#import-graph-simplified" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<pre><code><span class="hl-4">app</span><span class="hl-1">/</span><span class="hl-4">layout</span><span class="hl-1">.</span><span class="hl-4">tsx</span><br/><span class="hl-1">  ├── </span><span class="hl-4">components</span><span class="hl-1">/</span><span class="hl-0">Motion</span><span class="hl-1">        (</span><span class="hl-4">MotionProvider</span><span class="hl-1">)</span><br/><span class="hl-1">  ├── </span><span class="hl-4">components</span><span class="hl-1">/</span><span class="hl-4">auth</span><span class="hl-1">/</span><span class="hl-4">AuthProvider</span><br/><span class="hl-1">  ├── </span><span class="hl-4">components</span><span class="hl-1">/</span><span class="hl-4">cart</span><span class="hl-1">/</span><span class="hl-4">CartProvider</span><br/><span class="hl-1">  └── </span><span class="hl-4">components</span><span class="hl-1">/</span><span class="hl-4">cart</span><span class="hl-1">/</span><span class="hl-4">CartDrawer</span><span class="hl-1"> ──► </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-4">cart</span><span class="hl-1">-</span><span class="hl-4">math</span><br/><br/><span class="hl-4">app</span><span class="hl-1">/</span><span class="hl-4">page</span><span class="hl-1">.</span><span class="hl-4">tsx</span><span class="hl-1"> ──► </span><span class="hl-4">Header</span><span class="hl-1">, </span><span class="hl-4">Hero</span><span class="hl-1">, </span><span class="hl-4">Categories</span><span class="hl-1">, </span><span class="hl-4">Selection</span><span class="hl-1">, </span><span class="hl-4">Philosophy</span><span class="hl-1">, </span><span class="hl-4">Press</span><span class="hl-1">, </span><span class="hl-4">Community</span><span class="hl-1">, </span><span class="hl-4">Footer</span><br/><span class="hl-1">                    ├── </span><span class="hl-4">Header</span><span class="hl-1"> ──► </span><span class="hl-4">cart</span><span class="hl-1">/</span><span class="hl-4">BagButton</span><span class="hl-1">, </span><span class="hl-4">auth</span><span class="hl-1">/</span><span class="hl-4">AccountMenu</span><br/><span class="hl-1">                    └── </span><span class="hl-4">Hero</span><span class="hl-1">/</span><span class="hl-4">Categories</span><span class="hl-1">/… ──► </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-4">images</span><br/><br/><span class="hl-4">app</span><span class="hl-1">/</span><span class="hl-4">collections</span><span class="hl-1">/</span><span class="hl-4">page</span><span class="hl-1">.</span><span class="hl-4">tsx</span><span class="hl-1"> ──► </span><span class="hl-4">CollectionHero</span><span class="hl-1">, </span><span class="hl-4">Catalog</span><span class="hl-1">, </span><span class="hl-4">Provenance</span><br/><span class="hl-1">                    ├── </span><span class="hl-4">Catalog</span><span class="hl-1"> ──► </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-0">products</span><span class="hl-1"> (+ </span><span class="hl-4">ProductCard</span><span class="hl-1">)</span><br/><span class="hl-1">                    └── </span><span class="hl-4">Provenance</span><span class="hl-1"> ──► </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-4">images</span><br/><br/><span class="hl-4">app</span><span class="hl-1">/</span><span class="hl-4">products</span><span class="hl-1">/[</span><span class="hl-4">id</span><span class="hl-1">]/</span><span class="hl-4">page</span><span class="hl-1">.</span><span class="hl-4">tsx</span><span class="hl-1"> ──► </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-4">product</span><span class="hl-1">-</span><span class="hl-4">details</span><span class="hl-1"> ──► </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-4">products</span><span class="hl-1">, </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-4">images</span><br/><span class="hl-1">                    ├── </span><span class="hl-4">product</span><span class="hl-1">/</span><span class="hl-4">Gallery</span><br/><span class="hl-1">                    ├── </span><span class="hl-4">product</span><span class="hl-1">/</span><span class="hl-4">PurchasePanel</span><span class="hl-1"> ──► </span><span class="hl-4">cart</span><span class="hl-1">/</span><span class="hl-4">CartProvider</span><span class="hl-1">, </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-4">product</span><span class="hl-1">-</span><span class="hl-4">details</span><br/><span class="hl-1">                    └── </span><span class="hl-4">product</span><span class="hl-1">/</span><span class="hl-4">CompleteTheLook</span><span class="hl-1"> ──► </span><span class="hl-4">cart</span><span class="hl-1">/</span><span class="hl-4">CartProvider</span><br/><br/><span class="hl-4">app</span><span class="hl-1">/</span><span class="hl-4">login</span><span class="hl-1">/</span><span class="hl-4">page</span><span class="hl-1">.</span><span class="hl-4">tsx</span><span class="hl-1"> ──► </span><span class="hl-4">auth</span><span class="hl-1">/</span><span class="hl-4">LoginCard</span><span class="hl-1"> ──► </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-4">auth</span><span class="hl-1">-</span><span class="hl-4">client</span><span class="hl-1"> ──► </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-4">supabase</span><span class="hl-1">/</span><span class="hl-4">client</span><br/><span class="hl-1">                                  └── </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-4">safe</span><span class="hl-1">-</span><span class="hl-4">next</span><br/><span class="hl-4">app</span><span class="hl-1">/</span><span class="hl-4">register</span><span class="hl-1">/</span><span class="hl-4">page</span><span class="hl-1">.</span><span class="hl-4">tsx</span><span class="hl-1"> ──► </span><span class="hl-4">auth</span><span class="hl-1">/</span><span class="hl-4">RegisterForm</span><span class="hl-1"> ──► </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-4">auth</span><span class="hl-1">-</span><span class="hl-4">client</span><span class="hl-1">, </span><span class="hl-4">auth</span><span class="hl-1">/</span><span class="hl-4">Field</span><span class="hl-1">, </span><span class="hl-4">auth</span><span class="hl-1">/</span><span class="hl-4">VerifyEmailNotification</span><br/><span class="hl-4">app</span><span class="hl-1">/</span><span class="hl-4">auth</span><span class="hl-1">/</span><span class="hl-4">confirm</span><span class="hl-1">/</span><span class="hl-4">route</span><span class="hl-1">.</span><span class="hl-4">ts</span><span class="hl-1"> ──► </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-4">supabase</span><span class="hl-1">/</span><span class="hl-4">server</span><span class="hl-1">, </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-4">safe</span><span class="hl-1">-</span><span class="hl-4">next</span><br/><br/><span class="hl-4">proxy</span><span class="hl-1">.</span><span class="hl-4">ts</span><span class="hl-1"> ──► </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-4">supabase</span><span class="hl-1">/</span><span class="hl-0">proxy</span><span class="hl-1"> (</span><span class="hl-4">updateSession</span><span class="hl-1">)</span><br/><span class="hl-4">auth</span><span class="hl-1">/</span><span class="hl-4">AuthProvider</span><span class="hl-1"> ──► </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-4">supabase</span><span class="hl-1">/</span><span class="hl-4">client</span><span class="hl-1"> + </span><span class="hl-4">stores</span><span class="hl-1">/</span><span class="hl-4">auth</span><span class="hl-1">-</span><span class="hl-4">store</span><br/><span class="hl-4">auth</span><span class="hl-1">/</span><span class="hl-4">AccountMenu</span><span class="hl-1">  ──► </span><span class="hl-4">lib</span><span class="hl-1">/</span><span class="hl-4">supabase</span><span class="hl-1">/</span><span class="hl-4">client</span><span class="hl-1"> + </span><span class="hl-4">stores</span><span class="hl-1">/</span><span class="hl-4">auth</span><span class="hl-1">-</span><span class="hl-4">store</span><br/><br/><span class="hl-4">app</span><span class="hl-1">/</span><span class="hl-4">not</span><span class="hl-1">-</span><span class="hl-4">found</span><span class="hl-1">.</span><span class="hl-4">tsx</span><span class="hl-1"> ──► </span><span class="hl-4">components</span><span class="hl-1">/</span><span class="hl-4">atelier</span><span class="hl-3">/* ──► lib/atelier-data</span>
+</code><button>Copy</button></pre>
+
+<h3 id="external-dependency-roles" class="tsd-anchor-link">External dependency roles<a href="#external-dependency-roles" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Used by</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>next</code></td>
+<td>everything</td>
+<td>App Router, <code>next/image</code>, <code>next/font</code>, <code>next/link</code>, route handlers.</td>
+</tr>
+<tr>
+<td><code>react</code> / <code>react-dom</code></td>
+<td>everything</td>
+<td>19.x (Server + Client Components).</td>
+</tr>
+<tr>
+<td><code>framer-motion</code></td>
+<td>motion-heavy components</td>
+<td>Carousels, drawers, modals, reveals, layout animations.</td>
+</tr>
+<tr>
+<td><code>lucide-react</code></td>
+<td><code>components/atelier/*</code></td>
+<td>Icons for the 404 shell only.</td>
+</tr>
+<tr>
+<td><code>zustand</code></td>
+<td><code>stores/auth-store</code></td>
+<td>Tiny global auth state without context boilerplate.</td>
+</tr>
+<tr>
+<td><code>@supabase/ssr</code> / <code>@supabase/supabase-js</code></td>
+<td><code>lib/supabase/*</code>, auth components</td>
+<td>Cookie-based SSR auth + browser auth.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="environment-variables" class="tsd-anchor-link">Environment variables<a href="#environment-variables" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Required (from <code>.env.local</code>, which is git-ignored):</p>
+<pre><code class="bash"><span class="hl-4">NEXT_PUBLIC_SUPABASE_URL</span><span class="hl-1">=</span><span class="hl-2">...</span><br/><span class="hl-4">NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</span><span class="hl-1">=</span><span class="hl-2">...</span>
+</code><button type="button">Copy</button></pre>
+
+<p>Both are read via <code>process.env</code> in the three Supabase client factories.</p>
+<hr>
+<h2 id="8-key-flows" class="tsd-anchor-link">8. Key Flows<a href="#8-key-flows" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<h3 id="81-registration-email-verification" class="tsd-anchor-link">8.1 Registration &amp; email verification<a href="#81-registration-email-verification" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ol>
+<li><code>RegisterForm</code> validates locally, then calls <code>registerAccount()</code> → <code>supabase.auth.signUp</code> with profile metadata.</li>
+<li>Supabase (per the code comment) runs a <strong>SQL trigger</strong> that creates a profile row + default address from that metadata.</li>
+<li><code>RegisterForm</code> swaps to <code>VerifyEmailNotice</code>, which offers a cooldown-gated <code>auth.resend</code>.</li>
+<li>The user clicks the emailed link → <code>GET /auth/confirm?token_hash=…&amp;type=…&amp;next=…</code>.</li>
+<li>The handler calls <code>verifyOtp</code>, then redirects to <code>safeNext(next)</code> (or <code>/auth/error</code>).</li>
+</ol>
+<h3 id="82-sign-in" class="tsd-anchor-link">8.2 Sign-in<a href="#82-sign-in" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li><strong>Email/password:</strong> <code>LoginCard</code> → <code>signInWithPassword()</code> → on success <code>router.push(next)</code> + <code>router.refresh()</code>.</li>
+<li><strong>WhatsApp OTP (disabled/stub):</strong> <code>requestOtp()</code> and <code>verifyOtp()</code> are stubs; only <code>&quot;1234&quot;</code> is accepted in non-production.</li>
+</ul>
+<h3 id="83-session-lifecycle" class="tsd-anchor-link">8.3 Session lifecycle<a href="#83-session-lifecycle" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ol>
+<li>Every non-static request passes through [proxy.ts](file:///home/faheem/projects/eccomerce_website/proxy.ts) → <code>updateSession()</code>.</li>
+<li><code>getClaims()</code> refreshes the token and rewrites cookies on the response.</li>
+<li><code>AuthProvider</code> observes <code>onAuthStateChange</code> client-side and updates <code>useAuthStore</code>.</li>
+<li><code>/account*</code> is the only guarded area; unauthenticated access → <code>/login?next=…</code>.</li>
+</ol>
+<h3 id="84-add-to-cart" class="tsd-anchor-link">8.4 Add-to-cart<a href="#84-add-to-cart" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p><code>PurchasePanel.addToBag()</code> (or <code>CompleteTheLook.QuickAdd</code>) → <code>useCart().add(item)</code> →
+reducer merges/caps the line → <code>openBag()</code> reveals <code>CartDrawer</code> → item persisted to
+<code>localStorage</code> and totals computed via <code>summarize()</code>.</p>
+<hr>
+<h2 id="9-running-the-project" class="tsd-anchor-link">9. Running the Project<a href="#9-running-the-project" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<h3 id="prerequisites" class="tsd-anchor-link">Prerequisites<a href="#prerequisites" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li>Node.js (compatible with Next 16 / React 19)</li>
+<li><code>pnpm</code> (repo pins <code>pnpm@12.4.1</code> via <code>packageManager</code>)</li>
+<li>A Supabase project with the email-auth trigger configured (for real registration)</li>
+</ul>
+<h3 id="setup" class="tsd-anchor-link">Setup<a href="#setup" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<pre><code class="bash"><span class="hl-3"># 1. install dependencies</span><br/><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-2">install</span><br/><br/><span class="hl-3"># 2. create .env.local with your Supabase credentials</span><br/><span class="hl-3">#    NEXT_PUBLIC_SUPABASE_URL=...</span><br/><span class="hl-3">#    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...</span><br/><br/><span class="hl-3"># 3. start the dev server</span><br/><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-2">dev</span><span class="hl-1">            </span><span class="hl-3"># http://localhost:3000</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="production" class="tsd-anchor-link">Production<a href="#production" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<pre><code class="bash"><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-2">build</span><br/><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-2">start</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="lint-type-check" class="tsd-anchor-link">Lint / type-check<a href="#lint-type-check" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<pre><code class="bash"><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-2">lint</span><span class="hl-1">                          </span><span class="hl-3"># ESLint (flat config)</span><br/><span class="hl-0">pnpm</span><span class="hl-1"> </span><span class="hl-2">exec</span><span class="hl-1"> </span><span class="hl-2">tsc</span><span class="hl-1"> </span><span class="hl-7">--noEmit</span><span class="hl-1">             </span><span class="hl-3"># strict TypeScript check</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="building-blocks-to-be-aware-of" class="tsd-anchor-link">Building blocks to be aware of<a href="#building-blocks-to-be-aware-of" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li><strong>Turbopack</strong> is the bundler (see <code>next.config.ts</code> <code>turbopack.rules</code> for CSS).</li>
+<li><strong><code>cacheComponents: true</code></strong> and <strong><code>partialPrefetching: true</code></strong> are enabled in
+[next.config.ts](file:///home/faheem/projects/eccomerce_website/next.config.ts).</li>
+<li><strong>Remote images</strong> are whitelisted for <code>unsplash.com</code> / <code>images.unsplash.com</code> only.</li>
+<li>Path alias: <code>@/*</code> → repo root ([tsconfig.json](file:///home/faheem/projects/eccomerce_website/tsconfig.json)).</li>
+</ul>
+<hr>
+<h2 id="10-design-system-styling" class="tsd-anchor-link">10. Design System &amp; Styling<a href="#10-design-system-styling" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Defined in [globals.css](file:///home/faheem/projects/eccomerce_website/app/globals.css):</p>
+<ul>
+<li><strong>Theme tokens</strong> (<code>@theme inline</code>): <code>--color-paper</code>, <code>--color-sand</code>, <code>--color-ink</code>, <code>--color-muted</code>, <code>--color-line</code>, <code>--color-accent</code>; fonts <code>--font-serif</code> (Playfair), <code>--font-sans</code> (Inter).</li>
+<li><strong>Custom utilities</strong> (<code>@utility</code>): <code>wrap</code> (max-width container), <code>eyebrow</code>, <code>label-sm</code>.</li>
+<li>Respects <code>prefers-reduced-motion</code> globally (disables transitions/animations and smooth scroll).</li>
+<li>Visible focus rings via <code>:focus-visible</code>.</li>
+</ul>
+<hr>
+<h2 id="11-observations-stubs-known-gaps" class="tsd-anchor-link">11. Observations, Stubs &amp; Known Gaps<a href="#11-observations-stubs-known-gaps" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>These are factual notes surfaced during analysis — not required reading to run the app,
+but useful when extending it.</p>
+<ol>
+<li><strong>Dead code in <code>PurchasePanel</code></strong> — module-level <code>add()</code> / <code>openBag()</code> stubs
+([PurchasePanel.tsx](file:///home/faheem/projects/eccomerce_website/components/product/PurchasePanel.tsx#L283-L288))
+throw <code>&quot;Function not implemented.&quot;</code>. Inside the component they are <strong>shadowed</strong> by the
+<code>useCart()</code> destructuring, so they are never called — but they are unused and should be
+removed to avoid confusion.</li>
+<li><strong>Unbuilt routes referenced by UI</strong> — <code>/account</code>, <code>/account/orders</code>,
+<code>/account/addresses</code>, <code>/checkout</code>, <code>/track-order</code>, <code>/forgot-password</code> are linked but have
+no pages yet; <code>/account*</code> is the only path the proxy guards.</li>
+<li><strong>Header auth state</strong> — <code>Header</code> takes a <code>loggedIn</code> prop (default <code>false</code>) and is never
+passed <code>true</code>; it does not read <code>useAuthStore</code>, so signed-in users still see
+&quot;Sign in / Sign up&quot;. <code>WISHLIST_COUNT</code> is a hard-coded <code>2</code>.</li>
+<li><strong>OTP is a dev stub</strong> — <code>verifyOtp</code> accepts only <code>&quot;1234&quot;</code>, and <code>LoginCard</code> sets
+<code>ENABLE_WHATSAPP_OTP = false</code>.</li>
+<li><strong>Three product data sources</strong> — <code>lib/products.ts</code> (canonical), <code>lib/atelier-data.ts</code>
+(404 shell), and an inline array in <code>Selection.tsx</code>; keep them in sync or consolidate.</li>
+<li><strong>Image strategy is mixed</strong> — <code>next/image</code> with whitelisted Unsplash hosts for the main
+app vs. plain <code>&lt;img&gt;</code> + external CDN URLs in the atelier/404 components.</li>
+<li><strong>Supabase URL shape</strong> — <code>.env.local</code> supplies a value ending in <code>/rest/v1/</code>; the Supabase
+JS SDK conventionally expects the bare project URL (<code>https://&lt;ref&gt;.supabase.co</code>).
+Verify the auth endpoints resolve correctly.</li>
+<li><strong>Missing DB artifacts in-repo</strong> — the profile/address creation logic lives in a Supabase
+SQL trigger (referenced in <code>auth-client.ts</code>) that is not committed here.</li>
+<li><strong><code>trench</code> is special-cased</strong> — <code>getDetail</code> returns a hand-authored object for
+<code>sculptural-wool-trench</code> that is not part of <code>PRODUCTS</code>, so it appears only on its own
+detail page (but is included in <code>generateStaticParams</code>).</li>
+</ol>
+<hr>
+<h2 id="12-quick-reference-public-api-surface" class="tsd-anchor-link">12. Quick Reference — Public API Surface<a href="#12-quick-reference-public-api-surface" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Location</th>
+<th>Kind</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createClient</code></td>
+<td><code>lib/supabase/client.ts</code></td>
+<td>fn (browser)</td>
+</tr>
+<tr>
+<td><code>createClient</code></td>
+<td><code>lib/supabase/server.ts</code></td>
+<td>async fn (server)</td>
+</tr>
+<tr>
+<td><code>updateSession</code></td>
+<td><code>lib/supabase/proxy.ts</code></td>
+<td>async fn</td>
+</tr>
+<tr>
+<td><code>proxy</code></td>
+<td><code>proxy.ts</code></td>
+<td>async fn (Next interceptor)</td>
+</tr>
+<tr>
+<td><code>PRODUCTS</code>, <code>PALETTE</code></td>
+<td><code>lib/products.ts</code></td>
+<td>consts</td>
+</tr>
+<tr>
+<td><code>getDetail</code>, <code>allDetailIds</code></td>
+<td><code>lib/product-details.ts</code></td>
+<td>fns</td>
+</tr>
+<tr>
+<td><code>images</code>, <code>ids</code>, <code>u</code></td>
+<td><code>lib/images.ts</code></td>
+<td>consts/fn</td>
+</tr>
+<tr>
+<td><code>money</code>, <code>summarize</code></td>
+<td><code>lib/cart-math.ts</code></td>
+<td>fns</td>
+</tr>
+<tr>
+<td><code>registerAccount</code>, <code>signInWithPassword</code>, <code>requestOtp</code>, <code>verifyOtp</code></td>
+<td><code>lib/auth-client.ts</code></td>
+<td>fns</td>
+</tr>
+<tr>
+<td><code>safeNext</code></td>
+<td><code>lib/safe-next.ts</code></td>
+<td>fn</td>
+</tr>
+<tr>
+<td><code>useAuthStore</code></td>
+<td><code>stores/auth-store.ts</code></td>
+<td>Zustand hook</td>
+</tr>
+<tr>
+<td><code>CartProvider</code>, <code>useCart</code></td>
+<td><code>components/cart/CartProvider.tsx</code></td>
+<td>component/hook</td>
+</tr>
+<tr>
+<td><code>MotionProvider</code>, <code>Reveal</code></td>
+<td><code>components/Motion.tsx</code></td>
+<td>components</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><em>Generated from a static analysis of the repository at <code>/home/faheem/projects/eccomerce_website</code>.</em></p>
+</div></div>
+<div class="col-sidebar">
+<div class="page-menu">
+<div class="tsd-navigation settings">
+<details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div>
+<div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>On This Page</h3></summary>
+<div class="tsd-accordion-details"><a href="#épure-atelier-code-wiki"><span>É<wbr/>PURE <wbr/>Atelier — <wbr/>Code <wbr/>Wiki</span></a>
+<ul>
+<li><a href="#1-overview"><span>1. <wbr/>Overview</span></a></li>
+<li>
+<ul>
+<li><a href="#scripts-packagejsonfilehomefaheemprojectseccomerce_websitepackagejson"><span>Scripts ([package.json](file:///home/faheem/projects/eccomerce_<wbr/>website/package.json))</span></a></li></ul></li>
+<li><a href="#2-high-level-architecture"><span>2. <wbr/>High-<wbr/>Level <wbr/>Architecture</span></a></li>
+<li>
+<ul>
+<li><a href="#directory-map"><span>Directory map</span></a></li></ul></li>
+<li><a href="#3-domain-layer-"><span>3. <wbr/>Domain <wbr/>Layer — </span></a></li>
+<li>
+<ul>
+<li><a href="#31-supabase-clients-"><span>3.1 <wbr/>Supabase clients ()</span></a></li>
+<li><a href="#32-catalog-data"><span>3.2 <wbr/>Catalog data</span></a></li>
+<li><a href="#33-cart-math-cart-mathtsfilehomefaheemprojectseccomerce_websitelibcart-mathts"><span>3.3 <wbr/>Cart math — [cart-<wbr/>math.ts](file:///home/faheem/projects/eccomerce_<wbr/>website/lib/cart-<wbr/>math.ts)</span></a></li>
+<li><a href="#34-auth-helpers-auth-clienttsfilehomefaheemprojectseccomerce_websitelibauth-clientts"><span>3.4 <wbr/>Auth helpers — [auth-<wbr/>client.ts](file:///home/faheem/projects/eccomerce_<wbr/>website/lib/auth-<wbr/>client.ts)</span></a></li>
+<li><a href="#35-open-redirect-guard-safe-nexttsfilehomefaheemprojectseccomerce_websitelibsafe-nextts"><span>3.5 <wbr/>Open-<wbr/>redirect guard — [safe-<wbr/>next.ts](file:///home/faheem/projects/eccomerce_<wbr/>website/lib/safe-<wbr/>next.ts)</span></a></li></ul></li>
+<li><a href="#4-state-layer-"><span>4. <wbr/>State <wbr/>Layer — </span></a></li>
+<li>
+<ul>
+<li><a href="#auth-storetsfilehomefaheemprojectseccomerce_websitestoresauth-storets"><span>[auth-<wbr/>store.ts](file:///home/faheem/projects/eccomerce_<wbr/>website/stores/auth-<wbr/>store.ts)</span></a></li></ul></li>
+<li><a href="#5-routing-pages-"><span>5. <wbr/>Routing &amp; <wbr/>Pages — </span></a></li>
+<li>
+<ul>
+<li><a href="#51-root-layout-layouttsxfilehomefaheemprojectseccomerce_websiteapplayouttsx"><span>5.1 <wbr/>Root layout — [layout.tsx](file:///home/faheem/projects/eccomerce_<wbr/>website/app/layout.tsx)</span></a></li>
+<li><a href="#52-route-table"><span>5.2 <wbr/>Route table</span></a></li>
+<li><a href="#53-the-404-shell-"><span>5.3 <wbr/>The 404 shell ()</span></a></li></ul></li>
+<li><a href="#6-view-layer-"><span>6. <wbr/>View <wbr/>Layer — </span></a></li>
+<li>
+<ul>
+<li><a href="#61-providers-shared-widgets"><span>6.1 <wbr/>Providers &amp; shared widgets</span></a></li>
+<li><a href="#62-homepage-sections"><span>6.2 <wbr/>Homepage sections</span></a></li>
+<li><a href="#63-cart-"><span>6.3 <wbr/>Cart ()</span></a></li>
+<li><a href="#64-authentication-"><span>6.4 <wbr/>Authentication ()</span></a></li>
+<li><a href="#65-product-detail-"><span>6.5 <wbr/>Product detail ()</span></a></li></ul></li>
+<li><a href="#7-dependency-relationships"><span>7. <wbr/>Dependency <wbr/>Relationships</span></a></li>
+<li>
+<ul>
+<li><a href="#import-graph-simplified"><span>Import graph (simplified)</span></a></li>
+<li><a href="#external-dependency-roles"><span>External dependency roles</span></a></li>
+<li><a href="#environment-variables"><span>Environment variables</span></a></li></ul></li>
+<li><a href="#8-key-flows"><span>8. <wbr/>Key <wbr/>Flows</span></a></li>
+<li>
+<ul>
+<li><a href="#81-registration-email-verification"><span>8.1 <wbr/>Registration &amp; email verification</span></a></li>
+<li><a href="#82-sign-in"><span>8.2 <wbr/>Sign-<wbr/>in</span></a></li>
+<li><a href="#83-session-lifecycle"><span>8.3 <wbr/>Session lifecycle</span></a></li>
+<li><a href="#84-add-to-cart"><span>8.4 <wbr/>Add-<wbr/>to-<wbr/>cart</span></a></li></ul></li>
+<li><a href="#9-running-the-project"><span>9. <wbr/>Running the <wbr/>Project</span></a></li>
+<li>
+<ul>
+<li><a href="#prerequisites"><span>Prerequisites</span></a></li>
+<li><a href="#setup"><span>Setup</span></a></li>
+<li><a href="#production"><span>Production</span></a></li>
+<li><a href="#lint-type-check"><span>Lint / type-<wbr/>check</span></a></li>
+<li><a href="#building-blocks-to-be-aware-of"><span>Building blocks to be aware of</span></a></li></ul></li>
+<li><a href="#10-design-system-styling"><span>10. <wbr/>Design <wbr/>System &amp; <wbr/>Styling</span></a></li>
+<li><a href="#11-observations-stubs-known-gaps"><span>11. <wbr/>Observations, <wbr/>Stubs &amp; <wbr/>Known <wbr/>Gaps</span></a></li>
+<li><a href="#12-quick-reference-public-api-surface"><span>12. <wbr/>Quick <wbr/>Reference — <wbr/>Public <wbr/>API <wbr/>Surface</span></a></li></ul></div></details></div>
+<div class="site-menu">
+<nav class="tsd-navigation"><a href="modules.html">ÉPURE Atelier</a>
+<ul class="tsd-small-nested-navigation" id="tsd-nav-container">
+<li>Loading...</li></ul></nav></div></div></div><footer>
+<p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer>
+<div class="overlay"></div></body></html>

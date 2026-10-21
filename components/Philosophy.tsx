@@ -45,7 +45,7 @@ export default function Philosophy() {
               </div>
             ))}
           </dl>
-          <Link href="#" className="label-sm inline-flex items-center gap-2 border-b border-transparent pb-0.5 text-[11px] tracking-[0.12em] transition hover:border-current">
+          <Link href="/journal" className="label-sm inline-flex items-center gap-2 border-b border-transparent pb-0.5 text-[11px] tracking-[0.12em] transition hover:border-current">
             Explore our sourcing manifesto <ArrowIcon size={12} />
           </Link>
         </div>

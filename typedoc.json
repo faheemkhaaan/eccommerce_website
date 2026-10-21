@@ -1,0 +1,27 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "name": "ÉPURE Atelier",
+    "entryPoints": [
+        "app",
+        "components",
+        "lib",
+        "stores"
+    ],
+    "entryPointStrategy": "expand",
+    "exclude": [
+        "**/*.test.*",
+        "**/node_modules/**"
+    ],
+    "out": "docs-site",
+    "readme": "./docs/index.md",
+    "projectDocuments": [
+        "docs/guides/*.md"
+    ],
+    "excludeInternal": true,
+    "searchInComments": true,
+    "searchInDocuments": true,
+    "validation": {
+        "invalidLink": true,
+        "notExported": false
+    },
+}

@@ -41,3 +41,5 @@ export const EyeOffIcon = ({ size }: P) => (<svg {...base(size)}><path d="M3 3l1
 export const BellIcon = ({ size }: P) => (<svg {...base(size)}><path d="M6 17v-6a6 6 0 0 1 12 0v6l1.5 2h-15L6 17Z" /><path d="M10 21a2 2 0 0 0 4 0" /></svg>);
 export const BoxIcon = ({ size }: P) => (<svg {...base(size)}><path d="M3 8l9-5 9 5v8l-9 5-9-5V8Z" /><path d="m3 8 9 5 9-5M12 13v8" /></svg>);
 export const FabricIcon = ({ size }: P) => (<svg {...base(size)}><path d="M5 4h10l4 4v12H5V4Z" /><path d="M15 4v4h4" /><path d="M8 13c1.5-1.5 2.5 1.5 4 0s2.5 1.5 4 0" /></svg>);
+
+export const MailIcon = ({ size }: P) => (<svg {...base(size)}><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>);

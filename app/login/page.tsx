@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { Reveal } from "@/components/Motion";
 import LoginPromo from "@/components/auth/LoginPromo";
 import LoginCard from "@/components/auth/LoginCard";
 import TrustStrip from "@/components/auth/TrustStrip";
+import { safeNext } from "@/lib/safe-next";
 
 export const metadata: Metadata = { title: "Sign in — ÉPURE Atelier" };
 
-export default function LoginPage() {
+type Props = { searchParams: Promise<{ next?: string }> };
+
+export default function LoginPage({ searchParams }: Props) {
     return (
         <>
             <header className="flex justify-center py-8 md:py-10">
@@ -19,8 +23,12 @@ export default function LoginPage() {
                     <Reveal className="order-2 lg:order-1">
                         <LoginPromo />
                     </Reveal>
+
                     <Reveal delay={0.08} className="order-1 lg:order-2 lg:mt-4">
-                        <LoginCard />
+                        {/* Wrap the component relying on searchParams in Suspense */}
+                        <Suspense fallback={<div className="h-100 animate-pulse rounded-lg bg-muted/20" />}>
+                            <ResolvedLoginCard searchParams={searchParams} />
+                        </Suspense>
                     </Reveal>
                 </div>
 
@@ -34,4 +42,10 @@ export default function LoginPage() {
             </footer>
         </>
     );
+}
+
+// Helper async component to safely handle the searchParams promise
+async function ResolvedLoginCard({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
+    const { next } = await searchParams;
+    return <LoginCard next={safeNext(next)} />;
 }
