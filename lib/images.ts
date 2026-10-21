@@ -7,8 +7,20 @@ export const ids = {
     greyKnit: "b4pfclnkxJU",
 } as const;
 
+// The CDN asset behind each photo slug. `unsplash.com/photos/{slug}/download` is an HTML
+// page behind bot mitigation, and Vercel's image optimizer answers 502 when it follows the
+// redirect — so the CDN asset is linked directly instead.
+const cdn: Record<string, string> = {
+    [ids.trench]: "1724709972210-4beb408de580",
+    [ids.rack]: "1604882767135-b41fac508fff",
+    [ids.jackets]: "1534702718617-c141fb9f99d0",
+    [ids.hangers]: "1517502166878-35c93a0072f0",
+    [ids.knitStack]: "1758537698215-af1e35acb911",
+    [ids.greyKnit]: "1603906650843-b58e94d9df4d",
+};
+
 export const u = (id: string, w = 1600) =>
-    `https://unsplash.com/photos/${id}/download?force=true&w=${w}`;
+    `https://images.unsplash.com/photo-${cdn[id] ?? id}?q=80&fm=jpg&fit=crop&w=${w}`;
 
 export const images = {
     hero: u(ids.trench, 2000),
