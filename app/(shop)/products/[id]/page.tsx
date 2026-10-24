@@ -12,14 +12,11 @@ import { allDetailIds, getDetail } from "@/lib/product-details";
 
 type Props = { params: Promise<{ id: string }> };
 
+// No empty-list fallback here: Cache Components requires this to return at least
+// one result, and a catalogue we can't reach at build time is a real failure —
+// better to stop the deploy than to ship a site with no product pages.
 export async function generateStaticParams() {
-    try {
-        return await allDetailIds();
-    } catch {
-        // If the catalogue is unreachable at build time, fall back to generating
-        // each product page on first request instead of failing the build.
-        return [];
-    }
+    return allDetailIds();
 }
 
 // Only the shop landing page is a real destination; the rest of the trail is text.
