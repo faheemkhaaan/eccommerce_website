@@ -1,5 +1,5 @@
-import { ids, u } from "@/lib/images";
-import { PALETTE, PRODUCTS } from "@/lib/products";
+import { u, ids } from "@/lib/images";
+import { getCatalogue, getCatalogueProduct, type Pack } from "@/lib/catalogue";
 
 export type Photo = { full: string; thumb: string };
 
@@ -8,98 +8,156 @@ export type Detail = {
     edition: string;
     article: string;
     name: string;
+    short: string;
+    /** Price of the default pack, for the pre-selected state. */
     price: number;
     rating: number;
     reviews: number;
     badge: string;
     breadcrumb: string[];
-    colorways: { name: string; hex: string }[];
-    sizes: string[];
-    defaultSize: string;
-    stockLeft?: number;
-    modelNote: string;
+    packs: Pack[];
+    defaultPack: string;
+    /** Small print under the pack selector, e.g. how long a jar lasts. */
+    packNote: string;
     gallery: Photo[];
     sections: { title: string; body: string; bullets?: string[] }[];
-    ensemble: { id: string; category: string; name: string; price: number; image: string }[];
+    benefits: { title: string; body: string }[];
+    nutrition: { label: string; value: string }[];
+    comparison: { label: string; ours: string; others: string }[];
 };
+
+/**
+ * Everything about a product that is not a commercial field. Pack sizes, prices,
+ * stock and names come from the database instead, so the shop owner can change
+ * them without a deploy. This is the copy that still needs a developer.
+ */
+type Editorial = Omit<Detail, "name" | "short" | "packs" | "price">;
 
 const photos = (list: string[]): Photo[] =>
     list.map((id) => ({ full: u(id, 1400), thumb: u(id, 240) }));
 
-const trench: Detail = {
-    id: "sculptural-wool-trench",
-    edition: "Edition 04 — Atelier Release",
-    article: "842-10",
-    name: "The Sculptural Wool Trench Coat",
-    price: 680,
-    rating: 4.9,
-    reviews: 42,
-    badge: "Spring 2025 • Edition 04",
-    breadcrumb: ["Archive", "Apparel", "Outerwear"],
-    colorways: [
-        { name: "Oatmeal Beige", hex: "#e6dfd3" },
-        { name: "Obsidian Noir", hex: "#1d1b18" },
-        { name: "Saddle Tan", hex: "#8a5a3b" },
-    ],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    defaultSize: "S",
-    stockLeft: 3,
-    modelNote: "Model is 5′10″ (178cm) wearing size S",
-    gallery: photos([ids.trench, ids.rack, ids.jackets, ids.hangers]),
-    sections: [
-        {
-            title: "Material & Craftsmanship",
-            body: "Constructed from 100% ethically sourced double-faced virgin wool spun in Biella, Italy, tailored with uncompromised precision in Porto, Portugal.",
-            bullets: [
-                "540 GSM density for structured drape and warmth",
-                "Genuine carved buffalo horn hardware",
-                "Biodegradable organic natural fibers",
-            ],
-        },
-        {
-            title: "Fit & Tailoring Dimensions",
-            body: "A relaxed, sculpted silhouette with generous volume through the shoulder and a belted waist. Size S measures 104 cm across the chest and 112 cm in length. Between sizes, we suggest sizing down for a cleaner line.",
-        },
-        {
-            title: "Carbon-Neutral Dispatch",
-            body: "Every order ships in recycled, plastic-free packaging with offset carriers. Delivery takes 2–4 business days within Europe and 4–7 worldwide. Returns are free within 14 days.",
-        },
-    ],
-    ensemble: [
-        { id: "wide-leg-architectural-pleated-pant", category: "Tailored Trousers", name: "Wide-Leg Architectural Pleated Pant", price: 340, image: u(ids.jackets, 700) },
-        { id: "saddle-calfskin-porter-tote", category: "Leather Goods", name: "Saddle Calfskin Porter Tote", price: 520, image: u(ids.rack, 700) },
-        { id: "hand-thrown-sandstone-vessel", category: "Objects & Living", name: "Hand-Thrown Sandstone Vessel", price: 85, image: u(ids.hangers, 700) },
-    ],
+const EDITORIAL: Record<string, Editorial> = {
+    "bilona-organic-ghee": {
+        id: "bilona-organic-ghee",
+        edition: "Small batch — churned weekly",
+        article: "GH-01",
+        rating: 4.9,
+        reviews: 312,
+        badge: "Grass-fed · Bilona",
+        breadcrumb: ["Shop", "Ghee"],
+        defaultPack: "1 kg",
+        packNote: "A 1 kg jar lasts a family of four about six weeks.",
+        gallery: photos([ids.gheeJarC, ids.gheeSpoon, ids.jarOnBoard, ids.tin]),
+        sections: [
+            {
+                title: "Why our ghee is different",
+                body: "We start with whole milk from grass-fed desi cows, set it into curd overnight, then churn that curd the way it has been done for centuries. The butter is simmered slowly until the milk solids settle and the fat turns clear and golden. No centrifuge, no bleaching, no deodorising, no blending with vegetable fat.",
+                bullets: [
+                    "Bilona (curd-churned) method — not machine cream separation",
+                    "Grass-fed desi cow milk, single source",
+                    "Nothing added: no preservatives, colour or palm shortening",
+                ],
+            },
+            {
+                title: "How to use it",
+                body: "Ghee is the workhorse fat of a Pakistani kitchen — it takes high heat without turning bitter, and it carries the aroma of whatever you cook in it.",
+                bullets: [
+                    "Roti, paratha and naan — spread straight from the jar",
+                    "Tadka for dal, sabzi and karahi",
+                    "Biryani and pulao — a spoon before dum",
+                    "Halwa, gulab jamun and other desi sweets",
+                    "Bullet coffee, ghee roast dosa, or as a butter substitute in baking",
+                    "Traditional use for dry skin and hair",
+                ],
+            },
+            {
+                title: "Storage & shelf life",
+                body: "Ghee does not need refrigeration. Keep the jar tightly closed in a cool, dark cupboard, away from the stove, and always use a dry spoon. At room temperature it keeps for 12 months; in the fridge it will set hard but lasts longer.",
+                bullets: [
+                    "12 months from the churn date printed on the label",
+                    "Never introduce water or a wet spoon — that is what turns ghee rancid",
+                    "A little graininess or settling is natural, not a defect",
+                ],
+            },
+            {
+                title: "Delivery, COD & returns",
+                body: "We deliver anywhere in Pakistan with cash on delivery. Orders placed before 4 pm are dispatched the same day; Lahore, Karachi and Islamabad usually arrive in 48 hours. Unopened jars can be returned within 7 days.",
+                bullets: [
+                    "Free delivery on orders above Rs 5,000",
+                    "Flat Rs 250 delivery charge below that",
+                    "Cash on delivery — no advance payment, no card needed",
+                ],
+            },
+        ],
+        benefits: [
+            {
+                title: "Smoke point around 250 °C",
+                body: "Refined cooking oils start breaking down near 180–200 °C, releasing free radicals. Ghee holds its structure through frying, tadka and dum cooking.",
+            },
+            {
+                title: "Vitamins your body can actually absorb",
+                body: "Ghee carries vitamins A, D, E and K2, and being a fat it helps you absorb them from the vegetables cooked in it. Refined oils are stripped of these and often artificially fortified.",
+            },
+            {
+                title: "No trans fat, no hydrogenation",
+                body: "Vanaspati and heavily refined oils pass through hydrogenation and deodorising, which creates trans fats. Ghee is simply simmered butterfat.",
+            },
+            {
+                title: "Butyrate and CLA",
+                body: "Ghee is one of the richest natural sources of butyrate, a short-chain fatty acid that feeds the gut lining. Milk from grass-fed cows also carries more conjugated linoleic acid.",
+            },
+            {
+                title: "Lactose and casein removed",
+                body: "The slow simmer separates out the milk solids, so most people who react badly to milk can cook with ghee without the bloating.",
+            },
+            {
+                title: "A flavour you cannot fake",
+                body: "Curd-churned ghee smells of caramel and toasted milk. Cheaper ghee is bland because the aroma compounds are boiled off during industrial clarifying.",
+            },
+        ],
+        nutrition: [
+            { label: "Energy", value: "900 kcal" },
+            { label: "Total fat", value: "100 g" },
+            { label: "Saturated fat", value: "62 g" },
+            { label: "Monounsaturated", value: "29 g" },
+            { label: "Cholesterol", value: "256 mg" },
+            { label: "Vitamin A", value: "3069 IU" },
+            { label: "Vitamin E", value: "2.8 mg" },
+            { label: "Vitamin K2", value: "Present" },
+        ],
+        comparison: [
+            { label: "Smoke point", ours: "~250 °C", others: "180–200 °C refined oil" },
+            { label: "Trans fat", ours: "None", others: "Common in vanaspati" },
+            { label: "Vitamins A, D, E, K2", ours: "Naturally present", others: "Stripped, sometimes fortified" },
+            { label: "How it is made", ours: "Churned from cultured curd", others: "Solvent extracted & refined" },
+            { label: "Additives", ours: "Nothing", others: "Antioxidants, colours, anti-foam" },
+            { label: "Cooking at high heat", ours: "Stable", others: "Degrades and smokes" },
+        ],
+    },
 };
 
-// Build a detail page from a listing entry so every card on the collection page resolves.
-function fromListing(id: string): Detail | undefined {
-    const i = PRODUCTS.findIndex((x) => x.id === id);
-    if (i < 0) return undefined;
-    const p = PRODUCTS[i];
-    const pool = Object.values(ids);
-    const apparel = p.category === "Apparel";
+/** Merges the database's commercial fields with the editorial copy above. */
+export async function getDetail(id: string): Promise<Detail | undefined> {
+    const editorial = EDITORIAL[id];
+    if (!editorial) return undefined;
+
+    const product = await getCatalogueProduct(id);
+    if (!product) return undefined;
+
+    const preferred =
+        product.packs.find((k) => k.label === editorial.defaultPack) ?? product.packs[0];
 
     return {
-        ...trench,
-        id: p.id,
-        name: p.name,
-        price: p.price,
-        article: String(800 + i * 7).padStart(3, "0") + "-" + String(10 + i),
-        edition: `${p.badge ?? "Atelier Release"} — Spring 2025`,
-        breadcrumb: ["Archive", p.category, p.material],
-        colorways: p.palette.map((n) => ({ name: n, hex: PALETTE[n] })),
-        sizes: apparel ? trench.sizes : ["One size"],
-        defaultSize: apparel ? "S" : "One size",
-        stockLeft: p.badge === "Only 2 Left" ? 2 : undefined,
-        modelNote: apparel ? trench.modelNote : "",
-        gallery: photos([0, 1, 2, 3].map((k) => pool[(i + k) % pool.length])),
-        sections: [
-            { ...trench.sections[0], body: `${p.detail}. Made in small, numbered batches by our partner ateliers.`, bullets: undefined },
-            ...trench.sections.slice(1),
-        ],
+        ...editorial,
+        name: product.name,
+        short: product.short,
+        packs: product.packs,
+        price: preferred?.price ?? 0,
     };
-};
+}
 
-export const getDetail = (id: string) => (id === trench.id ? trench : fromListing(id));
-export const allDetailIds = () => [trench.id, ...PRODUCTS.map((p) => p.id)];
+export function allDetailIds() {
+    return getCatalogue().then((products) =>
+        products.filter((p) => p.id in EDITORIAL).map((p) => ({ id: p.id })),
+    );
+}

@@ -1,23 +1,23 @@
 import Link from "next/link";
+import { FREE_DELIVERY_FROM, DELIVERY_FLAT, money } from "@/lib/cart-math";
 
 // Links point only at pages that exist; the rest stay as plain text rather than dead links.
 const cols = [
   {
-    title: "Collections",
+    title: "Shop",
     links: [
-      { label: "Spring Summer 2025", href: "/collections" },
-      { label: "Tailored Apparel", href: "/collections?category=Apparel" },
-      { label: "Objects & Living", href: "/collections?category=Objects%20%26%20Living" },
-      { label: "Past Archives", href: "/journal#archive" },
+      { label: "All Ghee", href: "/collections" },
+      { label: "Bilona Organic Ghee", href: "/products/bilona-organic-ghee" },
+      { label: "Why Ghee", href: "/#why" },
+      { label: "Our Process", href: "/#process" },
     ],
   },
   {
-    title: "Client Care",
+    title: "Help",
     links: [
-      { label: "Concierge Support" },
-      { label: "Shipping & Returns", href: "/track-order" },
-      { label: "Atelier Boutiques" },
-      { label: "Sourcing & Ethics", href: "/journal" },
+      { label: "Track Your Order", href: "/track-order" },
+      { label: "Delivery & COD", href: "/#delivery" },
+      { label: "My Account", href: "/account" },
     ],
   },
 ];
@@ -31,14 +31,15 @@ export default function Footer() {
     <footer className="pt-16">
       <div className="wrap grid gap-10 pb-12 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1.2fr]">
         <div>
-          <Link href="/" className="font-serif text-lg tracking-[0.16em]">ÉPURE ATELIER</Link>
+          <Link href="/" className="font-serif text-lg tracking-[0.16em]">ORGANIC GHEE</Link>
           <p className="my-4 max-w-72 text-xs text-muted">
-            Deliberate aesthetics, archival silhouettes, and sustainable artisanal craftsmanship engineered for high discernment.
+            Small-batch bilona ghee, churned from cultured curd and grass-fed desi cow milk.
+            Delivered anywhere in Pakistan with cash on delivery.
           </p>
           <form action="#">
-            <label htmlFor="nl" className="label-sm mb-2 block text-[10px]">Dispatch Newsletter</label>
+            <label htmlFor="nl" className="label-sm mb-2 block text-[10px]">Batch notes by email</label>
             <div className="flex max-w-sm gap-2">
-              <input id="nl" type="email" placeholder="Enter your correspondence email" className="flex-1 rounded-[3px] border border-line bg-white px-3 py-2 text-xs" />
+              <input id="nl" type="email" placeholder="Your email address" className="flex-1 rounded-[3px] border border-line bg-white px-3 py-2 text-xs" />
               <button type="submit" className="label-sm rounded-[3px] bg-ink px-4 text-[11px] text-white">Join</button>
             </div>
           </form>
@@ -58,22 +59,25 @@ export default function Footer() {
         ))}
 
         <div>
-          <h4 className={h4}>Presence</h4>
+          <h4 className={h4}>Reach Us</h4>
           <address className="mb-4 text-[0.8rem] not-italic">
-            Galerie Vivienne, 75002 Paris<br />Omotesando, Shibuya, Tokyo
+            Dairy &amp; packing house, Sundar Estate<br />Lahore, Pakistan
           </address>
-          <ul className="flex gap-4 text-[0.8rem]">
-            {[{ label: "Editorial", href: "/journal" }, { label: "Journal", href: "/journal#archive" }, { label: "Instagram" }].map((l) => (
-              <li key={l.label}>{l.href ? <Link href={l.href} className={hover}>{l.label}</Link> : <span className="text-muted">{l.label}</span>}</li>
-            ))}
+          <ul className="space-y-1 text-[0.8rem]">
+            <li>
+              <a href="tel:+923001234567" className={hover}>+92 300 1234567</a>
+            </li>
+            <li className="text-muted">
+              Delivery {money(DELIVERY_FLAT)} · free above {money(FREE_DELIVERY_FROM)}
+            </li>
           </ul>
         </div>
       </div>
 
       <div className="wrap label-sm flex flex-wrap justify-between gap-4 border-t border-line py-5 text-[10px] tracking-[0.08em] text-muted">
-        <span>© 2025 ÉPURE ATELIER S.A. All rights reserved.</span>
+        <span>© 2026 Organic Ghee. All rights reserved.</span>
         <ul className="flex gap-6">
-          {["Privacy Policy", "Terms of Service", "Accessibility"].map((l) => (<li key={l}>{l}</li>))}
+          {["Privacy Policy", "Terms of Service", "Delivery & Returns"].map((l) => (<li key={l}>{l}</li>))}
         </ul>
       </div>
     </footer>

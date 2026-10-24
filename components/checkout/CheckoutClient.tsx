@@ -11,7 +11,7 @@ import { etaFrom, fmtDay, makeOrderId, saveOrder, type Order } from "@/lib/order
 import Field, { inputCls } from "@/components/auth/Field";
 import { ArrowIcon, BoxIcon, CashIcon, CheckIcon, LockIcon, TruckIcon } from "@/components/Icons";
 
-const CITIES = ["Lahore", "Karachi", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Peshawar", "Quetta", "Dubai"];
+const CITIES = ["Lahore", "Karachi", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Peshawar", "Quetta"];
 const ease = [0.22, 1, 0.36, 1] as const;
 
 type Values = { name: string; phone: string; city: string; address: string; notes: string };
@@ -71,7 +71,7 @@ export default function CheckoutClient() {
         notes: edits.notes ?? defaults.notes,
     };
 
-    const { shipping, tax, total } = summarize(subtotal);
+    const { shipping, total } = summarize(subtotal);
     const errors = validate(v);
     const shown = (k: Key) => (touched[k] || submitted ? errors[k] : undefined);
 
@@ -106,7 +106,7 @@ export default function CheckoutClient() {
                 notes: v.notes.trim(),
             },
             items: items.map((i) => ({ name: i.name, options: i.options, qty: i.qty, price: i.price, image: i.image })),
-            totals: { subtotal, shipping, tax, total },
+            totals: { subtotal, shipping, total },
         };
         saveOrder(order);
         setPlaced(order);
@@ -130,7 +130,7 @@ export default function CheckoutClient() {
                     </span>
                     <h1 className="mt-6 font-serif text-[clamp(2rem,4vw,2.8rem)] leading-tight tracking-tight">Order confirmed</h1>
                     <p className="mx-auto mt-4 max-w-md text-[0.9rem] leading-relaxed text-muted">
-                        Your pieces are reserved. Keep {money(placed.totals.total)} ready in cash — nothing is charged before
+                        Your order is reserved. Keep {money(placed.totals.total)} ready in cash — nothing is charged before
                         the parcel reaches you.
                     </p>
 
@@ -202,7 +202,7 @@ export default function CheckoutClient() {
                     </div>
                     <h2 className="mt-4 font-serif text-2xl leading-tight">Where should the rider bring it?</h2>
                     <p className="mt-2 text-[0.85rem] text-muted">
-                        Everything is dispatched from the atelier in Lahore and handed over in person.
+                        Everything is dispatched from our dairy in Lahore and handed over in person.
                     </p>
 
                     <div className="mt-7 space-y-5">
@@ -321,12 +321,11 @@ export default function CheckoutClient() {
                     <div className="flex justify-between"><dt className="text-muted">Subtotal</dt><dd>{money(subtotal)}</dd></div>
                     <div className="flex justify-between">
                         <dt className="inline-flex items-center gap-1.5 text-muted">
-                            Shipping
+                            Delivery
                             {shipping === 0 && <span className="grid size-4 place-items-center rounded-full border border-accent text-accent"><CheckIcon size={9} /></span>}
                         </dt>
                         <dd className={shipping === 0 ? "label-sm text-[11px]" : ""}>{shipping === 0 ? "Free" : money(shipping)}</dd>
                     </div>
-                    <div className="flex justify-between"><dt className="text-muted">Taxes (8%)</dt><dd>{money(tax)}</dd></div>
                 </dl>
 
                 <div className="mt-5 flex items-baseline justify-between border-t border-line pt-5">
@@ -356,7 +355,7 @@ export default function CheckoutClient() {
 
                 <ul className="label-sm mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[9px] text-muted">
                     <li className="inline-flex items-center gap-1.5"><span className="text-accent"><TruckIcon size={11} /></span>Rider-tracked</li>
-                    <li className="inline-flex items-center gap-1.5"><span className="text-accent"><BoxIcon size={11} /></span>Gift wrapped</li>
+                    <li className="inline-flex items-center gap-1.5"><span className="text-accent"><BoxIcon size={11} /></span>Sealed jar</li>
                     <li className="inline-flex items-center gap-1.5"><span className="text-accent"><CashIcon size={11} /></span>No prepayment</li>
                 </ul>
 

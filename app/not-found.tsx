@@ -1,25 +1,29 @@
-import { AnnouncementBar } from "@/components/atelier/announcement-bar";
-import { Hero404 } from "@/components/atelier/hero-404";
-import { ProductShowcase } from "@/components/atelier/product-showcase";
-import { ClientCare } from "@/components/atelier/client-care";
-import { SiteFooter } from "@/components/atelier/site-footer";
+import Link from "next/link";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
-/**
- * The design lives on `/` for preview purposes; this wires the identical
- * experience to every unmatched route so real 404s render the same page.
- */
 export default function NotFound() {
     return (
-        <div className="flex min-h-screen flex-col">
-            <AnnouncementBar />
+        <>
             <Header variant="solid" />
-            <main className="flex-1">
-                <Hero404 />
-                <ProductShowcase />
-                <ClientCare />
+            <main className="wrap flex min-h-[60vh] flex-col items-center justify-center py-24 text-center">
+                <p className="eyebrow mb-4">Error 404</p>
+                <h1 className="font-serif text-[clamp(2rem,5vw,3.2rem)] leading-tight tracking-tight">
+                    That page is not on the shelf.
+                </h1>
+                <p className="mt-5 max-w-md text-sm text-muted">
+                    The link you followed no longer exists. The ghee, however, very much does.
+                </p>
+                <div className="mt-8 flex flex-wrap justify-center gap-3">
+                    <Link href="/collections" className="label-sm inline-flex h-11 items-center rounded-full bg-ink px-6 text-[11px] text-white transition hover:bg-ink/85">
+                        Shop the ghee
+                    </Link>
+                    <Link href="/" className="label-sm inline-flex h-11 items-center rounded-full border border-line px-6 text-[11px] transition hover:border-ink">
+                        Back home
+                    </Link>
+                </div>
             </main>
-            <SiteFooter />
-        </div>
+            <Footer />
+        </>
     );
 }

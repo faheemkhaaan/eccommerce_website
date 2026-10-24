@@ -73,8 +73,8 @@ export default function AccountProfile() {
                     <dl className="mt-6">
                         <Row label="Full name" value={str(m.full_name)} />
                         <Row label="Mobile" value={localPhone(m.phone)} />
-                        <Row label="Preferred size" value={str(m.size)} />
-                        <Row label="Order updates" value={m.notify_whatsapp ? "WhatsApp · enabled" : "Email only"} />
+                        <Row label="Usual jar size" value={str(m.size)} />
+                        <Row label="Order updates" value={m.notify_whatsapp ? "Email · on" : "Email · off"} />
                     </dl>
 
                     <button
@@ -175,7 +175,7 @@ export default function AccountProfile() {
 
                 <p className="mt-6 flex items-start gap-3 rounded-2xl bg-sand p-5 text-xs leading-relaxed text-muted">
                     <span className="mt-0.5 text-accent"><MailIcon size={15} /></span>
-                    Questions about an order? Reply to your confirmation email and our concierge will pick it up.
+                    Questions about an order? Reply to your confirmation email and our team will pick it up.
                 </p>
             </div>
         </div>

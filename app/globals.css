@@ -1,12 +1,13 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-paper: #faf8f4;
-  --color-sand: #f3efe8;
-  --color-ink: #1d1b18;
-  --color-muted: #6f6a62;
-  --color-line: #e6e1d7;
-  --color-accent: #8b5e3c;
+  --color-paper: #faf7ef;
+  --color-sand: #f2ebdc;
+  --color-ink: #2b231b;
+  --color-muted: #6d6154;
+  --color-line: #e3d8c4;
+  --color-accent: #b8801f;
+  --color-leaf: #3c5a3a;
   --font-serif: var(--font-playfair), Georgia, serif;
   --font-sans: var(--font-inter), system-ui, sans-serif;
 }
@@ -58,4 +59,33 @@
   font-size: 0.62rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+/* Shared input styling for the admin forms. */
+@utility field {
+  width: 100%;
+  border: 1px solid var(--color-line);
+  border-radius: 0.5rem;
+  background: #fff;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.85rem;
+  color: var(--color-ink);
+}
+
+@utility btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: opacity 0.15s ease;
+}
+
+@utility btn-solid {
+  background: var(--color-ink);
+  color: #fff;
 }

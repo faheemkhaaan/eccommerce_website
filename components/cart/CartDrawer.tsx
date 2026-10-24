@@ -7,8 +7,8 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCart } from "./CartProvider";
 import { useAuthStore } from "@/stores/auth-store";
-import { GIFT_PACKAGING_FROM, money, summarize } from "@/lib/cart-math";
-import { ArrowIcon, CashIcon, CheckIcon, CloseIcon, GiftIcon, LeafIcon, LockIcon, MinusIcon, PlusIcon, ReturnIcon } from "../Icons";
+import { FREE_DELIVERY_FROM, money, summarize } from "@/lib/cart-math";
+import { ArrowIcon, CashIcon, CheckIcon, CloseIcon, LeafIcon, LockIcon, MinusIcon, PlusIcon, ReturnIcon, TruckIcon } from "../Icons";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const FOCUSABLE = 'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])';
@@ -20,9 +20,9 @@ export default function CartDrawer() {
     const panel = useRef<HTMLElement>(null);
     const closeBtn = useRef<HTMLButtonElement>(null);
 
-    const { shipping, tax, total } = summarize(subtotal);
-    const pct = Math.min(100, Math.round((subtotal / GIFT_PACKAGING_FROM) * 100));
-    const unlocked = subtotal >= GIFT_PACKAGING_FROM;
+    const { shipping, total } = summarize(subtotal);
+    const pct = Math.min(100, Math.round((subtotal / FREE_DELIVERY_FROM) * 100));
+    const unlocked = subtotal >= FREE_DELIVERY_FROM;
 
     // Buying needs an account, so guests are sent to sign in and straight back to checkout.
     const goToCheckout = () => {
@@ -116,14 +116,14 @@ export default function CartDrawer() {
                         </div>
                     ) : (
                         <>
-                            {/* Gift packaging progress */}
+                            {/* Free delivery progress */}
                             <div className="mx-6 mt-5 rounded-2xl bg-sand px-4 py-3 md:mx-8">
                                 <div className="label-sm mb-2 flex items-center justify-between gap-3 text-[10px]">
                                     <span className="inline-flex items-center gap-2">
-                                        <GiftIcon size={14} />
+                                        <TruckIcon size={14} />
                                         {unlocked
-                                            ? "Free luxury gift packaging unlocked!"
-                                            : `${money(GIFT_PACKAGING_FROM - subtotal)} away from free gift packaging`}
+                                            ? "Free delivery unlocked!"
+                                            : `${money(FREE_DELIVERY_FROM - subtotal)} away from free delivery`}
                                     </span>
                                     <span className="text-accent">{pct}%</span>
                                 </div>
@@ -193,14 +193,13 @@ export default function CartDrawer() {
                                     <div className="flex justify-between"><dt className="text-muted">Subtotal</dt><dd>{money(subtotal)}</dd></div>
                                     <div className="flex justify-between">
                                         <dt className="inline-flex items-center gap-1.5 text-muted">
-                                            Estimated Shipping
+                                            Delivery
                                             {shipping === 0 && (
                                                 <span className="grid size-4 place-items-center rounded-full border border-accent text-accent"><CheckIcon size={9} /></span>
                                             )}
                                         </dt>
                                         <dd className={shipping === 0 ? "label-sm text-[11px]" : ""}>{shipping === 0 ? "Free" : money(shipping)}</dd>
                                     </div>
-                                    <div className="flex justify-between"><dt className="text-muted">Estimated Taxes (8%)</dt><dd>{money(tax)}</dd></div>
                                 </dl>
 
                                 <div className="mt-4 flex items-baseline justify-between border-t border-line pt-4">

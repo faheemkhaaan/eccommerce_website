@@ -1,9 +1,9 @@
-import { CashIcon, HeadsetIcon, SendIcon } from "../Icons";
+import { CashIcon, HeadsetIcon, LeafIcon } from "../Icons";
 
 const items = [
-    { icon: <CashIcon size={20} />, title: "100% Cash on Delivery", text: "Inspect at doorstep across 18,000+ PIN codes with zero advance deposit." },
-    { icon: <SendIcon size={20} />, title: "Pre-Eid Guaranteed Dispatch", text: "Customized tailoring & express air couriers prioritized for celebratory deadlines." },
-    { icon: <HeadsetIcon size={20} />, title: "Direct WhatsApp Concierge", text: "Real-time styling advice, custom sleeve alterations, and parcel updates." },
+    { icon: <CashIcon size={20} />, title: "100% Cash on Delivery", text: "Pay at your doorstep anywhere in Pakistan. No card, no advance deposit." },
+    { icon: <LeafIcon size={20} />, title: "Churned Fresh Weekly", text: "Small batches made to order, never warehoused for months." },
+    { icon: <HeadsetIcon size={20} />, title: "Direct WhatsApp Support", text: "Questions about purity, storage or your parcel answered by the dairy." },
 ];
 
 export default function TrustStrip() {

@@ -9,9 +9,7 @@ export default function CollectionHero({ count }: { count: number }) {
                     <ol className="flex flex-wrap items-center gap-2">
                         <li><Link href="/" className="hover:text-ink">Home</Link></li>
                         <li aria-hidden>/</li>
-                        <li><Link href="/collections" className="hover:text-ink">Collections</Link></li>
-                        <li aria-hidden>/</li>
-                        <li aria-current="page" className="text-ink">Spring Summer ’25</li>
+                        <li aria-current="page" className="text-ink">Shop</li>
                     </ol>
                 </nav>
 
@@ -19,19 +17,19 @@ export default function CollectionHero({ count }: { count: number }) {
                     <div className="max-w-2xl">
                         <Reveal>
                             <p className="eyebrow mb-5 flex items-center gap-3 text-accent">
-                                <span className="h-px w-8 bg-current" /> Act I: L’Aura Silencieuse
+                                <span className="h-px w-8 bg-current" /> Small batch — churned weekly
                             </p>
                         </Reveal>
                         <Reveal delay={0.08}>
                             <h1 className="font-serif text-[clamp(2.6rem,7vw,4.75rem)] leading-[1.05] tracking-tight">
-                                The Spring Wardrobe
+                                Our Ghee
                             </h1>
                         </Reveal>
                         <Reveal delay={0.16}>
                             <p className="mt-6 max-w-lg text-sm text-muted">
-                                Sculpted volumes, untreated natural fibres, and architectural silhouettes designed to
-                                transcend seasonal transience. An intentional dialogue between wearable tailoring and
-                                functional homeware objects.
+                                One product, made properly: bilona ghee churned from cultured
+                                curd and grass-fed desi cow milk. Available in four pack sizes,
+                                delivered across Pakistan with cash on delivery.
                             </p>
                         </Reveal>
                     </div>
@@ -39,11 +37,13 @@ export default function CollectionHero({ count }: { count: number }) {
                     <Reveal delay={0.24} className="md:text-right">
                         <p className="font-serif text-4xl leading-none">
                             {count}
-                            <span className="label-sm ml-2 font-sans text-[10px] text-muted">Editions registered</span>
+                            <span className="label-sm ml-2 font-sans text-[10px] text-muted">
+                                {count === 1 ? "product" : "products"} in the pantry
+                            </span>
                         </p>
                         <p className="mt-2 inline-flex items-center gap-2 text-xs text-accent">
-                            <i className="size-1.5 rounded-full bg-[#b4372b]" />
-                            Atelier Paris &amp; Kyoto Release
+                            <i className="size-1.5 rounded-full bg-leaf" />
+                            More pantry staples coming soon
                         </p>
                     </Reveal>
                 </div>

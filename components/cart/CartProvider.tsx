@@ -10,7 +10,7 @@ export type CartItem = {
     id: string;
     name: string;
     image: string;
-    options: string[]; // shown under the name, e.g. ["Size: S", "Oatmeal Beige"]
+    options: string[]; // shown under the name, e.g. ["1 kg"]
     price: number;
     qty: number;
 };
@@ -23,7 +23,7 @@ type Action =
     | { type: "remove"; key: string }
     | { type: "clear" };
 
-const STORAGE_KEY = "epure-bag-v1";
+const STORAGE_KEY = "organic-ghee-bag-v1";
 const MAX_QTY = 9;
 const keyOf = (i: { id: string; options: string[] }) => [i.id, ...i.options].join("|");
 

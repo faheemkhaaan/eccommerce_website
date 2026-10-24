@@ -127,7 +127,7 @@ export default function TrackOrderClient({ initialId = "" }: { initialId?: strin
                             <span className="mx-auto grid size-14 place-items-center rounded-full bg-sand text-muted"><BoxIcon size={22} /></span>
                             <p className="mt-5 font-serif text-2xl">Track a parcel</p>
                             <p className="mx-auto mt-2 max-w-sm text-sm text-muted">
-                                Your atelier dispatch timeline — from the Lahore workshop to your doorstep — will appear here.
+                                Your dispatch timeline — from our dairy in Lahore to your doorstep — will appear here.
                             </p>
                         </div>
                     </div>

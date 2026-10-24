@@ -18,8 +18,8 @@ const COUNTRIES = {
 } as const;
 type CountryKey = keyof typeof COUNTRIES;
 
-const SIZES = ["XS", "S", "M", "L", "XL", "Unstitched"] as const;
-const CITIES = ["Lahore", "Karachi", "Islamabad", "Dubai", "Delhi", "Mumbai"];
+const JAR_SIZES = ["500 g", "1 kg", "2 kg", "5 kg"] as const;
+const CITIES = ["Lahore", "Karachi", "Islamabad", "Rawalpindi", "Faisalabad", "Peshawar"];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -73,7 +73,7 @@ export default function RegisterForm({ next = "/" }: { next?: string }) {
     const fromCheckout = next.startsWith("/checkout");
 
     const [v, setV] = useState<Values>({
-        name: "", country: "PK", phone: "", email: "", size: "M",
+        name: "", country: "PK", phone: "", email: "", size: "1 kg",
         city: "", address: "", password: "", confirm: "", notify: true,
     });
     const [touched, setTouched] = useState<Partial<Record<Key, boolean>>>({});
@@ -138,14 +138,14 @@ export default function RegisterForm({ next = "/" }: { next?: string }) {
     return (
         <div className="rounded-4xl bg-white p-6 shadow-[0_30px_70px_-40px_rgba(60,40,20,0.35)] sm:p-10 md:rounded-[2.5rem]">
             <span className="label-sm inline-flex items-center gap-2 rounded-full bg-sand px-3 py-1.5 text-[10px] tracking-[0.12em]">
-                <i className="size-1.5 rounded-full bg-accent" /> Atelier Registry
+                <i className="size-1.5 rounded-full bg-accent" /> New Account
             </span>
             <h1 className="mt-5 font-serif text-[clamp(2.1rem,4.4vw,3.2rem)] leading-[1.05] tracking-tight">
-                Create Your Atelier Account
+                Create Your Account
             </h1>
             <p className="mt-4 max-w-xl text-[0.9rem] leading-relaxed text-muted">
-                Join ÉPURE Studio to unlock seamless Cash on Delivery ordering, save your measurements &amp;
-                delivery addresses, and track festive drops before Eid.
+                Join Organic Ghee to order with Cash on Delivery, save your delivery addresses &amp; phone number,
+                and reorder your usual jar in a couple of taps.
             </p>
 
             {fromCheckout && (
@@ -204,9 +204,9 @@ export default function RegisterForm({ next = "/" }: { next?: string }) {
                     <input {...f("email")} type="email" autoComplete="email" value={v.email} onChange={(e) => set("email", e.target.value)} placeholder="ayla@example.com" className={inputCls} />
                 </Field>
 
-                <Field id={`${uid}-size`} group label="Preferred silhouette / sizing" hint={<span className="text-accent">Ensures correct tailoring cuts</span>}>
-                    <div role="radiogroup" aria-labelledby={`${uid}-size-label`} className="grid grid-cols-3 gap-2 sm:grid-cols-6">
-                        {SIZES.map((s) => {
+                <Field id={`${uid}-size`} group label="Usual jar size" hint={<span className="text-accent">Pre-selected for you at checkout</span>}>
+                    <div role="radiogroup" aria-labelledby={`${uid}-size-label`} className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                        {JAR_SIZES.map((s) => {
                             const sel = v.size === s;
                             return (
                                 <button
@@ -276,14 +276,14 @@ export default function RegisterForm({ next = "/" }: { next?: string }) {
                 <label className="flex cursor-pointer items-start gap-3">
                     <input type="checkbox" checked={v.notify} onChange={(e) => set("notify", e.target.checked)} className="mt-1 size-4 shrink-0 accent-ink" />
                     <span>
-                        <span className="block text-[0.85rem]">Notify me of new Eid Kurti drops and limited artisan releases via WhatsApp</span>
-                        <span className="mt-0.5 block text-[11px] text-muted">Includes priority reservation windows and unstitched suit fabric previews.</span>
+                        <span className="block text-[0.85rem]">Email me when a new batch is churned or a new pantry staple is released</span>
+                        <span className="mt-0.5 block text-[11px] text-muted">Roughly once a month. No spam, unsubscribe any time.</span>
                     </span>
                 </label>
 
                 <div className="grid gap-3 rounded-3xl bg-sand px-5 py-3.5 text-[11px] tracking-wide text-accent sm:grid-cols-2 sm:divide-x sm:divide-line sm:rounded-full sm:px-6">
                     <p className="flex items-center gap-3"><CashIcon size={16} /> No Credit Card Needed — Always 100% Cash on Delivery</p>
-                    <p className="flex items-center gap-3 sm:pl-5"><BoxIcon size={16} /> Free Delivery on Festive Collections</p>
+                    <p className="flex items-center gap-3 sm:pl-5"><BoxIcon size={16} /> Free Delivery on Orders Above Rs 5,000</p>
                 </div>
 
                 <AnimatePresence initial={false}>

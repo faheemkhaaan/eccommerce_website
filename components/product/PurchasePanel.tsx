@@ -2,20 +2,21 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowIcon, CheckIcon, ChevronIcon, MinusIcon, PlusIcon, RulerIcon, StarIcon } from "../Icons";
+import { ArrowIcon, CheckIcon, ChevronIcon, MinusIcon, PlusIcon, StarIcon } from "../Icons";
 import { Detail } from "@/lib/product-details";
+import type { Pack } from "@/lib/catalogue";
 import { useCart } from "../cart/CartProvider";
+import { money } from "@/lib/cart-math";
 
 const perks = [
-    { title: "Complimentary", sub: "Global Express" },
-    { title: "14-Day", sub: "Atelier Returns" },
-    { title: "Artisanal", sub: "Porto Workshop" },
+    { title: "Free delivery", sub: "Over Rs 5,000" },
+    { title: "Cash on", sub: "Delivery" },
+    { title: "7-day", sub: "Returns" },
 ];
 const ease = [0.22, 1, 0.36, 1] as const;
 
 export default function PurchasePanel({ product: p }: { product: Detail }) {
-    const [color, setColor] = useState(p.colorways[0].name);
-    const [size, setSize] = useState(p.defaultSize);
+    const [packLabel, setPackLabel] = useState(p.defaultPack);
     const [qty, setQty] = useState(1);
     const [added, setAdded] = useState(false);
     const [open, setOpen] = useState<number | null>(0);
@@ -37,16 +38,25 @@ export default function PurchasePanel({ product: p }: { product: Detail }) {
     }, []);
     useEffect(() => () => clearTimeout(timer.current), []);
 
-    const maxQty = p.stockLeft ?? 9;
-    const total = (p.price * qty).toLocaleString("en-US");
+    const pack = p.packs.find((k) => k.label === packLabel) ?? p.packs[0];
+    const maxQty = Math.max(pack.stock, 1);
+    const soldOut = pack.stock === 0;
+    const total = money(pack.price * qty);
+
+    // Clamp on change rather than in an effect, so the stepper can never strand
+    // the quantity above a smaller pack's stock.
+    const selectPack = (next: Pack) => {
+        setPackLabel(next.label);
+        setQty((q) => Math.min(q, Math.max(next.stock, 1)));
+    };
 
     const addToBag = () => {
         add({
             id: p.id,
             name: p.name,
             image: p.gallery[0].thumb,
-            options: [p.sizes.length > 1 ? `Size: ${size}` : "", color].filter(Boolean),
-            price: p.price,
+            options: [pack.label],
+            price: pack.price,
             qty,
         });
         openBag();
@@ -59,97 +69,69 @@ export default function PurchasePanel({ product: p }: { product: Detail }) {
         <div>
             <p className="label-sm flex justify-between gap-4 text-[10px] tracking-[0.14em]">
                 <span className="text-accent">{p.edition}</span>
-                <span className="text-muted">Art. {p.article}</span>
+                <span className="text-muted">Batch {p.article}</span>
             </p>
             <h1 className="mt-3 font-serif text-[clamp(1.9rem,3.4vw,2.6rem)] leading-tight tracking-tight">{p.name}</h1>
 
             <div className="mt-3 flex items-center gap-2 text-xs">
                 <span className="flex gap-0.5 [&_svg]:fill-current" aria-hidden><StarIcon size={12} /><StarIcon size={12} /><StarIcon size={12} /><StarIcon size={12} /><StarIcon size={12} /></span>
-                <a href="#reviews" className="text-muted underline underline-offset-4">
-                    {p.rating} ({p.reviews} atelier appraisals)
-                </a>
+                <span className="text-muted">{p.rating} ({p.reviews} reviews)</span>
             </div>
 
             <div className="mt-5 flex items-baseline gap-3">
-                <span className="font-serif text-3xl">${p.price.toLocaleString("en-US")}</span>
-                <span className="label-sm text-[10px] text-muted">USD tax included</span>
+                <span className="font-serif text-3xl">{money(pack.price)}</span>
+                <span className="label-sm text-[10px] text-muted">for {pack.label} · no tax on COD orders</span>
             </div>
             <p className="mt-1 text-xs text-muted">
-                Or 4 interest-free installments of ${Math.round(p.price / 4)} with{" "}
-                <span className="label-sm rounded bg-sand px-1.5 py-0.5 text-[9px] font-semibold text-ink">Klarna</span>
+                Paid in cash when the rider hands over your parcel. Nothing is charged up front.
             </p>
 
             <div className="mt-6 border-t border-line pt-6">
-                {/* Colorway */}
+                {/* Pack size — the only thing that changes the price */}
                 <div className="mb-3 flex items-center justify-between">
-                    <span className="label-sm text-[10px] text-muted">Colorway:</span>
-                    <span className="text-xs">{color}</span>
+                    <span className="label-sm text-[10px] text-muted">
+                        Choose a pack: <b className="font-medium text-ink">{pack.label}</b>
+                    </span>
                 </div>
-                <div role="radiogroup" aria-label="Colorway" className="flex gap-3">
-                    {p.colorways.map((c) => {
-                        const sel = c.name === color;
+                <div role="radiogroup" aria-label="Pack size" className="grid grid-cols-2 gap-2">
+                    {p.packs.map((k) => {
+                        const sel = k.label === pack.label;
+                        const out = k.stock === 0;
                         return (
                             <button
-                                key={c.name}
+                                key={k.label}
                                 type="button"
                                 role="radio"
                                 aria-checked={sel}
-                                aria-label={c.name}
-                                onClick={() => setColor(c.name)}
-                                className="relative size-7 rounded-full border border-line"
-                                style={{ background: c.hex }}
+                                disabled={out}
+                                onClick={() => selectPack(k)}
+                                className="relative px-3 py-3 text-left transition hover:bg-line/60 bg-sand disabled:cursor-not-allowed disabled:opacity-45"
                             >
                                 {sel && (
-                                    <motion.span
-                                        layoutId="swatch-ring"
-                                        transition={{ duration: 0.25, ease }}
-                                        className="absolute -inset-1.5 rounded-full border border-ink"
-                                    />
+                                    <motion.span layoutId="pack-pill" transition={{ duration: 0.25, ease }} className="absolute inset-0 bg-ink" />
+                                )}
+                                <span className={`relative z-10 block text-[0.8rem] transition-colors ${sel ? "text-white" : ""}`}>{k.label}</span>
+                                <span className={`relative z-10 mt-0.5 block text-[0.7rem] transition-colors ${sel ? "text-white/70" : "text-muted"}`}>
+                                    {money(k.price)}
+                                </span>
+                                {out && (
+                                    <span className={`label-sm relative z-10 mt-1 block text-[9px] tracking-widest ${sel ? "text-white/70" : "text-accent"}`}>
+                                        Sold out
+                                    </span>
                                 )}
                             </button>
                         );
                     })}
                 </div>
 
-                {/* Size */}
-                <div className="mb-3 mt-6 flex items-center justify-between">
-                    <span className="label-sm text-[10px] text-muted">
-                        Select size: <b className="font-medium text-ink">{size}</b>
-                    </span>
-                    <a href="#size-guide" className="inline-flex items-center gap-1.5 text-[11px] underline underline-offset-4">
-                        <RulerIcon size={12} /> Atelier Size Guide
-                    </a>
-                </div>
-                <div role="radiogroup" aria-label="Size" className={`grid gap-2 ${p.sizes.length > 1 ? "grid-cols-5" : "grid-cols-1"}`}>
-                    {p.sizes.map((s) => {
-                        const sel = s === size;
-                        return (
-                            <button
-                                key={s}
-                                type="button"
-                                role="radio"
-                                aria-checked={sel}
-                                onClick={() => setSize(s)}
-                                className="relative h-10 bg-sand text-[11px] tracking-wider transition hover:bg-line"
-                            >
-                                {sel && (
-                                    <motion.span layoutId="size-pill" transition={{ duration: 0.25, ease }} className="absolute inset-0 bg-ink" />
-                                )}
-                                <span className={`relative z-10 transition-colors ${sel ? "text-white" : ""}`}>{s}</span>
-                            </button>
-                        );
-                    })}
-                </div>
-                {(p.modelNote || p.stockLeft) && (
-                    <p className="mt-2 flex justify-between gap-4 text-[11px] text-muted">
-                        <span>{p.modelNote}</span>
-                        {p.stockLeft && (
-                            <span className="label-sm text-[10px] text-accent">
-                                Only {p.stockLeft} piece{p.stockLeft > 1 ? "s" : ""} left
-                            </span>
-                        )}
-                    </p>
-                )}
+                <p className="mt-3 flex justify-between gap-4 text-[11px] text-muted">
+                    <span>{p.packNote}</span>
+                    {soldOut ? (
+                        <span className="label-sm shrink-0 text-[10px]">Sold out</span>
+                    ) : (
+                        <span className="label-sm shrink-0 text-[10px] text-accent">{pack.stock} left</span>
+                    )}
+                </p>
 
                 {/* Purchase row */}
                 <div className="mt-6 flex items-center gap-3">
@@ -166,22 +148,23 @@ export default function PurchasePanel({ product: p }: { product: Detail }) {
                     <motion.button
                         ref={addRef}
                         type="button"
-                        whileHover={{ y: -2 }}
-                        whileTap={{ scale: 0.98 }}
+                        disabled={soldOut}
+                        whileHover={soldOut ? undefined : { y: -2 }}
+                        whileTap={soldOut ? undefined : { scale: 0.98 }}
                         onClick={addToBag}
                         aria-live="polite"
-                        className="label-sm flex h-12 flex-1 items-center justify-center rounded-full bg-ink px-6 text-[11px] text-white"
+                        className="label-sm flex h-12 flex-1 items-center justify-center rounded-full bg-ink px-6 text-[11px] text-white disabled:cursor-not-allowed disabled:bg-muted"
                     >
                         <AnimatePresence mode="wait" initial={false}>
                             <motion.span
-                                key={added ? "added" : "idle"}
+                                key={soldOut ? "out" : added ? "added" : "idle"}
                                 initial={{ opacity: 0, y: 6 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -6 }}
                                 transition={{ duration: 0.18 }}
                                 className="inline-flex items-center gap-2"
                             >
-                                {added ? (<>Added to bag <CheckIcon size={14} /></>) : (<>Add to bag • ${total} <ArrowIcon size={14} /></>)}
+                                {soldOut ? (<>Sold out</>) : added ? (<>Added to bag <CheckIcon size={14} /></>) : (<>Add to bag • {total} <ArrowIcon size={14} /></>)}
                             </motion.span>
                         </AnimatePresence>
                     </motion.button>
@@ -256,10 +239,10 @@ export default function PurchasePanel({ product: p }: { product: Detail }) {
                     >
                         <div className="min-w-0">
                             <p className="truncate text-xs font-medium">{p.name}</p>
-                            <p className="text-xs text-muted">${p.price.toLocaleString("en-US")} · {size}</p>
+                            <p className="text-xs text-muted">{money(pack.price)} · {pack.label}</p>
                         </div>
-                        <button type="button" onClick={addToBag} className="label-sm h-11 shrink-0 rounded-full bg-ink px-6 text-[11px] text-white">
-                            {added ? "Added" : "Add to bag"}
+                        <button type="button" disabled={soldOut} onClick={addToBag} className="label-sm h-11 shrink-0 rounded-full bg-ink px-6 text-[11px] text-white disabled:cursor-not-allowed disabled:bg-muted">
+                            {soldOut ? "Sold out" : added ? "Added" : "Add to bag"}
                         </button>
                     </motion.div>
                 )}
@@ -267,4 +250,3 @@ export default function PurchasePanel({ product: p }: { product: Detail }) {
         </div>
     );
 }
-

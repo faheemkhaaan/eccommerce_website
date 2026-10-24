@@ -199,7 +199,7 @@ export default function LoginCard({ next = "/" }: { next?: string }) {
             </div>
 
             <p className="mt-10 text-center text-[0.95rem] text-muted">
-                {fromCheckout ? "No account yet? " : "New to ÉPURE Studio? "}
+                {fromCheckout ? "No account yet? " : "New to Organic Ghee? "}
                 <Link href={fromCheckout ? "/register?next=%2Fcheckout" : "/register"} className="text-ink underline underline-offset-4">
                     Create an Account
                 </Link>

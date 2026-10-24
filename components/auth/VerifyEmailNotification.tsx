@@ -35,7 +35,7 @@ export default function VerifyEmailNotice({ email, onEdit }: { email: string; on
             </span>
             <h1 className="mt-6 font-serif text-[clamp(2rem,4vw,2.8rem)] leading-tight">Check your inbox</h1>
             <p className="mx-auto mt-4 max-w-md text-[0.9rem] leading-relaxed text-muted">
-                We sent a verification link to <span className="text-ink">{email}</span>. Open it to activate your atelier account.
+                We sent a verification link to <span className="text-ink">{email}</span>. Open it to activate your account.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">

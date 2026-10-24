@@ -17,7 +17,6 @@ export type OrderItem = {
 export type Totals = {
     subtotal: number;
     shipping: number;
-    tax: number;
     total: number;
 };
 
@@ -47,7 +46,7 @@ export type TrackingStep = {
     state: StepState;
 };
 
-const STORAGE_KEY = "epure-orders-v1";
+const STORAGE_KEY = "organic-ghee-orders-v1";
 const MAX_STORED = 20;
 const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no I/O/0/1 — read out over the phone
 
@@ -56,12 +55,12 @@ const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no I/O/0/1 — read out ove
 const STEP_MINUTES = [0, 1, 3, 6, 12];
 const ETA_HOURS = 48;
 
-export const DEMO_ORDER_ID = "EP-DEMO24";
+export const DEMO_ORDER_ID = "OG-DEMO24";
 
 export function makeOrderId(): string {
     let out = "";
     for (let i = 0; i < 6; i++) out += CHARS[Math.floor(Math.random() * CHARS.length)];
-    return `EP-${out}`;
+    return `OG-${out}`;
 }
 
 export const etaFrom = (placedAt: string) =>
@@ -118,14 +117,14 @@ export function demoOrder(now = Date.now()): Order {
         },
         items: [
             {
-                name: "Noor-e-Kashmir Kurti Suite",
-                options: ["Size: M", "Ivory Zari"],
+                name: "Bilona Organic Ghee",
+                options: ["1 kg"],
                 qty: 1,
-                price: 320,
-                image: images.p2,
+                price: 3250,
+                image: images.jar1kg,
             },
         ],
-        totals: { subtotal: 320, shipping: 0, tax: 25.6, total: 345.6 },
+        totals: { subtotal: 3250, shipping: 0, total: 3250 },
     };
 }
 
@@ -134,13 +133,13 @@ function route(order: Order) {
     return [
         {
             title: "Order confirmed",
-            place: "ÉPURE Atelier — Gulberg III, Lahore",
-            detail: "COD order received and confirmed by our concierge.",
+            place: "Organic Ghee — Gulberg III, Lahore",
+            detail: "COD order received and confirmed by our team.",
         },
         {
             title: "Packed & sealed",
-            place: "Atelier Fulfilment Centre — Sundar Estate, Lahore",
-            detail: "Hand-checked, gift-wrapped and sealed in the atelier.",
+            place: "Dairy Fulfilment Centre — Sundar Estate, Lahore",
+            detail: "Jar hand-checked, sealed and boxed for transit.",
         },
         {
             title: "In transit",

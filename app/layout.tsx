@@ -10,8 +10,9 @@ const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfa
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "ÉPURE Atelier",
-  description: "Sculpted silhouettes and considered objects, made in small batches.",
+  title: "Organic Ghee — Bilona Ghee, Delivered Across Pakistan",
+  description:
+    "Hand-churned bilona ghee from a single grass-fed herd near Lahore. One ingredient, no additives, cash on delivery anywhere in Pakistan.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
