@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
 import { createClient } from "@/lib/supabase/client";
-import { buildTracking, currentStep, readOrders, type Order } from "@/lib/orders";
+import { buildTracking, currentStep, type OrderRecord } from "@/lib/orders";
 import { money } from "@/lib/cart-math";
 import { ArrowIcon, BoxIcon, CheckIcon, MailIcon, TruckIcon } from "@/components/Icons";
 
@@ -29,16 +28,9 @@ function Row({ label, value }: { label: string; value: string }) {
     );
 }
 
-export default function AccountProfile() {
+export default function AccountProfile({ orders }: { orders: OrderRecord[] }) {
     const user = useAuthStore((s) => s.user);
     const router = useRouter();
-    const [orders, setOrders] = useState<Order[]>([]);
-
-    // Orders are kept in this browser, so they can only be read after mount.
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- reading localStorage is a mount-only sync with an external store
-        setOrders(readOrders());
-    }, []);
 
     const signOut = async () => {
         await createClient().auth.signOut(); // onAuthStateChange flips the store to "guest"
@@ -119,17 +111,17 @@ export default function AccountProfile() {
             <div id="orders" className="scroll-mt-28 rounded-[2rem] bg-white p-6 sm:p-8">
                 <div className="flex items-center justify-between gap-4">
                     <p className="eyebrow text-accent">Orders &amp; tracking</p>
-                    <span className="label-sm text-[10px] text-muted">{orders.length} in this browser</span>
+                    <span className="label-sm text-[10px] text-muted">{orders.length} on this account</span>
                 </div>
                 <h2 className="mt-3 font-serif text-2xl leading-tight">Your parcels</h2>
 
                 {orders.length === 0 ? (
                     <div className="mt-6 rounded-2xl bg-sand p-6 text-center">
                         <span className="mx-auto grid size-12 place-items-center rounded-full bg-white text-muted"><BoxIcon size={18} /></span>
-                        <p className="mt-4 text-sm">No orders in this browser yet.</p>
+                        <p className="mt-4 text-sm">No orders on this account yet.</p>
                         <p className="mx-auto mt-2 max-w-sm text-xs leading-relaxed text-muted">
-                            Place an order and it will appear here with its dispatch timeline. Already ordered on
-                            another device? Track it with your Order ID and mobile number.
+                            Place an order and it will appear here with its dispatch timeline, on every device you
+                            sign in from.
                         </p>
                         <div className="mt-5 flex flex-wrap justify-center gap-2">
                             <Link href="/collections" className="label-sm inline-flex h-11 items-center rounded-full bg-ink px-6 text-[10px] text-white">
@@ -143,7 +135,9 @@ export default function AccountProfile() {
                 ) : (
                     <ul className="mt-6 space-y-4">
                         {orders.map((o) => {
-                            const live = currentStep(buildTracking(o));
+                            const live = currentStep(
+                                buildTracking({ status: o.status, city: o.recipient.city, events: o.events }),
+                            );
                             return (
                                 <li key={o.id} className="rounded-2xl bg-sand p-5">
                                     <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">

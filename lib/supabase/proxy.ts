@@ -8,6 +8,7 @@ const PROTECTED = ["/account", "/checkout"];
 // Staff surfaces. A signed-out visitor is sent to /login; a signed-in customer is
 // sent home rather than told the dashboard exists.
 const ADMIN_ONLY = ["/admin"];
+const DRIVER_ONLY = ["/driver"];
 
 export async function updateSession(request: NextRequest) {
     let response = NextResponse.next({ request });
@@ -43,22 +44,25 @@ export async function updateSession(request: NextRequest) {
     };
 
     const wantsAdmin = ADMIN_ONLY.some((p) => pathname.startsWith(p));
+    const wantsDriver = DRIVER_ONLY.some((p) => pathname.startsWith(p));
 
-    if (!claims && (wantsAdmin || PROTECTED.some((p) => pathname.startsWith(p)))) {
+    if (!claims && (wantsAdmin || wantsDriver || PROTECTED.some((p) => pathname.startsWith(p)))) {
         return redirectTo("/login", `?next=${encodeURIComponent(pathname)}`);
     }
 
     // Signed in but not staff. This is a routing convenience, not the security
-    // boundary: the admin layout re-checks the role server-side and RLS guards the
-    // data itself, so a forged request gets nothing.
-    if (claims && wantsAdmin) {
+    // boundary: the admin/driver layouts re-check the role server-side and RLS
+    // guards the data itself, so a forged request gets nothing.
+    if (claims && (wantsAdmin || wantsDriver)) {
         const { data: roleRow } = await supabase
             .from("user_roles")
             .select("role")
             .eq("user_id", claims.sub)
             .maybeSingle();
 
-        if (roleRow?.role !== "admin") return redirectTo("/");
+        const role = roleRow?.role;
+        if (wantsAdmin && role !== "admin") return redirectTo("/");
+        if (wantsDriver && role !== "driver") return redirectTo("/");
     }
 
     return response;

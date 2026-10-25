@@ -2,18 +2,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { listProducts } from "@/lib/admin-catalogue";
 import { money } from "@/lib/cart-math";
+import { listBoardOrders } from "@/lib/order-queries";
 
 export default async function AdminOverview() {
-    const products = await listProducts();
+    const [products, orders] = await Promise.all([listProducts(), listBoardOrders()]);
     const packs = products.flatMap((p) => p.packs);
     const units = packs.reduce((sum, k) => sum + k.stock, 0);
     const soldOut = packs.filter((k) => k.stock === 0);
     const live = products.filter((p) => p.is_active).length;
 
+    const pending = orders.filter((o) => o.status === "pending").length;
+
     const stats = [
         { label: "Live products", value: String(live), sub: `${products.length} in the catalogue` },
-        { label: "Pack sizes", value: String(packs.length), sub: "across all products" },
         { label: "Units in stock", value: String(units), sub: "jars and tins ready to ship" },
+        { label: "Pending COD", value: String(pending), sub: "waiting on a confirmation call" },
         { label: "Sold out", value: String(soldOut.length), sub: soldOut.length ? soldOut.map((k) => k.label).join(", ") : "every pack is available" },
     ];
 
@@ -39,6 +42,12 @@ export default async function AdminOverview() {
                     </div>
                 ))}
             </dl>
+
+            <p className="mt-6 text-[0.85rem]">
+                <Link href="/admin/orders" className="underline underline-offset-4 hover:text-accent">
+                    Open the COD status board
+                </Link>
+            </p>
 
             <section className="mt-10">
                 <div className="flex flex-wrap items-center gap-4 border-b border-line pb-3">

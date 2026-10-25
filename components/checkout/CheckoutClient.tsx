@@ -7,7 +7,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useCart } from "@/components/cart/CartProvider";
 import { useAuthStore } from "@/stores/auth-store";
 import { money, summarize } from "@/lib/cart-math";
-import { etaFrom, fmtDay, makeOrderId, saveOrder, type Order } from "@/lib/orders";
+import { fmtDay, type Order } from "@/lib/orders";
+import { placeOrder } from "@/app/(shop)/order-actions";
 import Field, { inputCls } from "@/components/auth/Field";
 import { ArrowIcon, BoxIcon, CashIcon, CheckIcon, LockIcon, TruckIcon } from "@/components/Icons";
 
@@ -60,6 +61,7 @@ export default function CheckoutClient() {
     const [submitted, setSubmitted] = useState(false);
     const [placing, setPlacing] = useState(false);
     const [placed, setPlaced] = useState<Order | null>(null);
+    const [placeError, setPlaceError] = useState<string | null>(null);
 
     // What the client typed always wins; the rest stays prefilled from their account.
     const defaults = useMemo(() => fromAccount(user?.user_metadata), [user]);
@@ -83,33 +85,33 @@ export default function CheckoutClient() {
         onBlur: () => setTouched((t) => ({ ...t, [k]: true })),
     });
 
-    const place = (e: FormEvent<HTMLFormElement>) => {
+    const place = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const form = e.currentTarget;
         setSubmitted(true);
+        setPlaceError(null);
         if (Object.keys(errors).length) {
             setTimeout(() => form.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(), 50);
             return;
         }
 
         setPlacing(true);
-        const placedAt = new Date().toISOString();
-        const order: Order = {
-            id: makeOrderId(),
-            placedAt,
-            eta: etaFrom(placedAt),
-            recipient: {
+        const result = await placeOrder(
+            items.map((i) => ({ product_id: i.id, label: i.options[0] ?? "", qty: i.qty })),
+            {
                 name: v.name.trim(),
                 phone: e164(v.phone),
                 city: v.city.trim(),
                 address: v.address.trim(),
                 notes: v.notes.trim(),
             },
-            items: items.map((i) => ({ name: i.name, options: i.options, qty: i.qty, price: i.price, image: i.image })),
-            totals: { subtotal, shipping, total },
-        };
-        saveOrder(order);
-        setPlaced(order);
+        );
+        if (!result.ok) {
+            setPlaceError(result.message);
+            setPlacing(false);
+            return;
+        }
+        setPlaced(result.order);
         clear();
         setPlacing(false);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -120,7 +122,7 @@ export default function CheckoutClient() {
         const rows = [
             { k: "Order ID", v: placed.id },
             { k: "Cash to pay on delivery", v: money(placed.totals.total) },
-            { k: "Estimated arrival", v: fmtDay(placed.eta) },
+                        { k: "Estimated arrival", v: placed.eta ? fmtDay(placed.eta) : "—" },
         ];
         return (
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }} className="mx-auto max-w-2xl">
@@ -336,9 +338,9 @@ export default function CheckoutClient() {
                 </div>
 
                 <AnimatePresence initial={false}>
-                    {submitted && Object.keys(errors).length > 0 && (
+                    {((submitted && Object.keys(errors).length > 0) || placeError) && (
                         <motion.p role="alert" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden pt-4 text-xs text-[#b4372b]">
-                            Please complete the delivery details above.
+                            {placeError ?? "Please complete the delivery details above."}
                         </motion.p>
                     )}
                 </AnimatePresence>

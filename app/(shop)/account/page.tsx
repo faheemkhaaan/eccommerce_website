@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AccountProfile from "@/components/account/AccountProfile";
+import { listMyOrders } from "@/lib/order-queries";
 
 export const metadata: Metadata = { title: "My account — Organic Ghee" };
 
@@ -16,12 +18,19 @@ export default function AccountPage() {
                         Your pantry account
                     </h1>
                     <p className="mt-4 max-w-2xl text-[0.9rem] leading-relaxed text-muted">
-                        Your details, your delivery address, and every parcel you have ordered from this browser.
+                        Your details, your delivery address, and every parcel on this account.
                     </p>
                 </header>
-                <AccountProfile />
+                <Suspense fallback={<div className="h-100 animate-pulse rounded-[2rem] bg-muted/10" />}>
+                    <ResolvedAccount />
+                </Suspense>
             </main>
             <Footer />
         </>
     );
+}
+
+async function ResolvedAccount() {
+    const orders = await listMyOrders();
+    return <AccountProfile orders={orders} />;
 }

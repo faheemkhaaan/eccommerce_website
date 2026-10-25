@@ -12,6 +12,15 @@ const NOTES: Record<string, { ok: boolean; text: string }> = {
         text: "That product URL is already taken. Pick a different one.",
     },
     invalid: { ok: false, text: "Those values were rejected. Check the required fields and try again." },
+    assigned: { ok: true, text: "Rider assigned. They will see the parcel in their queue." },
+    unassigned: { ok: true, text: "Rider removed from this parcel." },
+    "status-updated": { ok: true, text: "Status updated. Tracking will show the new step." },
+    closed: { ok: false, text: "This order is already closed." },
+    denied: { ok: false, text: "You are not allowed to change that." },
+    missing: { ok: false, text: "That order was not found." },
+    "not-a-rider": { ok: false, text: "That account is not a rider. Grant the driver role first." },
+    "role-granted": { ok: true, text: "Role updated." },
+    "self-demote": { ok: false, text: "You cannot take away your own admin role." },
 };
 
 /** Renders the ?status= flag a server action redirected back with. */

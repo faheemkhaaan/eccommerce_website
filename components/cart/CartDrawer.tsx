@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCart } from "./CartProvider";
 import { useAuthStore } from "@/stores/auth-store";
@@ -17,6 +17,7 @@ export default function CartDrawer() {
     const { items, count, subtotal, isOpen, close, setQty, remove } = useCart();
     const user = useAuthStore((s) => s.user);
     const router = useRouter();
+    const pathname = usePathname();
     const panel = useRef<HTMLElement>(null);
     const closeBtn = useRef<HTMLButtonElement>(null);
 
@@ -30,9 +31,11 @@ export default function CartDrawer() {
         router.push(user ? "/checkout" : "/login?next=%2Fcheckout");
     };
 
+    const staffSurface = pathname.startsWith("/admin") || pathname.startsWith("/driver");
+
     // Scroll lock, Escape to close, focus trap, restore focus
     useEffect(() => {
-        if (!isOpen) return;
+        if (staffSurface || !isOpen) return;
         const previous = document.activeElement as HTMLElement | null;
         document.body.style.overflow = "hidden";
         closeBtn.current?.focus();
@@ -53,7 +56,9 @@ export default function CartDrawer() {
             document.body.style.overflow = "";
             previous?.focus();
         };
-    }, [isOpen, close]);
+    }, [isOpen, close, staffSurface]);
+
+    if (staffSurface) return null;
 
     return (
         <AnimatePresence>
@@ -79,7 +84,7 @@ export default function CartDrawer() {
                     animate={{ x: 0 }}
                     exit={{ x: "100%" }}
                     transition={{ duration: 0.45, ease }}
-                    className="fixed right-0 top-0 z-50 flex h-dvh w-full max-w-[32rem] flex-col bg-paper shadow-2xl"
+                    className="fixed right-0 top-0 z-50 flex h-dvh w-full max-w-lg flex-col bg-paper shadow-2xl"
                 >
                     {/* Header */}
                     <div className="flex items-center justify-between px-6 pt-6 md:px-8 md:pt-8">

@@ -5,6 +5,7 @@ import { MotionProvider } from "@/components/Motion";
 import { CartProvider } from "@/components/cart/CartProvider";
 import CartDrawer from "@/components/cart/CartDrawer";
 import AuthProvider from "@/components/auth/AuthProvider";
+import { Suspense } from "react";
 
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair", display: "swap" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -21,10 +22,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <MotionProvider>
           <AuthProvider>
-            <CartProvider>
-              {children}
-              <CartDrawer />
-            </CartProvider>
+            <Suspense fallback={null}>
+              <CartProvider>
+                {children}
+                <CartDrawer />
+              </CartProvider>
+            </Suspense>
           </AuthProvider>
         </MotionProvider>
       </body>
