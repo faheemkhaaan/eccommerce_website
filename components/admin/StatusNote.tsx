@@ -3,7 +3,15 @@ const NOTES: Record<string, { ok: boolean; text: string }> = {
     created: { ok: true, text: "Pack added." },
     deleted: { ok: true, text: "Pack removed." },
     duplicate: { ok: false, text: "That pack label is already used on this product." },
-    invalid: { ok: false, text: "Those values were rejected. Check the numbers and try again." },
+    "product-created": {
+        ok: true,
+        text: "Product created. Add a pack size below before it can go on sale.",
+    },
+    "duplicate-product": {
+        ok: false,
+        text: "That product URL is already taken. Pick a different one.",
+    },
+    invalid: { ok: false, text: "Those values were rejected. Check the required fields and try again." },
 };
 
 /** Renders the ?status= flag a server action redirected back with. */

@@ -77,9 +77,9 @@ async function ResolvedProduct({ params }: Props) {
                 </Reveal>
             </div>
 
-            <div className="mt-14 border-t border-line pt-14 md:mt-20 md:pt-20">
-                <ProductFacts product={p} />
-            </div>
+            {/* ProductFacts carries its own top border and renders nothing at all
+                for a product that has no editorial copy yet. */}
+            <ProductFacts product={p} />
         </>
     );
 }

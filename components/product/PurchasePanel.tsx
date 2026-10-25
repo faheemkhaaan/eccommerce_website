@@ -39,6 +39,11 @@ export default function PurchasePanel({ product: p }: { product: Detail }) {
     useEffect(() => () => clearTimeout(timer.current), []);
 
     const pack = p.packs.find((k) => k.label === packLabel) ?? p.packs[0];
+
+    // A product can exist in the catalogue before its first pack size is added.
+    // Everything below assumes a pack, so there is nothing to sell until then.
+    if (!pack) return <NotForSale product={p} />;
+
     const maxQty = Math.max(pack.stock, 1);
     const soldOut = pack.stock === 0;
     const total = money(pack.price * qty);
@@ -67,16 +72,20 @@ export default function PurchasePanel({ product: p }: { product: Detail }) {
     };
     return (
         <div>
-            <p className="label-sm flex justify-between gap-4 text-[10px] tracking-[0.14em]">
-                <span className="text-accent">{p.edition}</span>
-                <span className="text-muted">Batch {p.article}</span>
-            </p>
+            {(p.edition || p.article) && (
+                <p className="label-sm flex justify-between gap-4 text-[10px] tracking-[0.14em]">
+                    <span className="text-accent">{p.edition}</span>
+                    <span className="text-muted">{p.article && `Batch ${p.article}`}</span>
+                </p>
+            )}
             <h1 className="mt-3 font-serif text-[clamp(1.9rem,3.4vw,2.6rem)] leading-tight tracking-tight">{p.name}</h1>
 
-            <div className="mt-3 flex items-center gap-2 text-xs">
-                <span className="flex gap-0.5 [&_svg]:fill-current" aria-hidden><StarIcon size={12} /><StarIcon size={12} /><StarIcon size={12} /><StarIcon size={12} /><StarIcon size={12} /></span>
-                <span className="text-muted">{p.rating} ({p.reviews} reviews)</span>
-            </div>
+            {p.reviews > 0 && (
+                <div className="mt-3 flex items-center gap-2 text-xs">
+                    <span className="flex gap-0.5 [&_svg]:fill-current" aria-hidden><StarIcon size={12} /><StarIcon size={12} /><StarIcon size={12} /><StarIcon size={12} /><StarIcon size={12} /></span>
+                    <span className="text-muted">{p.rating} ({p.reviews} reviews)</span>
+                </div>
+            )}
 
             <div className="mt-5 flex items-baseline gap-3">
                 <span className="font-serif text-3xl">{money(pack.price)}</span>
@@ -247,6 +256,22 @@ export default function PurchasePanel({ product: p }: { product: Detail }) {
                     </motion.div>
                 )}
             </AnimatePresence>
+        </div>
+    );
+}
+
+/**
+ * Shown when a catalogue product has no pack sizes, so there is nothing to price
+ * or sell. Reached from /admin before the first pack is added.
+ */
+function NotForSale({ product: p }: { product: Detail }) {
+    return (
+        <div>
+            <h1 className="font-serif text-[clamp(1.9rem,3.4vw,2.6rem)] leading-tight tracking-tight">{p.name}</h1>
+            <p className="mt-3 text-sm leading-relaxed text-muted">{p.short}</p>
+            <p className="mt-6 border-t border-line pt-6 text-sm text-muted">
+                Not on sale yet — no pack sizes have been set up for this product.
+            </p>
         </div>
     );
 }

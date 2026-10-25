@@ -23,22 +23,25 @@ export default function Gallery({ photos, badge, name }: { photos: Photo[]; badg
 
     return (
         <div className="flex flex-col-reverse gap-3 md:flex-row md:gap-4">
-            <ul className="flex gap-2 overflow-x-auto md:w-20 md:shrink-0 md:flex-col md:overflow-visible">
-                {photos.map((ph, i) => (
-                    <li key={ph.thumb + i} className="w-16 shrink-0 md:w-full">
-                        <button
-                            type="button"
-                            onClick={() => setActive(i)}
-                            aria-label={`Show image ${i + 1} of ${photos.length}`}
-                            aria-current={i === active}
-                            className={`relative block aspect-3/4 w-full overflow-hidden rounded-[3px] bg-[#d8d0c2] transition ${i === active ? "ring-1 ring-ink ring-offset-2 ring-offset-paper" : "opacity-60 hover:opacity-100"
-                                }`}
-                        >
-                            <Image src={ph.thumb} alt="" fill sizes="80px" className="object-cover" />
-                        </button>
-                    </li>
-                ))}
-            </ul>
+            {/* A product with a single photo needs no thumbnail rail. */}
+            {photos.length > 1 && (
+                <ul className="flex gap-2 overflow-x-auto md:w-20 md:shrink-0 md:flex-col md:overflow-visible">
+                    {photos.map((ph, i) => (
+                        <li key={ph.thumb + i} className="w-16 shrink-0 md:w-full">
+                            <button
+                                type="button"
+                                onClick={() => setActive(i)}
+                                aria-label={`Show image ${i + 1} of ${photos.length}`}
+                                aria-current={i === active}
+                                className={`relative block aspect-3/4 w-full overflow-hidden rounded-[3px] bg-[#d8d0c2] transition ${i === active ? "ring-1 ring-ink ring-offset-2 ring-offset-paper" : "opacity-60 hover:opacity-100"
+                                    }`}
+                            >
+                                <Image src={ph.thumb} alt="" fill sizes="80px" className="object-cover" />
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            )}
 
             <div className="relative aspect-3/4 flex-1 overflow-hidden rounded-[3px] bg-[#d8d0c2]">
                 <AnimatePresence mode="popLayout" initial={false}>
@@ -61,7 +64,9 @@ export default function Gallery({ photos, badge, name }: { photos: Photo[]; badg
                     </motion.div>
                 </AnimatePresence>
 
-                <span className="label-sm absolute left-3 top-3 z-10 bg-white px-3 py-1.5 text-[9px] tracking-widest">{badge}</span>
+                {badge && (
+                    <span className="label-sm absolute left-3 top-3 z-10 bg-white px-3 py-1.5 text-[9px] tracking-widest">{badge}</span>
+                )}
                 <button
                     type="button"
                     onClick={() => setZoom(true)}

@@ -25,6 +25,42 @@ function back(path: string, status: string): never {
     redirect(`${path}?status=${status}`);
 }
 
+/** The product id doubles as the URL segment, so it has to survive a URL intact. */
+const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+export async function createProduct(formData: FormData) {
+    await assertRole("admin");
+
+    const path = "/admin/products/new";
+    const id = text(formData.get("id")).toLowerCase();
+    const name = text(formData.get("name"));
+    const short = text(formData.get("short"));
+    const image = text(formData.get("image"));
+    const badge = text(formData.get("badge"));
+    const sortOrder = int(formData.get("sort_order"));
+
+    if (!SLUG.test(id) || !name || !short || !image) back(path, "invalid");
+    if (!Number.isFinite(sortOrder)) back(path, "invalid");
+
+    const supabase = await createClient();
+    const { error } = await supabase.from("products").insert({
+        id,
+        name,
+        short,
+        image,
+        badge: badge || null,
+        sort_order: sortOrder,
+        // Off unless asked for: a product with no pack sizes yet has no price and
+        // nothing to buy, so it should not reach the shop until it is ready.
+        is_active: formData.get("is_active") === "on",
+    });
+
+    if (error) back(path, isDuplicate(error.code) ? "duplicate-product" : "invalid");
+
+    updateTag(CATALOGUE_TAG);
+    redirect(`/admin/products/${id}?status=product-created`);
+}
+
 export async function saveProduct(formData: FormData) {
     await assertRole("admin");
 

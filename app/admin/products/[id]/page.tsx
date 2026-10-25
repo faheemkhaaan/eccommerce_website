@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createPack, deletePack, savePack, saveProduct } from "@/app/admin/actions";
@@ -23,19 +24,52 @@ async function ResolvedProduct({ params, searchParams }: Props) {
     const product = await getProduct(id);
     if (!product) notFound();
 
+    const units = product.packs.reduce((sum, k) => sum + k.stock, 0);
+
     return (
         <div className="max-w-3xl">
             <Link href="/admin/products" className="label-sm text-[10px] text-muted hover:text-ink">
                 ← Products &amp; stock
             </Link>
 
-            <header className="mt-4">
-                <p className="eyebrow">Product</p>
-                <h1 className="mt-3 font-serif text-[clamp(1.8rem,3vw,2.4rem)] leading-tight tracking-tight">
-                    {product.name}
-                </h1>
-                <p className="mt-2 text-[0.78rem] text-muted">id: {product.id}</p>
-                <StatusNote status={status} />
+            <header className="mt-4 flex flex-wrap items-start gap-5">
+                <Image
+                    src={product.image}
+                    alt=""
+                    width={64}
+                    height={80}
+                    className="hidden h-20 w-16 shrink-0 rounded object-cover sm:block"
+                />
+                <div className="min-w-0">
+                    <p className="eyebrow">Product</p>
+                    <h1 className="mt-3 font-serif text-[clamp(1.8rem,3vw,2.4rem)] leading-tight tracking-tight">
+                        {product.name}
+                    </h1>
+                    <p className="mt-2 text-[0.78rem] text-muted">
+                        /products/{product.id} · {product.packs.length === 1 ? "1 pack size" : `${product.packs.length} pack sizes`}
+                        {" · "}
+                        {units} in stock
+                    </p>
+                    <p className="mt-3 flex flex-wrap items-center gap-3 text-[0.78rem]">
+                        {!product.is_active && (
+                            <span className="label-sm rounded-full bg-muted/15 px-2 py-1 text-[9px] text-muted">
+                                Hidden from shop
+                            </span>
+                        )}
+                        {product.packs.length === 0 && (
+                            <span className="label-sm rounded-full bg-accent/15 px-2 py-1 text-[9px] text-accent">
+                                Not for sale yet
+                            </span>
+                        )}
+                        <Link
+                            href={`/products/${product.id}`}
+                            className="label-sm text-[10px] text-accent hover:underline"
+                        >
+                            View in shop ↗
+                        </Link>
+                    </p>
+                    <StatusNote status={status} />
+                </div>
             </header>
 
             <section className="mt-8 rounded-xl border border-line p-5 md:p-6">

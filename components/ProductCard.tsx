@@ -35,11 +35,13 @@ export default function ProductCard({ product: p, index }: { product: CatalogueP
 
                 <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-3">
                     <h3 className="font-serif text-[1.05rem]">{p.name}</h3>
-                    <span className="shrink-0 text-[0.85rem] text-muted">from {money(p.fromPrice)}</span>
+                    <span className="shrink-0 text-[0.85rem] text-muted">
+                        {p.packs.length > 0 ? `from ${money(p.fromPrice)}` : "Coming soon"}
+                    </span>
                 </div>
                 <p className="mt-1 text-xs text-muted">{p.short}</p>
                 <p className="label-sm mt-2 text-[10px] text-muted">
-                    {p.packs.length} pack sizes · Cash on delivery
+                    {p.packs.length === 1 ? "1 pack size" : `${p.packs.length} pack sizes`} · Cash on delivery
                 </p>
             </Link>
         </motion.li>

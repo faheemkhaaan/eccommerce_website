@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { listProducts } from "@/lib/admin-catalogue";
 import { money } from "@/lib/cart-math";
@@ -40,32 +41,57 @@ export default async function AdminOverview() {
             </dl>
 
             <section className="mt-10">
-                <h2 className="label-sm text-[10px] text-muted">Catalogue</h2>
-                <ul className="mt-3 divide-y divide-line border-y border-line">
-                    {products.map((p) => (
-                        <li key={p.id} className="flex flex-wrap items-center gap-3 py-4">
-                            <div className="min-w-0 flex-1">
-                                <p className="truncate text-[0.95rem]">{p.name}</p>
-                                <p className="mt-0.5 text-[0.78rem] text-muted">
-                                    {p.packs.length} packs · {money(p.packs[0]?.price ?? 0)} to{" "}
-                                    {money(p.packs[p.packs.length - 1]?.price ?? 0)}
-                                </p>
-                            </div>
-                            {!p.is_active && (
-                                <span className="label-sm rounded-full bg-muted/15 px-2 py-1 text-[9px] text-muted">
-                                    Hidden
-                                </span>
-                            )}
-                            <Link
-                                href={`/admin/products/${p.id}`}
-                                className="btn border border-line text-ink hover:opacity-70"
-                            >
-                                Edit
-                            </Link>
-                        </li>
-                    ))}
+                <div className="flex flex-wrap items-center gap-4 border-b border-line pb-3">
+                    <h2 className="label-sm text-[10px] text-muted">Catalogue</h2>
+                    <Link href="/admin/products/new" className="btn btn-solid ml-auto hover:opacity-85">
+                        New product
+                    </Link>
+                </div>
+
+                <ul className="divide-y divide-line">
+                    {products.map((p) => {
+                        const units = p.packs.reduce((sum, k) => sum + k.stock, 0);
+                        return (
+                            <li key={p.id} className="flex flex-wrap items-center gap-4 py-4">
+                                <Image
+                                    src={p.image}
+                                    alt=""
+                                    width={40}
+                                    height={50}
+                                    className="hidden h-[50px] w-10 shrink-0 rounded object-cover sm:block"
+                                />
+                                <div className="min-w-0 flex-1">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <p className="truncate text-[0.95rem]">{p.name}</p>
+                                        {!p.is_active && (
+                                            <span className="label-sm rounded-full bg-muted/15 px-2 py-1 text-[9px] text-muted">
+                                                Hidden
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="mt-0.5 text-[0.78rem] text-muted">
+                                        {p.packs.length === 0
+                                            ? "No packs yet — not for sale"
+                                            : `${money(p.packs[0].price)} to ${money(p.packs[p.packs.length - 1].price)} · ${units} in stock`}
+                                    </p>
+                                </div>
+                                <Link
+                                    href={`/admin/products/${p.id}`}
+                                    className="btn border border-line bg-paper text-ink hover:opacity-70"
+                                >
+                                    Edit
+                                </Link>
+                            </li>
+                        );
+                    })}
                     {products.length === 0 && (
-                        <li className="py-6 text-[0.85rem] text-muted">The catalogue is empty.</li>
+                        <li className="py-6 text-[0.85rem] text-muted">
+                            The catalogue is empty.{" "}
+                            <Link href="/admin/products/new" className="underline hover:text-ink">
+                                Create the first product
+                            </Link>
+                            .
+                        </li>
                     )}
                 </ul>
             </section>

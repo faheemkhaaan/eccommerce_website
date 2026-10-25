@@ -1,5 +1,5 @@
 import { u, ids } from "@/lib/images";
-import { getCatalogue, getCatalogueProduct, type Pack } from "@/lib/catalogue";
+import { getCatalogue, getCatalogueProduct, type CatalogueProduct, type Pack } from "@/lib/catalogue";
 
 export type Photo = { full: string; thumb: string };
 
@@ -136,13 +136,39 @@ const EDITORIAL: Record<string, Editorial> = {
     },
 };
 
+/**
+ * Editorial copy for a product the dashboard created, which by definition has
+ * none. The page then renders only what the database knows — image, packs, price,
+ * stock — and every empty section hides itself. Better than a 404 for a product
+ * the owner can legitimately put on sale.
+ */
+function fallbackEditorial(product: CatalogueProduct): Editorial {
+    const first = product.packs[0];
+
+    return {
+        id: product.id,
+        edition: "",
+        article: "",
+        rating: 0,
+        reviews: 0,
+        badge: product.badge ?? "",
+        breadcrumb: ["Shop"],
+        defaultPack: first?.label ?? "",
+        packNote: "",
+        gallery: [{ full: product.image, thumb: product.image }],
+        sections: [],
+        benefits: [],
+        nutrition: [],
+        comparison: [],
+    };
+}
+
 /** Merges the database's commercial fields with the editorial copy above. */
 export async function getDetail(id: string): Promise<Detail | undefined> {
-    const editorial = EDITORIAL[id];
-    if (!editorial) return undefined;
-
     const product = await getCatalogueProduct(id);
     if (!product) return undefined;
+
+    const editorial = EDITORIAL[id] ?? fallbackEditorial(product);
 
     const preferred =
         product.packs.find((k) => k.label === editorial.defaultPack) ?? product.packs[0];
@@ -156,8 +182,11 @@ export async function getDetail(id: string): Promise<Detail | undefined> {
     };
 }
 
-export function allDetailIds() {
-    return getCatalogue().then((products) =>
-        products.filter((p) => p.id in EDITORIAL).map((p) => ({ id: p.id })),
-    );
+/**
+ * Every product the shop should prerender. Products added from the dashboard are
+ * included even without editorial copy, since getDetail now resolves them too.
+ */
+export async function allDetailIds() {
+    const products = await getCatalogue();
+    return products.map((p) => ({ id: p.id }));
 }
