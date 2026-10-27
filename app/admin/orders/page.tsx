@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import OrderCard from "@/components/admin/OrderCard";
-import StatusNote from "@/components/admin/StatusNote";
+import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { listBoardOrders, listDrivers } from "@/lib/order-queries";
 import { STATUS_LABEL, isTerminalStatus, type OrderStatus } from "@/lib/orders";
 import { money } from "@/lib/cart-math";
@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "COD board — Organic Ghee" };
 
 const OPEN_COLUMNS: OrderStatus[] = ["pending", "confirmed", "packed", "out_for_delivery", "attempted"];
 
-type Props = { searchParams: Promise<{ status?: string; view?: string }> };
+type Props = { searchParams: Promise<{ status?: NotesType; view?: string }> };
 
 export default function AdminOrdersPage({ searchParams }: Props) {
     return (

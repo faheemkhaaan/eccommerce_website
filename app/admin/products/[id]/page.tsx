@@ -3,12 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createPack, deletePack, savePack, saveProduct } from "@/app/admin/actions";
-import StatusNote from "@/components/admin/StatusNote";
+import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { getProduct } from "@/lib/admin-catalogue";
 
 type Props = {
     params: Promise<{ id: string }>;
-    searchParams: Promise<{ status?: string }>;
+    searchParams: Promise<{ status?: NotesType }>;
 };
 
 export default function AdminProductPage({ params, searchParams }: Props) {

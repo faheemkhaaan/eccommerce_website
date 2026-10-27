@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { grantRole } from "@/app/admin/team/actions";
-import StatusNote from "@/components/admin/StatusNote";
+import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { listStaffUsers } from "@/lib/order-queries";
 import { fmtDay } from "@/lib/orders";
 
 export const metadata: Metadata = { title: "Riders & roles — Organic Ghee" };
 
-type Props = { searchParams: Promise<{ status?: string; q?: string }> };
+type Props = { searchParams: Promise<{ status?: NotesType; q?: string }> };
 
 export default function AdminTeamPage({ searchParams }: Props) {
     return (

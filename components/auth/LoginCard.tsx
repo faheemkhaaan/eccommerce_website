@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
+import { useId, useState, type SubmitEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -28,7 +28,7 @@ export default function LoginCard({ next = "/" }: { next?: string }) {
     const [submitting, setSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
 
-    const submit = async (e: FormEvent) => {
+    const submit = async (e: SubmitEvent) => {
         e.preventDefault();
         setError(null);
         setUnverified(false);

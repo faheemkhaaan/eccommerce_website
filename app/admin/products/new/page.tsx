@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { createProduct } from "@/app/admin/actions";
-import StatusNote from "@/components/admin/StatusNote";
+import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { listProducts } from "@/lib/admin-catalogue";
 
 export const metadata: Metadata = { title: "New product — Organic Ghee" };
 
-type Props = { searchParams: Promise<{ status?: string }> };
+type Props = { searchParams: Promise<{ status?: NotesType }> };
 
 export default function NewProductPage({ searchParams }: Props) {
     return (

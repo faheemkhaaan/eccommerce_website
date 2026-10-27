@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import StatusNote from "@/components/admin/StatusNote";
+import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { money } from "@/lib/cart-math";
 import { listDriverOrders } from "@/lib/order-queries";
 import { STATUS_LABEL, isTerminalStatus } from "@/lib/orders";
 
 export const metadata: Metadata = { title: "Today’s parcels — Organic Ghee" };
 
-type Props = { searchParams: Promise<{ status?: string }> };
+type Props = { searchParams: Promise<{ status?: NotesType }> };
 
 export default function DriverHomePage({ searchParams }: Props) {
     return (

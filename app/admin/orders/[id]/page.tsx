@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { assignDriver, setOrderStatus } from "@/app/admin/orders/actions";
-import StatusNote from "@/components/admin/StatusNote";
+import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { money } from "@/lib/cart-math";
 import { getOrder, listDrivers } from "@/lib/order-queries";
 import {
@@ -17,7 +17,7 @@ import {
 
 export const metadata: Metadata = { title: "Order — Organic Ghee" };
 
-type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ status?: string }> };
+type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ status?: NotesType }> };
 
 export default function AdminOrderPage({ params, searchParams }: Props) {
     return (

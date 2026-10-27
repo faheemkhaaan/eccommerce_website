@@ -13,6 +13,22 @@ import { ArrowIcon, CashIcon, CheckIcon, CloseIcon, LeafIcon, LockIcon, MinusIco
 const ease = [0.22, 1, 0.36, 1] as const;
 const FOCUSABLE = 'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])';
 
+
+
+/**
+ * CartDrawer Component
+ * 
+ * A sliding sidebar drawer component that displays the user's shopping bag, cart items,
+ * free delivery progress bar, subtotal/total calculation, and checkout navigation.
+ * 
+ * Features:
+ * - Animated entrance/exit via Framer Motion.
+ * - Accessibility support: Focus trap, `Escape` key handling to close, and screen reader announcements.
+ * - Auto-hidden on administrative or driver routes (`/admin`, `/driver`).
+ * - Handles guest vs authenticated checkout routing (redirects unauthenticated users to `/login?next=%2Fcheckout`).
+ * 
+ * @returns {JSX.Element | null} The rendered CartDrawer component or null if on a staff surface.
+ */
 export default function CartDrawer() {
     const { items, count, subtotal, isOpen, close, setQty, remove } = useCart();
     const user = useAuthStore((s) => s.user);

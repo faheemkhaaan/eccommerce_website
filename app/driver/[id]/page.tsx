@@ -3,14 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { reportDelivery } from "@/app/driver/actions";
-import StatusNote from "@/components/admin/StatusNote";
+import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { money } from "@/lib/cart-math";
 import { getOrder } from "@/lib/order-queries";
 import { STATUS_LABEL, fmtDay, nextStatuses } from "@/lib/orders";
 
 export const metadata: Metadata = { title: "Parcel — Organic Ghee" };
 
-type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ status?: string }> };
+type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ status?: NotesType }> };
 
 export default function DriverOrderPage({ params, searchParams }: Props) {
     return (

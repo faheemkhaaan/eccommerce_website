@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { saveStock } from "@/app/admin/actions";
-import StatusNote from "@/components/admin/StatusNote";
+import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { listProducts } from "@/lib/admin-catalogue";
 import { money } from "@/lib/cart-math";
 
@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "Products & stock — Organic Ghee" }
 /** Below this many units a pack is worth flagging before it sells out. */
 const LOW_STOCK = 5;
 
-type Props = { searchParams: Promise<{ status?: string }> };
+type Props = { searchParams: Promise<{ status?: NotesType }> };
 
 export default function AdminProductsPage({ searchParams }: Props) {
     return (
@@ -155,9 +155,8 @@ async function ResolvedProducts({ searchParams }: Props) {
 function Badge({ tone = "muted", children }: { tone?: "muted" | "accent"; children: React.ReactNode }) {
     return (
         <span
-            className={`label-sm shrink-0 rounded-full px-2 py-1 text-[9px] ${
-                tone === "accent" ? "bg-accent/15 text-accent" : "bg-muted/15 text-muted"
-            }`}
+            className={`label-sm shrink-0 rounded-full px-2 py-1 text-[9px] ${tone === "accent" ? "bg-accent/15 text-accent" : "bg-muted/15 text-muted"
+                }`}
         >
             {children}
         </span>

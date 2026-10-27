@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useState, type FormEvent, type InputHTMLAttributes } from "react";
+import { useId, useMemo, useState, type SubmitEvent, type InputHTMLAttributes } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -98,7 +98,7 @@ export default function RegisterForm({ next = "/" }: { next?: string }) {
 
     const country = COUNTRIES[v.country];
 
-    const submit = async (e: FormEvent<HTMLFormElement>) => {
+    const submit = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         const form = e.currentTarget;
         setSubmitted(true);
@@ -125,7 +125,7 @@ export default function RegisterForm({ next = "/" }: { next?: string }) {
             });
             setSentTo(v.email.trim());
             setSuccess(true);
-            setTimeout(() => router.push("/"), 900); // TODO: send to your account or welcome page
+            setTimeout(() => router.push("/login"), 9000); // TODO: send to your account or welcome page
         } catch (err) {
             setFormError(err instanceof Error ? err.message : "We couldn’t create your account. Please try again.");
         } finally {
