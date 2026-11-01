@@ -21,7 +21,7 @@ export default function AccountPage() {
                         Your details, your delivery address, and every parcel on this account.
                     </p>
                 </header>
-                <Suspense fallback={<div className="h-100 animate-pulse rounded-[2rem] bg-muted/10" />}>
+                <Suspense fallback={<div className="h-100 animate-pulse rounded-4xl bg-muted/10" />}>
                     <ResolvedAccount />
                 </Suspense>
             </main>

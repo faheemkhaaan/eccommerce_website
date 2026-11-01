@@ -7,9 +7,17 @@ import { ORDER_STATUSES, type OrderStatus } from "@/lib/orders";
 
 const text = (v: FormDataEntryValue | null) => String(v ?? "").trim();
 
+const SAFE_NEXT = /^\/admin\/orders(\/[\w-]+)?(\?[\w=&-]*)?$/;
+const safeNext = (raw: string, fallback: string) => (SAFE_NEXT.test(raw) ? raw : fallback);
+
 function back(path: string, status: string): never {
-    redirect(`${path}?status=${status}`);
+    const url = new URL(path, "http://local");
+    url.searchParams.set("status", status);   // appends with & when a query already exists
+    redirect(`${url.pathname}${url.search}`);
 }
+// function back(path: string, status: string): never {
+//     redirect(`${path}?status=${status}`);
+// }
 
 function rpcStatus(message?: string) {
     const m = (message ?? "").toLowerCase();
@@ -21,7 +29,7 @@ function rpcStatus(message?: string) {
 }
 
 export async function setOrderStatus(formData: FormData) {
-    await assertRole("admin");
+    await assertRole(["admin", 'driver']);
 
     const id = text(formData.get("order_id"));
     const status = text(formData.get("status")) as OrderStatus;

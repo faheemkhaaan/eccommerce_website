@@ -219,18 +219,23 @@ export async function trackOrderByQuery(query: string): Promise<TrackedOrder | n
     if (error) throw error;
     return parseTracked(data);
 }
-
-export async function listBoardOrders(): Promise<OrderSummary[]> {
+export async function listBoardOrders(opts?: { driverId?: string }): Promise<OrderSummary[]> {
     const supabase = await createClient();
-    const { data, error } = await supabase
+
+    let query = supabase
         .from("orders")
         .select(SUMMARY_COLS)
         .order("placed_at", { ascending: false });
 
+    // Admins see everything. A rider's board is narrowed to their own parcels.
+    // RLS enforces this independently; the filter keeps a rider who also orders
+    // as a customer from seeing their own purchases on the board.
+    if (opts?.driverId) query = query.eq("driver_id", opts.driverId);
+
+    const { data, error } = await query;
     if (error) throw error;
     return ((data ?? []) as OrderRow[]).map(toSummary);
 }
-
 export async function listMyOrders(): Promise<OrderRecord[]> {
     const user = await getCurrentUser();
     if (!user) return [];

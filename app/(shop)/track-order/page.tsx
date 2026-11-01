@@ -18,7 +18,7 @@ export default function TrackOrderPage({ searchParams }: Props) {
                     <h1 className="mt-3 font-serif text-[clamp(2.1rem,4.4vw,3.2rem)] leading-[1.05] tracking-tight">Track your parcel</h1>
                 </header>
                 {/* Reading searchParams needs a Suspense boundary while the page is prerendered */}
-                <Suspense fallback={<div className="h-100 animate-pulse rounded-[2rem] bg-muted/10" />}>
+                <Suspense fallback={<div className="h-100 animate-pulse rounded-4xl bg-muted/10" />}>
                     <ResolvedTracker searchParams={searchParams} />
                 </Suspense>
             </main>

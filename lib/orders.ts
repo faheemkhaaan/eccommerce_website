@@ -86,14 +86,25 @@ const OPEN_FLOW: Record<OrderStatus, OrderStatus[]> = {
     returned: [],
 };
 
-/** Statuses the UI offers next. The database still enforces who may set what. */
+const DRIVER_FLOW: Partial<Record<OrderStatus, OrderStatus[]>> = {
+    packed: ["out_for_delivery"],
+    out_for_delivery: ["delivered", "attempted"],
+    attempted: ["out_for_delivery", "delivered"],
+};
+
 export function nextStatuses(current: OrderStatus, actor: "admin" | "driver"): OrderStatus[] {
-    if (actor === "driver") {
-        if (isTerminalStatus(current)) return [];
-        return DRIVER_STATUSES.filter((s) => s !== current);
-    }
+    if (actor === "driver") return DRIVER_FLOW[current] ?? [];
     return OPEN_FLOW[current] ?? [];
 }
+
+/** Statuses the UI offers next. The database still enforces who may set what. */
+// export function nextStatuses(current: OrderStatus, actor: "admin" | "driver"): OrderStatus[] {
+//     if (actor === "driver") {
+//         if (isTerminalStatus(current)) return [];
+//         return DRIVER_STATUSES.filter((s) => s !== current);
+//     }
+//     return OPEN_FLOW[current] ?? [];
+// }
 
 /** A failed attempt does not move the parcel off its route — it stays on "out for delivery". */
 export const stepIndex = (s: OrderStatus) =>
@@ -166,10 +177,10 @@ export function buildTracking(order: {
                 ? "done"
                 : "next"
             : i < idx
-              ? "done"
-              : i === idx
-                ? "current"
-                : "next";
+                ? "done"
+                : i === idx
+                    ? "current"
+                    : "next";
 
         return { status: s.status, title: s.title, place: s.place(city), detail: s.detail, at, state };
     });

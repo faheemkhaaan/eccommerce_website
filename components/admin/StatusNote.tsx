@@ -23,7 +23,7 @@ const NOTES: Record<string, { ok: boolean; text: string }> = {
     "self-demote": { ok: false, text: "You cannot take away your own admin role." },
 };
 
-export type NotesType = "saved" | "created" | "deleted" | "duplicate" | "product-created" | "duplicated-product" | "invalid" | "assigned" | "unassigned" | "status-updated" | "closed" | "denied" | "missing" |
+export type NotesType = "saved" | "created" | "deleted" | "duplicate" | "product-created" | "duplicate-product" | "invalid" | "assigned" | "unassigned" | "status-updated" | "closed" | "denied" | "missing" |
     "not-a-rider" | "role-granted" | "self-demote"
 
 /** Renders the ?status= flag a server action redirected back with. */

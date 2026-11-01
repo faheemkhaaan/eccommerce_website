@@ -17,10 +17,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 }
 
 async function AdminGate({ children }: { children: React.ReactNode }) {
-    const user = await requireRole("admin", "/admin");
-    return <AdminFrame email={user.email}>{children}</AdminFrame>;
+    const user = await requireRole(["admin", "driver"], "/admin");
+    return <AdminFrame email={user.email} role={user.role as "admin" | "driver"}>{children}</AdminFrame>;
 }
-
 function AdminLoading() {
     return (
         <div className="wrap py-16">

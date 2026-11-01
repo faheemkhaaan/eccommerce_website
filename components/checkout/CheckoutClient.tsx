@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useState, type FormEvent } from "react";
+import { useId, useMemo, useState, type SubmitEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -85,7 +85,7 @@ export default function CheckoutClient() {
         onBlur: () => setTouched((t) => ({ ...t, [k]: true })),
     });
 
-    const place = async (e: FormEvent<HTMLFormElement>) => {
+    const place = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         const form = e.currentTarget;
         setSubmitted(true);
@@ -122,7 +122,7 @@ export default function CheckoutClient() {
         const rows = [
             { k: "Order ID", v: placed.id },
             { k: "Cash to pay on delivery", v: money(placed.totals.total) },
-                        { k: "Estimated arrival", v: placed.eta ? fmtDay(placed.eta) : "—" },
+            { k: "Estimated arrival", v: placed.eta ? fmtDay(placed.eta) : "—" },
         ];
         return (
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }} className="mx-auto max-w-2xl">
@@ -197,7 +197,7 @@ export default function CheckoutClient() {
         <form onSubmit={place} noValidate className="grid items-start gap-6 lg:grid-cols-[7fr_5fr] lg:gap-8">
             {/* Delivery */}
             <div className="space-y-4">
-                <div className="rounded-[2rem] bg-white p-6 sm:p-8">
+                <div className="rounded-4xl bg-white p-6 sm:p-8">
                     <div className="flex items-center justify-between gap-4">
                         <p className="eyebrow text-accent">Delivery details</p>
                         <span className="label-sm text-[10px] text-muted">Step 1 of 2</span>
@@ -275,7 +275,7 @@ export default function CheckoutClient() {
                 </div>
 
                 {/* Payment — COD only */}
-                <div className="rounded-[2rem] bg-white p-6 sm:p-8">
+                <div className="rounded-4xl bg-white p-6 sm:p-8">
                     <div className="flex items-center justify-between gap-4">
                         <p className="eyebrow text-accent">Payment</p>
                         <span className="label-sm text-[10px] text-muted">Step 2 of 2</span>
@@ -301,7 +301,7 @@ export default function CheckoutClient() {
             </div>
 
             {/* Summary */}
-            <aside className="rounded-[2rem] bg-white p-6 sm:p-8 lg:sticky lg:top-8">
+            <aside className="rounded-4xl bg-white p-6 sm:p-8 lg:sticky lg:top-8">
                 <p className="eyebrow text-accent">Your order</p>
                 <ul className="mt-5 space-y-5">
                     {items.map((i) => (

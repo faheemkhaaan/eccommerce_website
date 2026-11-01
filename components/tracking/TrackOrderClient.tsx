@@ -72,7 +72,7 @@ export default function TrackOrderClient({ initialId = "" }: { initialId?: strin
 
     return (
         <div className="grid items-start gap-6 lg:grid-cols-[5fr_7fr] lg:gap-8">
-            <div className="rounded-[2rem] bg-white p-6 sm:p-8 lg:sticky lg:top-8">
+            <div className="rounded-4xl bg-white p-6 sm:p-8 lg:sticky lg:top-8">
                 <p className="eyebrow text-accent">Order tracking</p>
                 <h2 className="mt-4 font-serif text-2xl leading-tight">Where is my parcel?</h2>
                 <p className="mt-2 text-[0.85rem] leading-relaxed text-muted">
@@ -128,7 +128,7 @@ export default function TrackOrderClient({ initialId = "" }: { initialId?: strin
                     )}
                 </AnimatePresence>
 
-                <div className="mt-6 rounded-3xl bg-sand p-5">
+                {/* <div className="mt-6 rounded-3xl bg-sand p-5">
                     <p className="label-sm text-[10px]">No order handy?</p>
                     <p className="mt-1.5 text-xs leading-relaxed text-muted">
                         Open the sample parcel we keep on hand to preview the live tracking view.
@@ -143,12 +143,12 @@ export default function TrackOrderClient({ initialId = "" }: { initialId?: strin
                     >
                         View sample order {DEMO_ORDER_ID}
                     </button>
-                </div>
+                </div> */}
             </div>
 
             <div>
                 {!result ? (
-                    <div className="grid min-h-80 place-items-center rounded-[2rem] bg-white p-10 text-center">
+                    <div className="grid min-h-80 place-items-center rounded-4xl bg-white p-10 text-center">
                         <div>
                             <span className="mx-auto grid size-14 place-items-center rounded-full bg-sand text-muted">
                                 <BoxIcon size={22} />
@@ -168,18 +168,17 @@ export default function TrackOrderClient({ initialId = "" }: { initialId?: strin
                     >
                         {notice && (
                             <div
-                                className={`rounded-[2rem] px-6 py-5 text-sm ${
-                                    notice.tone === "bad"
-                                        ? "bg-[#b4372b]/10 text-[#b4372b]"
-                                        : "bg-accent/10 text-accent"
-                                }`}
+                                className={`rounded-4xl px-6 py-5 text-sm ${notice.tone === "bad"
+                                    ? "bg-[#b4372b]/10 text-[#b4372b]"
+                                    : "bg-accent/10 text-accent"
+                                    }`}
                             >
                                 <p className="font-medium">{notice.title}</p>
                                 <p className="mt-1 text-[0.85rem] leading-relaxed opacity-90">{notice.body}</p>
                             </div>
                         )}
 
-                        <div className="rounded-[2rem] bg-white p-6 sm:p-8">
+                        <div className="rounded-4xl bg-white p-6 sm:p-8">
                             <div className="flex flex-wrap items-start justify-between gap-4">
                                 <div>
                                     <p className="eyebrow text-accent">Order {result.id}</p>
@@ -211,16 +210,15 @@ export default function TrackOrderClient({ initialId = "" }: { initialId?: strin
                             </div>
                         </div>
 
-                        <div className="rounded-[2rem] bg-white p-6 sm:p-8">
+                        <div className="rounded-4xl bg-white p-6 sm:p-8">
                             <p className="eyebrow text-accent">Dispatch timeline</p>
                             <ol className="mt-6">
                                 {steps.map((s, i) => (
                                     <li key={s.title} className="relative grid grid-cols-[2.25rem_1fr] gap-4 pb-8 last:pb-0">
                                         {i < steps.length - 1 && (
                                             <span
-                                                className={`absolute left-[1.05rem] top-9 h-[calc(100%-2.5rem)] w-px ${
-                                                    s.state === "done" ? "bg-ink/25" : "bg-line"
-                                                }`}
+                                                className={`absolute left-[1.05rem] top-9 h-[calc(100%-2.5rem)] w-px ${s.state === "done" ? "bg-ink/25" : "bg-line"
+                                                    }`}
                                             />
                                         )}
                                         <span
@@ -251,7 +249,7 @@ export default function TrackOrderClient({ initialId = "" }: { initialId?: strin
                         </div>
 
                         <div className="grid gap-4 sm:grid-cols-2">
-                            <div className="rounded-[2rem] bg-white p-6">
+                            <div className="rounded-4xl bg-white p-6">
                                 <p className="eyebrow text-accent">In this parcel</p>
                                 <ul className="mt-5 space-y-4">
                                     {result.items.map((i) => (
@@ -272,7 +270,7 @@ export default function TrackOrderClient({ initialId = "" }: { initialId?: strin
                                 </p>
                             </div>
 
-                            <div className="rounded-[2rem] bg-white p-6">
+                            <div className="rounded-4xl bg-white p-6">
                                 <p className="eyebrow text-accent">Delivering to</p>
                                 <div className="mt-5 space-y-3 text-sm">
                                     <p>{result.name}</p>

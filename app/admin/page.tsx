@@ -3,8 +3,10 @@ import Link from "next/link";
 import { listProducts } from "@/lib/admin-catalogue";
 import { money } from "@/lib/cart-math";
 import { listBoardOrders } from "@/lib/order-queries";
+import { requireRole } from "@/lib/roles";
 
 export default async function AdminOverview() {
+    await requireRole("admin", "/admin/orders")
     const [products, orders] = await Promise.all([listProducts(), listBoardOrders()]);
     const packs = products.flatMap((p) => p.packs);
     const units = packs.reduce((sum, k) => sum + k.stock, 0);

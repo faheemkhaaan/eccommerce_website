@@ -9,19 +9,24 @@ import AdminNav from "./AdminNav";
 export default function AdminFrame({
     email,
     children,
+    role
 }: {
     email?: string;
     children: React.ReactNode;
+    role: "admin" | "driver"
 }) {
+    console.log(`AdminFrame Role: ${role}`)
     return (
         <div className="min-h-screen bg-paper lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
             <aside className="border-b border-line bg-sand/60 lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-r">
                 <div className="flex items-center gap-3 px-5 py-5">
                     <Link href="/" className="font-serif text-base tracking-[0.16em]">Organic Ghee</Link>
-                    <span className="label-sm rounded-full bg-ink px-2 py-0.5 text-[9px] text-white">Admin</span>
+                    <span className="label-sm rounded-full bg-ink px-2 py-0.5 text-[9px] text-white">
+                        {role === "admin" ? "Admin" : "Rider"}
+                    </span>
                 </div>
                 <nav aria-label="Admin sections" className="px-3 pb-4">
-                    <AdminNav />
+                    <AdminNav role={role} />
                 </nav>
                 <div className="hidden border-t border-line px-5 py-4 lg:block">
                     <p className="truncate text-[11px] text-muted">

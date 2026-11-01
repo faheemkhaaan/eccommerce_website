@@ -3,13 +3,17 @@ import Link from "next/link";
 import { Suspense } from "react";
 import OrderCard from "@/components/admin/OrderCard";
 import StatusNote, { NotesType } from "@/components/admin/StatusNote";
-import { listBoardOrders, listDrivers } from "@/lib/order-queries";
+import { DriverOption, listBoardOrders, listDrivers } from "@/lib/order-queries";
 import { STATUS_LABEL, isTerminalStatus, type OrderStatus } from "@/lib/orders";
 import { money } from "@/lib/cart-math";
+import { requireStaff } from "@/lib/roles";
+
 
 export const metadata: Metadata = { title: "COD board — Organic Ghee" };
 
 const OPEN_COLUMNS: OrderStatus[] = ["pending", "confirmed", "packed", "out_for_delivery", "attempted"];
+// A rider only deals with parcels from the moment they are ready to collect.
+const DRIVER_COLUMNS: OrderStatus[] = ["packed", "out_for_delivery", "attempted"];
 
 type Props = { searchParams: Promise<{ status?: NotesType; view?: string }> };
 
@@ -22,27 +26,47 @@ export default function AdminOrdersPage({ searchParams }: Props) {
 }
 
 async function ResolvedBoard({ searchParams }: Props) {
+    const { userId, role } = await requireStaff("/admin/orders");
+    const isAdmin = role === "admin";
+
     const [{ status, view }, orders, drivers] = await Promise.all([
         searchParams,
-        listBoardOrders(),
-        listDrivers(),
+        listBoardOrders(isAdmin ? undefined : { driverId: userId }),
+        // list_users_with_roles is admin-only in SQL, so a rider must never call it.
+        isAdmin ? listDrivers() : Promise.resolve([] as DriverOption[]),
     ]);
 
     const closedView = view === "closed";
     const visible = orders.filter((o) => (closedView ? isTerminalStatus(o.status) : !isTerminalStatus(o.status)));
     const pending = orders.filter((o) => o.status === "pending").length;
+    const packed = orders.filter((o) => o.status === "packed").length;
     const out = orders.filter((o) => o.status === "out_for_delivery").length;
     const unassigned = orders.filter((o) => o.status === "packed" && !o.driverId).length;
     const cashOut = orders
         .filter((o) => o.status === "out_for_delivery" || o.status === "attempted")
         .reduce((sum, o) => sum + o.total, 0);
 
-    const grouped = OPEN_COLUMNS.map((col) => ({
+    const columns = isAdmin ? OPEN_COLUMNS : DRIVER_COLUMNS;
+    const grouped = columns.map((col) => ({
         col,
         rows: visible.filter((o) => o.status === col),
     }));
 
+    const stats = isAdmin
+        ? [
+            { label: "Waiting on a call", value: String(pending), sub: "pending confirmation" },
+            { label: "Need a rider", value: String(unassigned), sub: "packed, unassigned" },
+            { label: "Out with a rider", value: String(out), sub: "cash still on the road" },
+            { label: "Cash on the road", value: money(cashOut), sub: "out for delivery + attempted" },
+        ]
+        : [
+            { label: "To collect", value: String(packed), sub: "packed and ready" },
+            { label: "Out with me", value: String(out), sub: "on my route" },
+            { label: "Cash I'm carrying", value: money(cashOut), sub: "out for delivery + attempted" },
+        ];
+
     const returnTo = closedView ? "/admin/orders?view=closed" : "/admin/orders";
+
 
     return (
         <div>
@@ -107,7 +131,7 @@ async function ResolvedBoard({ searchParams }: Props) {
                 <ul className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                     {visible.map((order) => (
                         <li key={order.id}>
-                            <OrderCard order={order} drivers={drivers} returnTo={returnTo} />
+                            <OrderCard order={order} drivers={drivers} returnTo={returnTo} role={role} />
                         </li>
                     ))}
                     {visible.length === 0 && (
@@ -125,7 +149,7 @@ async function ResolvedBoard({ searchParams }: Props) {
                             <ul className="space-y-3">
                                 {rows.map((order) => (
                                     <li key={order.id}>
-                                        <OrderCard order={order} drivers={drivers} returnTo={returnTo} />
+                                        <OrderCard order={order} drivers={drivers} returnTo={returnTo} role={role} />
                                     </li>
                                 ))}
                                 {rows.length === 0 && (

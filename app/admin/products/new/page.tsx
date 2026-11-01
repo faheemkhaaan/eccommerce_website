@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { createProduct } from "@/app/admin/actions";
 import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { listProducts } from "@/lib/admin-catalogue";
+import { requireRole } from "@/lib/roles";
 
 export const metadata: Metadata = { title: "New product — Organic Ghee" };
 
@@ -18,6 +19,8 @@ export default function NewProductPage({ searchParams }: Props) {
 }
 
 async function ResolvedNewProduct({ searchParams }: Props) {
+    await requireRole("admin", "/admin/orders")
+
     const [{ status }, products] = await Promise.all([searchParams, listProducts()]);
 
     // A new product belongs at the end of the shop ordering unless the owner says

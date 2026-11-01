@@ -5,6 +5,9 @@ import { createClient } from "@/lib/supabase/server";
 export type AppRole = "customer" | "admin" | "driver";
 
 export type CurrentUser = { userId: string; email?: string; role: AppRole };
+type Roles = AppRole | AppRole[];
+const allows = (user: CurrentUser, roles: Roles) =>
+    (Array.isArray(roles) ? roles : [roles]).includes(user.role);
 
 /**
  * Resolves the signed-in user together with their application role.
@@ -36,20 +39,26 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
  * Guards a server-rendered route. Redirects rather than returning, so callers can
  * treat a successful return as an authorisation guarantee.
  */
-export async function requireRole(role: AppRole, nextPath = "/"): Promise<CurrentUser> {
+export async function requireRole(roles: Roles, nextPath = "/"): Promise<CurrentUser> {
     const user = await getCurrentUser();
-
     if (!user) redirect(`/login?next=${encodeURIComponent(nextPath)}`);
-    if (user.role !== role) redirect("/");
-
+    // A rider who wanders onto an admin-only page lands on their board, not the shop.
+    if (!allows(user, roles)) redirect(user.role === "driver" ? "/admin/orders" : "/");
     return user;
 }
 
 /** Throwing variant for server actions, which must authorise close to the data. */
-export async function assertRole(role: AppRole): Promise<CurrentUser> {
+export async function assertRole(roles: Roles): Promise<CurrentUser> {
     const user = await getCurrentUser();
-
-    if (!user || user.role !== role) throw new Error("Not authorised");
-
+    if (!user || !allows(user, roles)) throw new Error("Not authorised");
     return user;
+}
+
+export type StaffRole = Exclude<AppRole, "customer">; // "admin" | "driver"
+
+/** requireRole for staff pages, with the role narrowed so it can be passed straight to staff-only APIs. */
+export async function requireStaff(nextPath = "/admin/orders"): Promise<CurrentUser & { role: StaffRole }> {
+    const user = await requireRole(["admin", "driver"], nextPath);
+    // requireRole has already redirected anyone else, so this narrowing is safe.
+    return user as CurrentUser & { role: StaffRole };
 }

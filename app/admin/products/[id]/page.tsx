@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { createPack, deletePack, savePack, saveProduct } from "@/app/admin/actions";
 import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { getProduct } from "@/lib/admin-catalogue";
+import { requireRole } from "@/lib/roles";
 
 type Props = {
     params: Promise<{ id: string }>;
@@ -20,6 +21,8 @@ export default function AdminProductPage({ params, searchParams }: Props) {
 }
 
 async function ResolvedProduct({ params, searchParams }: Props) {
+    await requireRole("admin", "/admin/orders")
+
     const [{ id }, { status }] = await Promise.all([params, searchParams]);
     const product = await getProduct(id);
     if (!product) notFound();

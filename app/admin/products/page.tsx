@@ -6,6 +6,7 @@ import { saveStock } from "@/app/admin/actions";
 import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { listProducts } from "@/lib/admin-catalogue";
 import { money } from "@/lib/cart-math";
+import { requireRole } from "@/lib/roles";
 
 export const metadata: Metadata = { title: "Products & stock — Organic Ghee" };
 
@@ -23,6 +24,8 @@ export default function AdminProductsPage({ searchParams }: Props) {
 }
 
 async function ResolvedProducts({ searchParams }: Props) {
+    await requireRole("admin", "/admin/orders")
+
     const [{ status }, products] = await Promise.all([searchParams, listProducts()]);
 
     return (

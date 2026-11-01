@@ -25,12 +25,15 @@ export default function OrderCard({
     order,
     drivers,
     returnTo,
+    role,
 }: {
     order: OrderSummary;
     drivers: DriverOption[];
     returnTo: string;
+    role: "admin" | "driver";
 }) {
-    const next = nextStatuses(order.status, "admin");
+    const isAdmin = role === "admin";
+    const next = nextStatuses(order.status, role);
     const rider = drivers.find((d) => d.id === order.driverId);
 
     return (
@@ -48,36 +51,52 @@ export default function OrderCard({
                 {order.city} · {money(order.total)}
             </p>
             <p className="mt-1 text-[0.72rem] text-muted">{relativeTime(order.placedAt)}</p>
-            {!order.driverId && order.status === "packed" && (
+
+            {isAdmin && !order.driverId && order.status === "packed" && (
                 <p className="mt-2 text-[0.72rem] text-accent">Needs a rider</p>
             )}
-            {rider && <p className="mt-2 truncate text-[0.72rem] text-muted">Rider {rider.email}</p>}
+            {isAdmin && rider && (
+                <p className="mt-2 truncate text-[0.72rem] text-muted">Rider {rider.email}</p>
+            )}
 
-            <form action={assignDriver} className="mt-3">
-                <input type="hidden" name="order_id" value={order.id} />
-                <input type="hidden" name="next" value={returnTo} />
-                <label className="label-sm sr-only" htmlFor={`driver-${order.id}`}>
-                    Assign rider
-                </label>
-                <div className="flex gap-2">
-                    <select
-                        id={`driver-${order.id}`}
-                        name="driver_id"
-                        defaultValue={order.driverId ?? ""}
-                        className="field min-w-0 flex-1 py-1.5 text-[0.75rem]"
-                    >
-                        <option value="">Unassigned</option>
-                        {drivers.map((d) => (
-                            <option key={d.id} value={d.id}>
-                                {d.email}
-                            </option>
-                        ))}
-                    </select>
-                    <button type="submit" className="btn border border-line text-ink hover:opacity-70">
-                        Save
-                    </button>
+            {/* Riders need to reach the customer and find the door, nothing more. */}
+            {!isAdmin && (
+                <div className="mt-3 text-[0.78rem]">
+                    <a href={`tel:${order.phone}`} className="underline underline-offset-4">
+                        {order.phone}
+                    </a>
+                    <p className="mt-1 leading-relaxed text-muted">{order.address}</p>
+                    {order.notes && <p className="mt-1 italic text-muted">“{order.notes}”</p>}
                 </div>
-            </form>
+            )}
+
+            {isAdmin && (
+                <form action={assignDriver} className="mt-3">
+                    <input type="hidden" name="order_id" value={order.id} />
+                    <input type="hidden" name="next" value={returnTo} />
+                    <label className="label-sm sr-only" htmlFor={`driver-${order.id}`}>
+                        Assign rider
+                    </label>
+                    <div className="flex gap-2">
+                        <select
+                            id={`driver-${order.id}`}
+                            name="driver_id"
+                            defaultValue={order.driverId ?? ""}
+                            className="field min-w-0 flex-1 py-1.5 text-[0.75rem]"
+                        >
+                            <option value="">Unassigned</option>
+                            {drivers.map((d) => (
+                                <option key={d.id} value={d.id}>
+                                    {d.email}
+                                </option>
+                            ))}
+                        </select>
+                        <button type="submit" className="btn border border-line text-ink hover:opacity-70">
+                            Save
+                        </button>
+                    </div>
+                </form>
+            )}
 
             {next.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1.5">

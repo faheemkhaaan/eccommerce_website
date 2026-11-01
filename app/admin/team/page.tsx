@@ -4,6 +4,7 @@ import { grantRole } from "@/app/admin/team/actions";
 import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { listStaffUsers } from "@/lib/order-queries";
 import { fmtDay } from "@/lib/orders";
+import { requireRole } from "@/lib/roles";
 
 export const metadata: Metadata = { title: "Riders & roles — Organic Ghee" };
 
@@ -18,6 +19,8 @@ export default function AdminTeamPage({ searchParams }: Props) {
 }
 
 async function ResolvedTeam({ searchParams }: Props) {
+    await requireRole("admin", "/admin/orders")
+
     const { status, q } = await searchParams;
     const query = typeof q === "string" ? q : "";
     const users = await listStaffUsers(query);

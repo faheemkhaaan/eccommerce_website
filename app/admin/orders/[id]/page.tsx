@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { assignDriver, setOrderStatus } from "@/app/admin/orders/actions";
 import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { money } from "@/lib/cart-math";
-import { getOrder, listDrivers } from "@/lib/order-queries";
+import { DriverOption, getOrder, listDrivers } from "@/lib/order-queries";
 import {
     STATUS_LABEL,
     buildTracking,
@@ -14,6 +14,7 @@ import {
     nextStatuses,
     relativeTime,
 } from "@/lib/orders";
+import { requireRole, requireStaff } from "@/lib/roles";
 
 export const metadata: Metadata = { title: "Order — Organic Ghee" };
 
@@ -29,14 +30,20 @@ export default function AdminOrderPage({ params, searchParams }: Props) {
 
 async function ResolvedOrder({ params, searchParams }: Props) {
     const { id } = await params;
+    const { userId, role } = await requireStaff(`/admin/orders/${id}`);
     const { status } = await searchParams;
-    const [order, drivers] = await Promise.all([getOrder(id), listDrivers()]);
-    if (!order) notFound();
+    const isAdmin = role === "admin";
 
-    const next = nextStatuses(order.status, "admin");
+    const [order, drivers] = await Promise.all([
+        getOrder(id),
+        isAdmin ? listDrivers() : Promise.resolve([] as DriverOption[]),
+    ]);
+    if (!order) notFound();
+    if (!isAdmin && order.driverId !== userId) notFound(); // not theirs: pretend it doesn't exist
+
+    const next = nextStatuses(order.status, role);
     const steps = buildTracking({ status: order.status, city: order.recipient.city, events: order.events });
     const path = `/admin/orders/${order.id}`;
-
     return (
         <div className="max-w-4xl">
             <p className="text-[0.8rem]">
