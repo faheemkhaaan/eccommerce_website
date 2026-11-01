@@ -35,15 +35,20 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     };
 }
 
+export const homeFor = (role: AppRole) =>
+    role === "admin" ? "/admin" : role === "driver" ? "/driver" : "/";
+
+
 /**
  * Guards a server-rendered route. Redirects rather than returning, so callers can
  * treat a successful return as an authorisation guarantee.
  */
 export async function requireRole(roles: Roles, nextPath = "/"): Promise<CurrentUser> {
     const user = await getCurrentUser();
+    console.log(user)
     if (!user) redirect(`/login?next=${encodeURIComponent(nextPath)}`);
     // A rider who wanders onto an admin-only page lands on their board, not the shop.
-    if (!allows(user, roles)) redirect(user.role === "driver" ? "/admin/orders" : "/");
+    if (!allows(user, roles)) redirect(homeFor(user.role));
     return user;
 }
 
@@ -59,6 +64,7 @@ export type StaffRole = Exclude<AppRole, "customer">; // "admin" | "driver"
 /** requireRole for staff pages, with the role narrowed so it can be passed straight to staff-only APIs. */
 export async function requireStaff(nextPath = "/admin/orders"): Promise<CurrentUser & { role: StaffRole }> {
     const user = await requireRole(["admin", "driver"], nextPath);
+    console.log(user)
     // requireRole has already redirected anyone else, so this narrowing is safe.
     return user as CurrentUser & { role: StaffRole };
 }

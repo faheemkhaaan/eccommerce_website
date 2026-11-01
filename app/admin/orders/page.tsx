@@ -6,7 +6,7 @@ import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { DriverOption, listBoardOrders, listDrivers } from "@/lib/order-queries";
 import { STATUS_LABEL, isTerminalStatus, type OrderStatus } from "@/lib/orders";
 import { money } from "@/lib/cart-math";
-import { requireStaff } from "@/lib/roles";
+import { requireRole } from "@/lib/roles";
 
 
 export const metadata: Metadata = { title: "COD board — Organic Ghee" };
@@ -26,8 +26,7 @@ export default function AdminOrdersPage({ searchParams }: Props) {
 }
 
 async function ResolvedBoard({ searchParams }: Props) {
-    const { userId, role } = await requireStaff("/admin/orders");
-    console.log(userId, role)
+    const { userId, role } = await requireRole("admin", "/admin/orders");
     const isAdmin = role === "admin";
 
     const [{ status, view }, orders, drivers] = await Promise.all([
@@ -132,7 +131,7 @@ async function ResolvedBoard({ searchParams }: Props) {
                 <ul className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                     {visible.map((order) => (
                         <li key={order.id}>
-                            <OrderCard order={order} drivers={drivers} returnTo={returnTo} role={role} />
+                            <OrderCard order={order} drivers={drivers} returnTo={returnTo} role={role as "admin" | "driver"} />
                         </li>
                     ))}
                     {visible.length === 0 && (
@@ -150,7 +149,7 @@ async function ResolvedBoard({ searchParams }: Props) {
                             <ul className="space-y-3">
                                 {rows.map((order) => (
                                     <li key={order.id}>
-                                        <OrderCard order={order} drivers={drivers} returnTo={returnTo} role={role} />
+                                        <OrderCard order={order} drivers={drivers} returnTo={returnTo} role={role as "admin" | "driver"} />
                                     </li>
                                 ))}
                                 {rows.length === 0 && (

@@ -23,7 +23,7 @@ async function ResolvedStaffLink() {
 
     return (
         <Link
-            href={isAdmin ? "/admin" : "/admin/orders"}
+            href={isAdmin ? "/admin" : "/driver"}
             className="label-sm rounded-full border border-current px-3 py-1 text-[10px] tracking-widest transition hover:opacity-70"
         >
             {isAdmin ? "Admin" : "My deliveries"}

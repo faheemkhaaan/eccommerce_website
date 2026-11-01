@@ -9,6 +9,7 @@ import {
     type OrderStatus,
     type OrderSummary,
 } from "@/lib/orders";
+import { AppRole } from "@/lib/roles";
 
 const TONE: Record<OrderStatus, string> = {
     pending: "bg-accent/15 text-accent",
@@ -30,7 +31,7 @@ export default function OrderCard({
     order: OrderSummary;
     drivers: DriverOption[];
     returnTo: string;
-    role: "admin" | "driver";
+    role: Exclude<AppRole, "customer">;
 }) {
     const isAdmin = role === "admin";
     const next = nextStatuses(order.status, role);

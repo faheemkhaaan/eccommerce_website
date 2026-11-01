@@ -7,6 +7,9 @@ import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { money } from "@/lib/cart-math";
 import { getOrder } from "@/lib/order-queries";
 import { STATUS_LABEL, fmtDay, nextStatuses } from "@/lib/orders";
+import ParcelMap from "@/components/driver/ParcelMap";
+import { directionsUrl, mapQuery } from "@/lib/maps";
+
 
 export const metadata: Metadata = { title: "Parcel — Organic Ghee" };
 
@@ -29,7 +32,7 @@ async function ResolvedParcel({ params, searchParams }: Props) {
     const next = nextStatuses(order.status, "driver");
     const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${order.recipient.address}, ${order.recipient.city}`)}`;
     const path = `/driver/${order.id}`;
-
+    const navigateTo = directionsUrl(mapQuery(order.recipient.address, order.recipient.city));
     return (
         <div>
             <p className="text-[0.8rem]">
@@ -55,6 +58,8 @@ async function ResolvedParcel({ params, searchParams }: Props) {
                 {order.recipient.city}
                 {order.recipient.notes && <p className="mt-2 text-muted">“{order.recipient.notes}”</p>}
             </address>
+
+            <ParcelMap address={order.recipient.address} city={order.recipient.city} />
 
             <div className="mt-4 grid grid-cols-2 gap-2">
                 <a href={`tel:${order.recipient.phone}`} className="btn btn-solid h-12 hover:opacity-85">

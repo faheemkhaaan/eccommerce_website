@@ -14,7 +14,7 @@ import {
     nextStatuses,
     relativeTime,
 } from "@/lib/orders";
-import { requireRole, requireStaff } from "@/lib/roles";
+import { requireStaff } from "@/lib/roles";
 
 export const metadata: Metadata = { title: "Order — Organic Ghee" };
 
