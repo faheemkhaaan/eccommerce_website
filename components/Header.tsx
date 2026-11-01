@@ -1,6 +1,7 @@
 import Link from "next/link";
 import BagButton from "./cart/BagButton";
 import AccountMenu from "./auth/AccountMenu";
+import StaffLink from "./auth/StaffLink";
 
 // Every entry maps onto a real destination — the shop, the two education
 // sections on the homepage, or the public tracking lookup.
@@ -19,7 +20,7 @@ export default function Header({ variant = "overlay", active }: Props) {
 
   return (
     <header className={solid ? "relative z-20 border-b border-line bg-paper text-ink" : "absolute inset-x-0 top-0 z-20 text-white "}>
-      <p className="label-sm bg-[#2b231b] px-5 py-2 text-center text-[10px] tracking-widest text-white">
+      <p className="label-sm bg-ink px-5 py-2 text-center text-[10px] tracking-widest text-white">
         Cash on delivery across Pakistan · Free delivery above Rs 5,000
       </p>
       <div className="mx-auto flex max-w-360 items-center gap-10 px-5 py-4 md:px-12">
@@ -46,6 +47,7 @@ export default function Header({ variant = "overlay", active }: Props) {
               AccountMenu renders the sign-in state and swaps to the avatar once signed in. */}
           <div className="flex items-center gap-4">
             <span className="hidden text-[11px] tracking-wider md:block">PKR (Rs)</span>
+            <StaffLink />
             <BagButton badgeClass={badge} />
             <AccountMenu solid={solid} />
           </div>

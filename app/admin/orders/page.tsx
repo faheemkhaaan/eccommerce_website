@@ -27,6 +27,7 @@ export default function AdminOrdersPage({ searchParams }: Props) {
 
 async function ResolvedBoard({ searchParams }: Props) {
     const { userId, role } = await requireStaff("/admin/orders");
+    console.log(userId, role)
     const isAdmin = role === "admin";
 
     const [{ status, view }, orders, drivers] = await Promise.all([
