@@ -275,17 +275,20 @@ auth.verifyOtp({ phone, token, type: "phone_change" })  // confirms it
   `localPhone()` (back to `03001234567` for display) and `digits()`.
 - `lib/auth-client.ts` — `startPhoneVerification(phone)` and
   `confirmPhoneVerification(phone, token)`; `phoneError()` keeps Supabase's own
-  message for anything unrecognised; `isPhoneVerified(user)` reads
-  `phone_confirmed_at`.
+  message for anything unrecognised.
 - `components/auth/PhoneVerify.tsx` — the reusable OTP control (phases
   `idle → sent → done`, a 60s resend cooldown mirroring Supabase's throttle, a
-  `+92\d{10}` gate, a **4-digit minimum** on the code input, and a `<form>` so
-  Enter confirms). It takes `verifiedPhone` / `onVerified` and refreshes the route
-  after a successful confirm.
+  `+92\d{10}` gate, a **4-digit minimum** on the code input, and explicit Enter
+  handling on the code field). It takes `verifiedPhone` / `onVerified` and never
+  refreshes the route itself — the parent decides. **Not** a `<form>`: it renders
+  inside the checkout's own form, and a nested form makes Confirm submit the
+  checkout, which validates every field and looks like a page reload.
 - `components/checkout/CheckoutClient.tsx` — renders the verified pill or the
   `PhoneVerify` control beside the phone field (keyed on the number so a pending
-  code never carries over), and **blocks placement** until the typed number equals
-  the **server-resolved** `verifiedPhone`, scrolling the control into view with a
+  code never carries over), and **blocks placement** unless the typed number equals
+  either the **server-resolved** `verifiedPhone` or the number confirmed in this
+  session (`justVerified` local state — a `router.refresh()` here would remount the
+  component and wipe the half-typed order), scrolling the control into view with a
   plain-English reason.
 - `components/account/AccountProfile.tsx` — an **optional early path**: a "Mobile
   verified / unverified" badge and an inline `PhoneVerify` when the number is not

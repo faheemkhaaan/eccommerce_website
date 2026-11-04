@@ -83,7 +83,9 @@ export default function AccountProfile({ orders, verifiedPhone }: { orders: Orde
                     </dl>
 
                     {!mobileVerified && phone && (
-                        <PhoneVerify key={phone} phone={phone} verifiedPhone={verifiedPhone} className="mt-5" />
+                        // Nothing typed here to lose, so a refresh is the simplest way to pick up
+                        // the newly confirmed number from the server.
+                        <PhoneVerify key={phone} phone={phone} verifiedPhone={verifiedPhone} onVerified={() => router.refresh()} className="mt-5" />
                     )}
 
                     <button

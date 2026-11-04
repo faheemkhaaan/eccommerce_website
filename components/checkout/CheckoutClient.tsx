@@ -64,6 +64,9 @@ export default function CheckoutClient({ verifiedPhone }: { verifiedPhone?: stri
     const [placing, setPlacing] = useState(false);
     const [placed, setPlaced] = useState<Order | null>(null);
     const [placeError, setPlaceError] = useState<string | null>(null);
+    // The number this session confirmed in-place. Refreshing the route to learn this would
+    // remount the component and wipe everything already typed, so we note it locally instead.
+    const [justVerified, setJustVerified] = useState<string | null>(null);
 
     // What the client typed always wins; the rest stays prefilled from their account.
     const defaults = useMemo(() => fromAccount(user?.user_metadata), [user]);
@@ -77,10 +80,10 @@ export default function CheckoutClient({ verifiedPhone }: { verifiedPhone?: stri
 
     const { shipping, total } = summarize(subtotal);
     const errors = validate(v);
-    // The rider calls the number printed on the parcel, so it must be the account's
-    // SMS-confirmed number. Coming from the server, it is accurate the instant we verify.
+    // The rider calls the number printed on the parcel, so it must be the account's SMS-confirmed
+    // number. That is either what the server already knew, or what we just confirmed in this session.
     const phoneE164 = toE164(v.phone);
-    const verified = Boolean(verifiedPhone) && verifiedPhone === phoneE164;
+    const verified = (Boolean(verifiedPhone) && verifiedPhone === phoneE164) || justVerified === phoneE164;
     const shown = (k: Key) => (touched[k] || submitted ? errors[k] : undefined);
 
     const set = <K extends Key>(k: K, val: Values[K]) => setEdits((p) => ({ ...p, [k]: val }));
@@ -247,11 +250,18 @@ export default function CheckoutClient({ verifiedPhone }: { verifiedPhone?: stri
                             {verified ? (
                                 <p className="mt-2.5 inline-flex items-center gap-2 rounded-full bg-sand px-3 py-1.5 text-[10px] text-accent">
                                     <span className="grid size-3.5 place-items-center rounded-full bg-ink text-white"><CheckIcon size={8} /></span>
-                                    {localPhone(verifiedPhone)} verified
+                                    {localPhone(phoneE164)} verified
                                 </p>
                             ) : (
                                 // Remounts when the number changes so a pending code never carries over.
-                                <PhoneVerify key={phoneE164} id={`${uid}-verify`} phone={phoneE164} verifiedPhone={verifiedPhone} className="mt-2.5" />
+                                <PhoneVerify
+                                    key={phoneE164}
+                                    id={`${uid}-verify`}
+                                    phone={phoneE164}
+                                    verifiedPhone={verifiedPhone}
+                                    onVerified={() => setJustVerified(phoneE164)}
+                                    className="mt-2.5"
+                                />
                             )}
                         </Field>
 

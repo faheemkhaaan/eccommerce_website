@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { confirmPhoneVerification, startPhoneVerification } from "@/lib/auth-client";
 import { localPhone } from "@/lib/phone";
@@ -18,7 +17,10 @@ type PhoneVerifyProps = {
     phone: string;
     /** The number already confirmed on the account. When it equals `phone` we open in the "done" state. */
     verifiedPhone?: string;
-    /** Called after a successful confirm so the parent can refresh what it displays. */
+    /**
+     * Called after a successful confirm. The parent owns the refresh decision: the checkout
+     * just flips a local flag (a refresh there would remount it and wipe the order form).
+     */
     onVerified?: () => void;
     /** Optional DOM id, used by the checkout to scroll the block into view. */
     id?: string;
@@ -33,7 +35,6 @@ type PhoneVerifyProps = {
  */
 export default function PhoneVerify({ phone, verifiedPhone, onVerified, id, className = "" }: PhoneVerifyProps) {
     const uid = useId();
-    const router = useRouter();
     const codeRef = useRef<HTMLInputElement>(null);
 
     // Already confirmed for this exact number? Then there is nothing left to prove.
@@ -87,17 +88,16 @@ export default function PhoneVerify({ phone, verifiedPhone, onVerified, id, clas
 
     /**
      * Confirms the typed code. On success Supabase marks the account's phone verified, so we
-     * flip to "done", tell the parent, and refresh so server-rendered state catches up.
+     * flip to "done" and hand control to the parent — the parent decides how (or whether) to
+     * refresh, because refreshing the checkout would remount it and lose the typed order details.
      */
-    const confirm = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const confirm = async () => {
         setError(null);
         setBusy(true);
         try {
             await confirmPhoneVerification(phone, code);
             setPhase("done");
             onVerified?.();
-            router.refresh();
         } catch (err) {
             setError(err instanceof Error ? err.message : "That code isn’t right.");
         } finally {
@@ -128,7 +128,7 @@ export default function PhoneVerify({ phone, verifiedPhone, onVerified, id, clas
             </p>
 
             {phase === "sent" && (
-                <form onSubmit={confirm} className="mt-3 flex gap-2">
+                <div className="mt-3 flex gap-2">
                     <input
                         ref={codeRef}
                         id={`${uid}-code`}
@@ -137,17 +137,27 @@ export default function PhoneVerify({ phone, verifiedPhone, onVerified, id, clas
                         aria-label="Verification code"
                         value={code}
                         onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
+                        // The checkout renders this inside its own <form>, so Enter is handled here.
+                        // A nested <form> is invalid HTML and an unhandled Enter would submit the
+                        // checkout instead — which validates every field and looks like a page reload.
+                        onKeyDown={(e) => {
+                            if (e.key !== "Enter") return;
+                            e.preventDefault();
+                            e.stopPropagation();
+                            void confirm();
+                        }}
                         placeholder="123456"
                         className={`${inputCls} flex-1 tracking-[0.3em]`}
                     />
                     <button
-                        type="submit"
+                        type="button"
+                        onClick={() => void confirm()}
                         disabled={busy || code.length < 4}
                         className="label-sm h-12 shrink-0 rounded-md bg-ink px-5 text-[10px] text-white transition disabled:opacity-50"
                     >
                         {busy ? "Checking…" : "Confirm"}
                     </button>
-                </form>
+                </div>
             )}
 
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
