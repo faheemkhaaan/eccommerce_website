@@ -60,7 +60,7 @@ async function ResolvedProducts({ searchParams }: Props) {
                                     alt=""
                                     width={48}
                                     height={60}
-                                    className="hidden h-[60px] w-12 shrink-0 rounded object-cover sm:block"
+                                    className="hidden h-15 w-12 shrink-0 rounded object-cover sm:block"
                                 />
                                 <div className="min-w-0 flex-1">
                                     <div className="flex flex-wrap items-center gap-2">

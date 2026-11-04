@@ -4,7 +4,10 @@ export type AuthErrorCode =
     | "email_not_confirmed"
     | "already_exists"
     | "rate_limit"
-    | "invalid_credentials";
+    | "invalid_credentials"
+    | "phone_taken"
+    | "invalid_code"
+    | "expired";
 
 /** Typed auth error so the UI can react to specific cases (e.g. offer a verification resend). */
 export class AuthError extends Error {
@@ -72,4 +75,50 @@ export async function resendVerification(email: string): Promise<void> {
             throw new AuthError("Please wait a minute before requesting another email.", "rate_limit");
         throw new AuthError("We couldn’t resend the email. Please try again.");
     }
+}
+
+/**
+ * Turns a Supabase phone-auth error into copy we are happy to show a customer.
+ * Anything we do not recognise keeps Supabase's own message, so a real failure
+ * (a mis-configured provider, say) is never hidden behind a vague string.
+ */
+function phoneError(error: { code?: string; status?: number; message: string }): AuthError {
+    if (error.status === 429 || error.code === "over_sms_send_rate_limit")
+        return new AuthError("Too many codes requested. Please wait a minute and try again.", "rate_limit");
+    switch (error.code) {
+        case "phone_exists":
+            return new AuthError("That number is already linked to another account.", "phone_taken");
+        // Supabase reports a wrong code and an expired one the same way.
+        case "otp_expired":
+            return new AuthError("That code isn’t right or has expired. Request a new one.", "expired");
+        case "sms_send_failed":
+            return new AuthError("We couldn’t send the text. Please try again shortly.");
+        default:
+            return new AuthError(error.message || "Something went wrong. Please try again.");
+    }
+}
+
+/**
+ * Texts a one-time code so the signed-in account can claim this number.
+ * Supabase generates, stores, expires and throttles the code; we only start the flow.
+ *
+ * @param phone The number to verify, in E.164 form (`+923001234567`).
+ * @throws {AuthError} When the send is refused or the number is already taken.
+ */
+export async function startPhoneVerification(phone: string): Promise<void> {
+    const { error } = await createClient().auth.updateUser({ phone });
+    if (error) throw phoneError(error);
+}
+
+/**
+ * Confirms the code {@link startPhoneVerification} sent, which marks the phone
+ * verified on the same account (`phone_confirmed_at`).
+ *
+ * @param phone The same E.164 number the code was sent to.
+ * @param token The code the customer read from the SMS.
+ * @throws {AuthError} When the code is wrong or has expired.
+ */
+export async function confirmPhoneVerification(phone: string, token: string): Promise<void> {
+    const { error } = await createClient().auth.verifyOtp({ phone, token, type: "phone_change" });
+    if (error) throw phoneError(error);
 }

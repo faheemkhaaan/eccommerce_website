@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export type AppRole = "customer" | "admin" | "driver";
 
-export type CurrentUser = { userId: string; email?: string; role: AppRole };
+export type CurrentUser = { userId: string; email?: string; phone?: string; role: AppRole };
 type Roles = AppRole | AppRole[];
 const allows = (user: CurrentUser, roles: Roles) =>
     (Array.isArray(roles) ? roles : [roles]).includes(user.role);
@@ -13,6 +13,9 @@ const allows = (user: CurrentUser, roles: Roles) =>
  * Resolves the signed-in user together with their application role.
  * Reads the role from the user_roles table rather than user_metadata, which the
  * client can write to. Returns null when there is no session.
+ *
+ * `phone` is the account's SMS-confirmed number, used only to decide what the UI shows.
+ * It is NOT the security check — that is `public.verified_phone()` in the database.
  */
 export async function getCurrentUser(): Promise<CurrentUser | null> {
     const supabase = await createClient();
@@ -27,10 +30,20 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
         .eq("user_id", claims.sub)
         .maybeSingle();
 
+    // The access token may carry the phone; when it does not, fall back to the auth record —
+    // but only trust it once Supabase has actually confirmed it.
+    const claimPhone = (claims as { phone?: unknown }).phone;
+    let phone = typeof claimPhone === "string" ? claimPhone : undefined;
+    if (!phone) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.phone_confirmed_at) phone = user.phone ?? undefined;
+    }
+
     // A user with no row is an ordinary customer; only the service role can grant more.
     return {
         userId: claims.sub,
         email: typeof claims.email === "string" ? claims.email : undefined,
+        phone,
         role: (row?.role as AppRole | undefined) ?? "customer",
     };
 }
@@ -45,7 +58,6 @@ export const homeFor = (role: AppRole) =>
  */
 export async function requireRole(roles: Roles, nextPath = "/"): Promise<CurrentUser> {
     const user = await getCurrentUser();
-    console.log(user)
     if (!user) redirect(`/login?next=${encodeURIComponent(nextPath)}`);
     // A rider who wanders onto an admin-only page lands on their board, not the shop.
     if (!allows(user, roles)) redirect(homeFor(user.role));
@@ -64,7 +76,6 @@ export type StaffRole = Exclude<AppRole, "customer">; // "admin" | "driver"
 /** requireRole for staff pages, with the role narrowed so it can be passed straight to staff-only APIs. */
 export async function requireStaff(nextPath = "/admin/orders"): Promise<CurrentUser & { role: StaffRole }> {
     const user = await requireRole(["admin", "driver"], nextPath);
-    console.log(user)
     // requireRole has already redirected anyone else, so this narrowing is safe.
     return user as CurrentUser & { role: StaffRole };
 }

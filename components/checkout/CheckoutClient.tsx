@@ -10,6 +10,8 @@ import { money, summarize } from "@/lib/cart-math";
 import { fmtDay, type Order } from "@/lib/orders";
 import { placeOrder } from "@/app/(shop)/order-actions";
 import Field, { inputCls } from "@/components/auth/Field";
+import PhoneVerify from "@/components/auth/PhoneVerify";
+import { digits, localPhone, toE164 } from "@/lib/phone";
 import { ArrowIcon, BoxIcon, CashIcon, CheckIcon, LockIcon, TruckIcon } from "@/components/Icons";
 
 const CITIES = ["Lahore", "Karachi", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Peshawar", "Quetta"];
@@ -18,14 +20,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
 type Values = { name: string; phone: string; city: string; address: string; notes: string };
 type Key = keyof Values;
 
-const digits = (s: string) => s.replace(/\D/g, "");
-// Register stores E.164 (+923001234567); the field shows the local format (0300 1234567).
-const localPhone = (raw: unknown) => {
-    const d = digits(String(raw ?? ""));
-    return d.startsWith("92") ? `0${d.slice(2)}` : d;
-};
 const displayPhone = (d: string) => (d.length > 4 ? `${d.slice(0, 4)} ${d.slice(4)}` : d);
-const e164 = (d: string) => `+92${digits(d).replace(/^0/, "")}`;
 
 const labelCls = "label-sm mb-2.5 block text-[10px] tracking-[0.14em]";
 const str = (x: unknown) => (typeof x === "string" ? x : "");
@@ -51,7 +46,14 @@ function validate(v: Values): Partial<Record<Key, string>> {
     return e;
 }
 
-export default function CheckoutClient() {
+/**
+ * The COD checkout. Delivery details, a phone that must be SMS-verified, and the order summary.
+ *
+ * @param verifiedPhone The account's confirmed mobile number, resolved on the server. The row
+ *   only counts as verified when the typed number matches this one; a mismatch (the customer
+ *   edited it) re-opens verification. `undefined` means nothing is verified yet.
+ */
+export default function CheckoutClient({ verifiedPhone }: { verifiedPhone?: string }) {
     const uid = useId();
     const { items, subtotal, clear, hydrated } = useCart();
     const user = useAuthStore((s) => s.user);
@@ -75,6 +77,10 @@ export default function CheckoutClient() {
 
     const { shipping, total } = summarize(subtotal);
     const errors = validate(v);
+    // The rider calls the number printed on the parcel, so it must be the account's
+    // SMS-confirmed number. Coming from the server, it is accurate the instant we verify.
+    const phoneE164 = toE164(v.phone);
+    const verified = Boolean(verifiedPhone) && verifiedPhone === phoneE164;
     const shown = (k: Key) => (touched[k] || submitted ? errors[k] : undefined);
 
     const set = <K extends Key>(k: K, val: Values[K]) => setEdits((p) => ({ ...p, [k]: val }));
@@ -95,12 +101,19 @@ export default function CheckoutClient() {
             return;
         }
 
+        // A COD parcel is only deliverable if we can ring the number on it.
+        if (!verified) {
+            setPlaceError("Verify your mobile number to place the order — tap “Send code” beside it.");
+            setTimeout(() => document.getElementById(`${uid}-verify`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+            return;
+        }
+
         setPlacing(true);
         const result = await placeOrder(
             items.map((i) => ({ product_id: i.id, label: i.options[0] ?? "", qty: i.qty })),
             {
                 name: v.name.trim(),
-                phone: e164(v.phone),
+                phone: toE164(v.phone),
                 city: v.city.trim(),
                 address: v.address.trim(),
                 notes: v.notes.trim(),
@@ -216,7 +229,7 @@ export default function CheckoutClient() {
                             id={`${uid}-phone`}
                             label="Mobile number"
                             required
-                            hint={<span className="text-accent">Rider calls before arrival</span>}
+                            hint={<span className="text-accent">{verified ? "Verified" : "Rider calls before arrival"}</span>}
                             error={shown("phone")}
                         >
                             <input
@@ -225,10 +238,21 @@ export default function CheckoutClient() {
                                 inputMode="numeric"
                                 autoComplete="tel-national"
                                 value={displayPhone(v.phone)}
-                                onChange={(e) => set("phone", digits(e.target.value).replace(/^0+/, "").slice(0, 11))}
+                                // Keep whatever the customer types: a leading 0 or the 92 country
+                                // code is fine. `toE164` normalises any of these shapes later.
+                                onChange={(e) => set("phone", digits(e.target.value).slice(0, 12))}
                                 placeholder="0300 1234567"
                                 className={inputCls}
                             />
+                            {verified ? (
+                                <p className="mt-2.5 inline-flex items-center gap-2 rounded-full bg-sand px-3 py-1.5 text-[10px] text-accent">
+                                    <span className="grid size-3.5 place-items-center rounded-full bg-ink text-white"><CheckIcon size={8} /></span>
+                                    {localPhone(verifiedPhone)} verified
+                                </p>
+                            ) : (
+                                // Remounts when the number changes so a pending code never carries over.
+                                <PhoneVerify key={phoneE164} id={`${uid}-verify`} phone={phoneE164} verifiedPhone={verifiedPhone} className="mt-2.5" />
+                            )}
                         </Field>
 
                         <Field id={`${uid}-city`} label="Delivery city" required error={shown("city")}>
@@ -344,6 +368,12 @@ export default function CheckoutClient() {
                         </motion.p>
                     )}
                 </AnimatePresence>
+
+                {!verified && (
+                    <p className="mt-4 text-center text-[11px] leading-relaxed text-muted">
+                        Verify your mobile number above to place this order.
+                    </p>
+                )}
 
                 <motion.button
                     type="submit"

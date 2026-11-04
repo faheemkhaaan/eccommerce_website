@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentUser } from "@/lib/roles";
 import { parsePlacedOrder, trackOrderByQuery } from "@/lib/order-queries";
 import type { Order, TrackedOrder } from "@/lib/orders";
 
@@ -19,10 +18,17 @@ export type PlaceResult =
     | { ok: false; message: string };
 
 export async function placeOrder(items: PlaceItem[], recipient: PlaceRecipient): Promise<PlaceResult> {
-    const user = await getCurrentUser();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { ok: false, message: "Sign in before placing an order." };
 
-    const supabase = await createClient();
+    // Cash on Delivery is only deliverable if the rider can ring the number on the parcel,
+    // so the order goes through only from a number the account confirmed by SMS.
+    if (!user.phone_confirmed_at)
+        return { ok: false, message: "Verify your mobile number before placing the order." };
+    if (user.phone !== recipient.phone)
+        return { ok: false, message: "Use the mobile number you verified to place this order." };
+
     const { data, error } = await supabase.rpc("create_order", {
         p_items: items,
         p_recipient: recipient,

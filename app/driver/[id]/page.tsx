@@ -30,7 +30,7 @@ async function ResolvedParcel({ params, searchParams }: Props) {
     if (!order) notFound();
 
     const next = nextStatuses(order.status, "driver");
-    const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${order.recipient.address}, ${order.recipient.city}`)}`;
+    // const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${order.recipient.address}, ${order.recipient.city}`)}`;
     const path = `/driver/${order.id}`;
     const navigateTo = directionsUrl(mapQuery(order.recipient.address, order.recipient.city));
     return (
@@ -59,14 +59,14 @@ async function ResolvedParcel({ params, searchParams }: Props) {
                 {order.recipient.notes && <p className="mt-2 text-muted">“{order.recipient.notes}”</p>}
             </address>
 
-            <ParcelMap address={order.recipient.address} city={order.recipient.city} />
+            {/* <ParcelMap address={order.recipient.address} city={order.recipient.city} /> */}
 
             <div className="mt-4 grid grid-cols-2 gap-2">
                 <a href={`tel:${order.recipient.phone}`} className="btn btn-solid h-12 hover:opacity-85">
                     Call
                 </a>
-                <a href={maps} target="_blank" rel="noreferrer" className="btn h-12 border border-line text-ink hover:opacity-70">
-                    Maps
+                <a href={navigateTo} target="_blank" rel="noreferrer" className="btn h-12 border border-line text-ink hover:opacity-70">
+                    Open in Maps
                 </a>
             </div>
 

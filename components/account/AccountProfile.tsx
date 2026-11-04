@@ -4,17 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
 import { createClient } from "@/lib/supabase/client";
+import { localPhone, toE164 } from "@/lib/phone";
+import PhoneVerify from "@/components/auth/PhoneVerify";
 import { buildTracking, currentStep, type OrderRecord } from "@/lib/orders";
 import { money } from "@/lib/cart-math";
 import { ArrowIcon, BoxIcon, CheckIcon, MailIcon, TruckIcon } from "@/components/Icons";
 
 const str = (x: unknown) => (typeof x === "string" ? x : "");
-
-// Register stores E.164 (+923001234567); show the local format clients recognise.
-const localPhone = (raw: unknown) => {
-    const d = str(raw).replace(/\D/g, "");
-    return d.startsWith("92") ? `0${d.slice(2)}` : d;
-};
 
 const fmtDay = (iso: string) =>
     new Date(iso).toLocaleDateString("en-US", { weekday: "short", day: "numeric", month: "short" });
@@ -28,7 +24,14 @@ function Row({ label, value }: { label: string; value: string }) {
     );
 }
 
-export default function AccountProfile({ orders }: { orders: OrderRecord[] }) {
+/**
+ * The account surface: identity, verification badges, default address and order history.
+ *
+ * @param orders The signed-in customer's own orders, already fetched on the server.
+ * @param verifiedPhone The account's SMS-confirmed mobile, resolved on the server. Presence of
+ *   this value is what the "Mobile verified" badge reflects.
+ */
+export default function AccountProfile({ orders, verifiedPhone }: { orders: OrderRecord[]; verifiedPhone?: string }) {
     const user = useAuthStore((s) => s.user);
     const router = useRouter();
 
@@ -44,6 +47,8 @@ export default function AccountProfile({ orders }: { orders: OrderRecord[] }) {
     const name = str(m.full_name) || user.email || "Client";
     const city = str(m.city);
     const address = str(m.address);
+    const phone = toE164(m.phone);
+    const mobileVerified = Boolean(verifiedPhone);
 
     return (
         <div className="grid items-start gap-6 lg:grid-cols-[6fr_6fr] lg:gap-8">
@@ -56,10 +61,18 @@ export default function AccountProfile({ orders }: { orders: OrderRecord[] }) {
                             <h2 className="mt-3 font-serif text-2xl leading-tight">{name}</h2>
                             <p className="mt-1.5 text-sm text-muted">{user.email}</p>
                         </div>
-                        <span className="label-sm inline-flex items-center gap-2 rounded-full bg-sand px-4 py-2 text-[10px]">
-                            <span className="grid size-3.5 place-items-center rounded-full bg-ink text-white"><CheckIcon size={8} /></span>
-                            Email verified
-                        </span>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <span className="label-sm inline-flex items-center gap-2 rounded-full bg-sand px-4 py-2 text-[10px]">
+                                <span className="grid size-3.5 place-items-center rounded-full bg-ink text-white"><CheckIcon size={8} /></span>
+                                Email verified
+                            </span>
+                            <span className={`label-sm inline-flex items-center gap-2 rounded-full px-4 py-2 text-[10px] ${mobileVerified ? "bg-sand text-accent" : "bg-white text-muted ring-1 ring-line"}`}>
+                                <span className={`grid size-3.5 place-items-center rounded-full ${mobileVerified ? "bg-ink text-white" : "bg-line"}`}>
+                                    {mobileVerified && <CheckIcon size={8} />}
+                                </span>
+                                {mobileVerified ? "Mobile verified" : "Mobile unverified"}
+                            </span>
+                        </div>
                     </div>
 
                     <dl className="mt-6">
@@ -68,6 +81,10 @@ export default function AccountProfile({ orders }: { orders: OrderRecord[] }) {
                         <Row label="Usual jar size" value={str(m.size)} />
                         <Row label="Order updates" value={m.notify_whatsapp ? "Email · on" : "Email · off"} />
                     </dl>
+
+                    {!mobileVerified && phone && (
+                        <PhoneVerify key={phone} phone={phone} verifiedPhone={verifiedPhone} className="mt-5" />
+                    )}
 
                     <button
                         type="button"
