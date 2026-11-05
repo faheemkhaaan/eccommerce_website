@@ -80,10 +80,22 @@ export default function PurchasePanel({ product: p }: { product: Detail }) {
             )}
             <h1 className="mt-3 font-serif text-[clamp(1.9rem,3.4vw,2.6rem)] leading-tight tracking-tight">{p.name}</h1>
 
+            {/* Real score only: a product nobody has reviewed shows no stars at all. */}
             {p.reviews > 0 && (
                 <div className="mt-3 flex items-center gap-2 text-xs">
-                    <span className="flex gap-0.5 [&_svg]:fill-current" aria-hidden><StarIcon size={12} /><StarIcon size={12} /><StarIcon size={12} /><StarIcon size={12} /><StarIcon size={12} /></span>
-                    <span className="text-muted">{p.rating} ({p.reviews} reviews)</span>
+                    <span className="flex gap-0.5" aria-hidden>
+                        {[1, 2, 3, 4, 5].map((n) => (
+                            <span
+                                key={n}
+                                className={n <= Math.round(p.rating) ? "text-ink [&_svg]:fill-current" : "text-muted/30"}
+                            >
+                                <StarIcon size={12} />
+                            </span>
+                        ))}
+                    </span>
+                    <a href="#reviews" className="text-muted hover:text-ink">
+                        {p.rating.toFixed(1)} · {p.reviews} {p.reviews === 1 ? "review" : "reviews"}
+                    </a>
                 </div>
             )}
 

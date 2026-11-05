@@ -8,7 +8,11 @@ import { MotionProvider, Reveal } from "@/components/Motion";
 import Gallery from "@/components/product/Gallery";
 import PurchasePanel from "@/components/product/PurchasePanel";
 import ProductFacts from "@/components/product/ProductFacts";
+import ReviewGate from "@/components/product/ReviewGate";
+import Reviews from "@/components/product/Reviews";
 import { allDetailIds, getDetail } from "@/lib/product-details";
+import { getProductReviews } from "@/lib/review-queries";
+import { productSchema } from "@/lib/seo";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -51,8 +55,29 @@ async function ResolvedProduct({ params }: Props) {
     const p = await getDetail(id);
     if (!p) notFound();
 
+    // Cached and tagged, so the review text ships inside the prerendered page.
+    const { reviews, summary } = await getProductReviews(p.id);
+
+    const schema = productSchema({
+        name: p.name,
+        description: p.short,
+        images: p.gallery.map((photo) => photo.full),
+        sku: p.id,
+        priceFrom: p.packs.length ? Math.min(...p.packs.map((k) => k.price)) : 0,
+        priceTo: p.packs.length ? Math.max(...p.packs.map((k) => k.price)) : 0,
+        packCount: p.packs.length,
+        inStock: p.packs.some((k) => k.stock > 0),
+        rating: summary,
+    });
+
     return (
         <>
+            {/* Escaping "<" keeps a stray sequence in a product name from closing the tag. */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }}
+            />
+
             <nav aria-label="Breadcrumb" className="label-sm text-[10px] tracking-[0.14em] text-muted">
                 <ol className="flex flex-wrap items-center gap-2">
                     {p.breadcrumb.map((b) => {
@@ -80,6 +105,14 @@ async function ResolvedProduct({ params }: Props) {
             {/* ProductFacts carries its own top border and renders nothing at all
                 for a product that has no editorial copy yet. */}
             <ProductFacts product={p} />
+
+            <Reviews reviews={reviews} summary={summary}>
+                {/* Who may review depends on the session, so it streams in behind
+                    its own boundary rather than holding up the reviews above. */}
+                <Suspense fallback={<ComposerSkeleton />}>
+                    <ReviewGate productId={p.id} />
+                </Suspense>
+            </Reviews>
         </>
     );
 }
@@ -99,5 +132,22 @@ function ProductSkeleton() {
                 </div>
             </div>
         </>
+    );
+}
+
+/** Shape-matched fallback for the review composer while the session resolves. */
+function ComposerSkeleton() {
+    return (
+        <div className="rounded-xl border border-line bg-sand/30 p-5">
+            <div className="h-5 w-40 animate-pulse rounded-full bg-muted/15" />
+            <div className="mt-3 flex gap-1.5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="size-6 animate-pulse rounded bg-muted/15" />
+                ))}
+            </div>
+            <div className="mt-5 h-12 w-full animate-pulse rounded-md bg-muted/10" />
+            <div className="mt-4 h-28 w-full animate-pulse rounded-md bg-muted/10" />
+            <div className="mt-5 h-11 w-36 animate-pulse rounded-full bg-muted/15" />
+        </div>
     );
 }

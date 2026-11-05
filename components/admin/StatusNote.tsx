@@ -22,10 +22,12 @@ const NOTES: Record<string, { ok: boolean; text: string }> = {
     "not-a-rider": { ok: false, text: "That account is not a rider. Grant the driver role first." },
     "role-granted": { ok: true, text: "Role updated." },
     "self-demote": { ok: false, text: "You cannot take away your own admin role." },
+    "review-published": { ok: true, text: "Review published. It is now on the product page." },
+    "review-removed": { ok: true, text: "Review removed. The customer can write another." },
 };
 
 export type NotesType = "saved" | "created" | "deleted" | "duplicate" | "product-created" | "duplicate-product" | "invalid" | "assigned" | "unassigned" | "status-updated" | "needs-driver" | "closed" | "denied" | "missing" |
-    "not-a-rider" | "role-granted" | "self-demote"
+    "not-a-rider" | "role-granted" | "self-demote" | "review-published" | "review-removed"
 
 /** Renders the ?status= flag a server action redirected back with. */
 export default function StatusNote({ status }: { status?: NotesType }) {

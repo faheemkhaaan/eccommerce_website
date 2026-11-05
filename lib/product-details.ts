@@ -1,5 +1,6 @@
 import { u, ids } from "@/lib/images";
 import { getCatalogue, getCatalogueProduct, type CatalogueProduct, type Pack } from "@/lib/catalogue";
+import { getProductReviews } from "@/lib/review-queries";
 
 export type Photo = { full: string; thumb: string };
 
@@ -11,7 +12,9 @@ export type Detail = {
     short: string;
     /** Price of the default pack, for the pre-selected state. */
     price: number;
+    /** Mean published review score, or 0 when nobody has reviewed it yet. */
     rating: number;
+    /** How many published reviews that score is based on. */
     reviews: number;
     badge: string;
     breadcrumb: string[];
@@ -30,8 +33,11 @@ export type Detail = {
  * Everything about a product that is not a commercial field. Pack sizes, prices,
  * stock and names come from the database instead, so the shop owner can change
  * them without a deploy. This is the copy that still needs a developer.
+ *
+ * Rating and review count are excluded too: they are counted from real reviews,
+ * not written here.
  */
-type Editorial = Omit<Detail, "name" | "short" | "packs" | "price">;
+type Editorial = Omit<Detail, "name" | "short" | "packs" | "price" | "rating" | "reviews">;
 
 const photos = (list: string[]): Photo[] =>
     list.map((id) => ({ full: u(id, 1400), thumb: u(id, 240) }));
@@ -41,8 +47,6 @@ const EDITORIAL: Record<string, Editorial> = {
         id: "bilona-organic-ghee",
         edition: "Small batch — churned weekly",
         article: "GH-01",
-        rating: 4.9,
-        reviews: 312,
         badge: "Grass-fed · Bilona",
         breadcrumb: ["Shop", "Ghee"],
         defaultPack: "1 kg",
@@ -149,8 +153,6 @@ function fallbackEditorial(product: CatalogueProduct): Editorial {
         id: product.id,
         edition: "",
         article: "",
-        rating: 0,
-        reviews: 0,
         badge: product.badge ?? "",
         breadcrumb: ["Shop"],
         defaultPack: first?.label ?? "",
@@ -173,12 +175,18 @@ export async function getDetail(id: string): Promise<Detail | undefined> {
     const preferred =
         product.packs.find((k) => k.label === editorial.defaultPack) ?? product.packs[0];
 
+    // Counted from published reviews rather than written into the copy above, so
+    // the stars on the page and the review list below it cannot disagree.
+    const { summary } = await getProductReviews(id);
+
     return {
         ...editorial,
         name: product.name,
         short: product.short,
         packs: product.packs,
         price: preferred?.price ?? 0,
+        rating: summary.average,
+        reviews: summary.count,
         // Photos uploaded from the dashboard beat the stock ones written in code. Storage
         // serves one file per size, so the thumbnail reuses the full URL.
         gallery: product.images.length

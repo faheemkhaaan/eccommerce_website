@@ -384,13 +384,61 @@ Invariants worth keeping:
 Removing a photo deletes the storage object first and the row second — an orphaned
 row is easy to spot, an orphaned file is not.
 
+### 2.14 Verified-purchase reviews, and the SEO to go with them
+
+Shoppers had no way to leave feedback and the page carried a fabricated `4.9 / 312`
+rating written into `lib/product-details.ts`. Both are gone: reviews are now real,
+and the score is counted from them.
+
+Two rules shape the feature:
+
+1. **Only a delivered customer may review.** `reviewable_order(product_id)` returns
+   the caller's most recent `delivered` order containing that product, and the
+   insert policy requires `order_id` to equal exactly that. A review cannot be
+   attached to a jar the reviewer never received.
+2. **Nothing is public until staff publish it.** The insert policy pins `status` to
+   `pending` and a `before insert` trigger forces it again, so a customer cannot
+   approve their own words however they call the API. `products`/`product_reviews`
+   follow the developer's call that RLS — not the UI — is the boundary.
+
+- `supabase/migrations/0010_product_reviews.sql` — the table, the two helper
+  functions, the author-name trigger, and the policies. There is **no client update
+  policy**: publishing is staff-only.
+- `lib/reviews.ts` — pure: types, `summarise()`, `reviewProblem()` (the same limits
+  the CHECK constraints enforce), `fmtReviewDate`. No `server-only`, no Supabase
+  import, so the client form validates with the rules the server applies.
+- `lib/review-queries.ts` — `server-only`. `getProductReviews()` is `'use cache'` +
+  `cacheTag(REVIEWS_TAG)` on the anon client, so the review text ships inside the
+  prerendered page; `getReviewAccess()` is session-bound and answers both "may I
+  review?" and "what did I already write?" in one pass.
+- `components/product/Reviews.tsx` — presentational, server-rendered. The one thing
+  it cannot know — who is reading — arrives in `children`, which the page fills with
+  `ReviewGate` behind its own `<Suspense>`. That split is the whole trick: the
+  published reviews stay in the static shell while the composer streams.
+- `components/product/ReviewGate.tsx` / `ReviewForm.tsx` — the form uses
+  `useActionState`, so a refusal comes back with the text still in the box instead
+  of a redirect that empties it (the same trap the image gallery hit, §2.13).
+- `app/admin/reviews/` — the moderation queue. `approveReview` sets `published` and
+  calls `updateTag(REVIEWS_TAG)`; `removeReview` deletes, which is also the only way
+  a customer gets a second attempt, since one review per product is a uniqueness
+  constraint rather than a UI rule.
+- `lib/seo.ts`, `app/sitemap.ts`, `app/robots.ts` — `Product` + `aggregateRating`
+  JSON-LD on the detail page, a sitemap built from `allDetailIds()`, and a robots
+  file that keeps `/admin`, `/driver`, `/account` and `/checkout` out of the index.
+  `aggregateRating` is **omitted entirely** until real reviews exist — a rating with
+  nothing behind it is what gets rich results revoked.
+
+`SITE_URL` comes from `NEXT_PUBLIC_SITE_URL`, falling back to Vercel's own host and
+then `localhost`. The JSON-LD escapes `<` in the serialised payload so a stray
+sequence in a product name cannot close the `script` tag.
+
 ---
 
 ## 3. Database reference
 
-Nine migrations, each applied by hand by pasting it into the **Supabase SQL
+Ten migrations, each applied by hand by pasting it into the **Supabase SQL
 Editor**. They were verified live after applying, so **re-running 0001–0004 will
-fail** — they are not written idempotently. `0005`–`0009` use `create or replace` /
+fail** — they are not written idempotently. `0005`–`0010` use `create or replace` /
 `if not exists` / `drop policy if exists`, so they are safe to re-run.
 
 | file | what it adds |
@@ -404,6 +452,7 @@ fail** — they are not written idempotently. `0005`–`0009` use `create or rep
 | `0007_require_driver_for_delivery.sql` | replaces `set_order_status` again so `out_for_delivery` / `attempted` / `delivered` require an assigned rider |
 | `0008_lock_driver_on_closed_orders.sql` | replaces `assign_driver` so delivered / cancelled / returned parcels can no longer be re-assigned |
 | `0009_product_images.sql` | the `product-images` storage bucket + `storage.objects` admin policies, and the `product_images` gallery table |
+| `0010_product_reviews.sql` | `review_status` enum, `product_reviews`, `reviewable_order()` / `can_review_product()`, the author-name trigger, RLS |
 
 ### `public.user_roles` — `0001_roles.sql`
 
@@ -604,6 +653,7 @@ request, **not** baked into the JWT.
 | `app/(shop)/products/[id]/page.tsx` | product detail; Suspense + `ProductSkeleton` |
 | `app/(shop)/login`, `register`, `account`, `checkout`, `track-order` | storefront flows |
 | `app/(shop)/order-actions.ts` | `placeOrder` (with the phone gate) + `lookupTrackedOrder` |
+| `app/(shop)/review-actions.ts` | `submitReview` — verified-purchase check, then insert as `pending` |
 | `app/admin/layout.tsx` | admin role gate (Suspense boundary) |
 | `app/admin/page.tsx` | dashboard overview |
 | `app/admin/products/page.tsx` | product list + quick restock |
@@ -614,11 +664,14 @@ request, **not** baked into the JWT.
 | `app/admin/orders/actions.ts` | `setOrderStatus`, `assignDriver` |
 | `app/admin/team/page.tsx` | search users, grant roles |
 | `app/admin/team/actions.ts` | `grantRole` |
+| `app/admin/reviews/page.tsx` | review moderation queue (pending first) |
+| `app/admin/reviews/actions.ts` | `approveReview` / `removeReview` + `updateTag('reviews')` |
 | `app/admin/actions.ts` | catalogue + auth Server Actions |
 | `app/driver/layout.tsx` · `page.tsx` · `[id]/page.tsx` | rider PWA shell, queue, parcel |
 | `app/driver/manifest.ts` · `sw/route.ts` · `actions.ts` | PWA manifest, service worker, `reportDelivery` |
 | `app/auth/confirm/route.ts` | verifies the email OTP, then redirects |
 | `app/api/auth/send-sms/route.ts` | Supabase "Send SMS" hook — verifies the signature, then sends via SendPK |
+| `app/sitemap.ts` · `app/robots.ts` | file-convention SEO routes (sitemap from `allDetailIds()`, staff paths disallowed) |
 | `app/layout.tsx`, `app/not-found.tsx`, `app/globals.css` | root shell |
 | ⚠️ `app/whoami/page.tsx` | debug route — **delete after testing** |
 
@@ -629,6 +682,9 @@ request, **not** baked into the JWT.
 | `catalogue.ts` | **public cached** catalogue read (`'use cache'` + `cacheTag('catalogue')`), exports `CATALOGUE_TAG` |
 | `admin-catalogue.ts` | **uncached, session-bound** staff read; can see inactive products |
 | `product-details.ts` | merges DB commercial fields with in-code editorial copy |
+| `reviews.ts` | **pure** review domain: types, `summarise`, `reviewProblem`, `fmtReviewDate` (no network) |
+| `review-queries.ts` | `server-only`; cached published reviews (`REVIEWS_TAG`) + session-bound `getReviewAccess` |
+| `seo.ts` | `SITE_URL`, `absolute`, `productSchema` (Product + conditional `aggregateRating`) |
 | `orders.ts` | **pure** order domain: types, status helpers, timeline (no network) |
 | `order-queries.ts` | `server-only`; all order DB reads + `listDrivers` / `listStaffUsers` |
 | `maps.ts` | `mapQuery` / `embedUrl` (null without a key) / `directionsUrl` |
@@ -657,7 +713,9 @@ request, **not** baked into the JWT.
 - `components/driver/` — `RegisterSW`, `AutoRefresh`, `ParcelMap`
 - `components/auth/` — `AuthProvider`, `LoginCard`, `RegisterForm`, `AccountMenu`,
   `Field`, `PhoneVerify`
-- `components/product/` — `Gallery`, `PurchasePanel`, `ProductFacts`
+- `components/product/` — `Gallery`, `PurchasePanel`, `ProductFacts`, `Reviews`
+  (presentational list + summary), `ReviewGate` (session-bound async child),
+  `ReviewForm` (client, `useActionState`)
 - `components/cart/` — `CartProvider`, `CartDrawer`, `BagButton`
 - `components/checkout/CheckoutClient.tsx`, `components/account/AccountProfile.tsx`,
   `components/tracking/TrackOrderClient.tsx`
@@ -747,6 +805,13 @@ These caused real bugs. Re-read before touching pages.
   it is pasted into the Supabase SQL Editor there is no `product-images` bucket, no
   `product_images` table, and every upload from `/admin/products/<id>` will fail —
   the product form still needs at least one photo. Apply it before trying an upload.
+- ⛔ **`supabase/migrations/0010_product_reviews.sql` has NOT been applied yet.** Until
+  it is pasted into the Supabase SQL Editor there is no `product_reviews` table, the
+  product page cannot prerender (`Could not find the table 'public.product_reviews'`),
+  and no review can be posted. Apply it before touching the review flow.
+- ⛔ **No review has been written, approved or displayed.** The whole path — verified
+  buyer posts → pending → admin publishes → `updateTag('reviews')` → storefront shows
+  it → `aggregateRating` appears in the JSON-LD — has never run end-to-end.
 - ⛔ **No photo has been uploaded through the browser → Storage path.** That route
   depends on the admin's JWT carrying the admin role into the `storage.objects`
   policy, which has never been exercised.
