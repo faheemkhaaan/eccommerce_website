@@ -110,6 +110,8 @@ single, obvious tag.
 - `components/admin/StatusNote.tsx` — renders the `?status=` result of an action.
 - `app/admin/page.tsx` — overview: product count, pack count, total stock value,
   low-stock list.
+- `app/admin/revenue/page.tsx` — delivered-order revenue, average COD order value,
+  cash on the road and city totals.
 - `app/admin/products/page.tsx` — list view with an inline "save stock" form.
 - `app/admin/products/[id]/page.tsx` — edit a product and each of its packs,
   add a pack, delete a pack.
@@ -191,6 +193,10 @@ The file split that keeps this importable everywhere:
   a `?status=` code (`not-a-rider`, `closed`, `denied`, `missing`, `invalid`).
 - `components/admin/OrderCard.tsx`, `StatusNote.tsx` — the row and the feedback pill.
 
+Later follow-up: the **overview** at `app/admin/page.tsx` now also counts
+`delivered` orders and sums their totals as **Cash received**, so the admin home
+shows actual completed COD sales rather than just pending work and raw stock.
+
 One subtlety worth keeping: **`list_users_with_roles` is admin-only in SQL**, so the
 board only calls `listDrivers()` when `isAdmin` — a rider must never invoke it.
 
@@ -202,10 +208,12 @@ board only calls `listDrivers()` when `isAdmin` — a rider must never invoke it
   role, calls the `grant_role` RPC, maps *"own admin"* → `self-demote`, preserves
   `?q=`. `grant_role` **refuses to let an admin demote themselves**.
 - `components/admin/AdminNav.tsx` — one table drives the nav:
+  (now including a dedicated **Revenue** page for admins):
 
   ```ts
   const NAV = [
       { href: "/admin",          label: "Overview",         roles: ["admin"] },
+      { href: "/admin/revenue",  label: "Revenue",          roles: ["admin"] },
       { href: "/admin/orders",   label: "COD board",        roles: ["admin", "driver"] },
       { href: "/admin/team",     label: "Riders & roles",   roles: ["admin"] },
       { href: "/admin/products", label: "Products & stock", roles: ["admin"] },
@@ -333,10 +341,10 @@ JSDoc header** saying what it does and, where useful, its parameters.
 
 ## 3. Database reference
 
-Five migrations, each applied by hand by pasting it into the **Supabase SQL
+Six migrations, each applied by hand by pasting it into the **Supabase SQL
 Editor**. They were verified live after applying, so **re-running 0001–0004 will
-fail** — they are not written idempotently. `0005` uses `create or replace`, so it is
-safe to re-run.
+fail** — they are not written idempotently. `0005` and `0006` use `create or replace`,
+so they are safe to re-run.
 
 | file | what it adds |
 | --- | --- |
@@ -345,6 +353,8 @@ safe to re-run.
 | `0003_orders.sql` | `order_status` enum, `orders`, `order_items`, `order_events`, the RPCs, demo parcel |
 | `0004_rider_transitions.sql` | replaces `set_order_status` with a rider transition whitelist + closed-order guard |
 | `0005_verified_phone.sql` | `verified_phone()` + the phone guard at the top of `create_order` |
+| `0006_delivery_sales_stock.sql` | replaces `set_order_status` so delivered orders decrement pack stock in the same transaction |
+| `0007_require_driver_for_delivery.sql` | replaces `set_order_status` again so `out_for_delivery` / `attempted` / `delivered` require an assigned rider |
 
 ### `public.user_roles` — `0001_roles.sql`
 
@@ -672,6 +682,12 @@ These caused real bugs. Re-read before touching pages.
 - ⛔ **`supabase/migrations/0005_verified_phone.sql` has NOT been applied yet.** Until
   it is pasted into the Supabase SQL Editor, the database will not enforce the
   verified-phone rule (the app-level checks in `placeOrder` still run).
+- ⛔ **`supabase/migrations/0006_delivery_sales_stock.sql` has NOT been applied yet.**
+  Until it is pasted into the Supabase SQL Editor, marking an order `delivered`
+  will not decrement `product_packs.stock` in the database.
+- ⛔ **`supabase/migrations/0007_require_driver_for_delivery.sql` has NOT been applied yet.**
+  Until it is pasted into the Supabase SQL Editor, the database will still allow
+  delivery-route status changes on unassigned parcels if someone bypasses the UI.
 - ⛔ **No one has completed a real end-to-end COD order** from a verified phone
   number, nor exercised the board → rider hand-off in production.
 - ⛔ **The phone flow has not been exercised end-to-end.** Test numbers are the plan

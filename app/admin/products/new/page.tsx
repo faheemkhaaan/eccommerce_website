@@ -12,7 +12,7 @@ type Props = { searchParams: Promise<{ status?: NotesType }> };
 
 export default function NewProductPage({ searchParams }: Props) {
     return (
-        <Suspense fallback={<p className="text-[0.85rem] text-muted">Loading the form…</p>}>
+        <Suspense fallback={<NewProductSkeleton />}>
             <ResolvedNewProduct searchParams={searchParams} />
         </Suspense>
     );
@@ -145,6 +145,33 @@ async function ResolvedNewProduct({ searchParams }: Props) {
                 A product created here renders with its image, packs and price only, and every empty
                 section hides itself.
             </p>
+        </div>
+    );
+}
+
+/** Shape-matched fallback for the new-product form. */
+function NewProductSkeleton() {
+    return (
+        <div className="max-w-3xl">
+            <div className="h-3 w-32 animate-pulse rounded-full bg-muted/15" />
+            <div className="mt-6 h-3 w-20 animate-pulse rounded-full bg-muted/15" />
+            <div className="mt-4 h-10 w-48 animate-pulse rounded-full bg-muted/15" />
+            <div className="mt-3 h-3 w-full max-w-2xl animate-pulse rounded-full bg-muted/10" />
+
+            <section className="mt-8 rounded-xl border border-line p-5 md:p-6">
+                <div className="space-y-4">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                        <div key={i} className="space-y-2">
+                            <div className="h-3 w-24 animate-pulse rounded-full bg-muted/15" />
+                            <div className="h-11 w-full animate-pulse rounded-lg bg-muted/10" />
+                        </div>
+                    ))}
+                    <div className="flex gap-3 border-t border-line pt-5">
+                        <div className="h-10 w-28 animate-pulse rounded-lg bg-muted/10" />
+                        <div className="h-10 w-24 animate-pulse rounded-lg bg-muted/10" />
+                    </div>
+                </div>
+            </section>
         </div>
     );
 }

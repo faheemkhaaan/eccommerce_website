@@ -7,7 +7,6 @@ import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { money } from "@/lib/cart-math";
 import { getOrder } from "@/lib/order-queries";
 import { STATUS_LABEL, fmtDay, nextStatuses } from "@/lib/orders";
-import ParcelMap from "@/components/driver/ParcelMap";
 import { directionsUrl, mapQuery } from "@/lib/maps";
 
 
@@ -17,7 +16,7 @@ type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ status?:
 
 export default function DriverOrderPage({ params, searchParams }: Props) {
     return (
-        <Suspense fallback={<p className="text-[0.85rem] text-muted">Loading parcel…</p>}>
+        <Suspense fallback={<ParcelSkeleton />}>
             <ResolvedParcel params={params} searchParams={searchParams} />
         </Suspense>
     );
@@ -111,6 +110,39 @@ async function ResolvedParcel({ params, searchParams }: Props) {
                     ))}
                 </section>
             )}
+        </div>
+    );
+}
+
+/** Shape-matched fallback for one parcel in the rider app. */
+function ParcelSkeleton() {
+    return (
+        <div>
+            <div className="h-3 w-20 animate-pulse rounded-full bg-muted/15" />
+            <div className="mt-4 h-10 w-44 animate-pulse rounded-full bg-muted/15" />
+            <div className="mt-2 h-3 w-28 animate-pulse rounded-full bg-muted/10" />
+
+            <div className="mt-5 h-12 w-28 animate-pulse rounded-full bg-muted/15" />
+            <div className="mt-2 h-3 w-32 animate-pulse rounded-full bg-muted/10" />
+
+            <div className="mt-6 rounded-2xl bg-white p-4">
+                <div className="h-3 w-full animate-pulse rounded-full bg-muted/10" />
+                <div className="mt-2 h-3 w-2/3 animate-pulse rounded-full bg-muted/10" />
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="h-12 animate-pulse rounded-lg bg-muted/10" />
+                <div className="h-12 animate-pulse rounded-lg bg-muted/10" />
+            </div>
+
+            <div className="mt-6 space-y-2">
+                {Array.from({ length: 2 }).map((_, i) => (
+                    <div key={i} className="flex justify-between gap-3">
+                        <div className="h-3 w-40 animate-pulse rounded-full bg-muted/10" />
+                        <div className="h-3 w-16 animate-pulse rounded-full bg-muted/10" />
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }

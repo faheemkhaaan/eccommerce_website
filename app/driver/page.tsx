@@ -12,7 +12,7 @@ type Props = { searchParams: Promise<{ status?: NotesType }> };
 
 export default function DriverHomePage({ searchParams }: Props) {
     return (
-        <Suspense fallback={<p className="text-[0.85rem] text-muted">Loading your queue…</p>}>
+        <Suspense fallback={<DriverQueueSkeleton />}>
             <ResolvedQueue searchParams={searchParams} />
         </Suspense>
     );
@@ -82,6 +82,31 @@ async function ResolvedQueue({ searchParams }: Props) {
                     </ul>
                 </section>
             )}
+        </div>
+    );
+}
+
+/** Shape-matched fallback for the rider queue. */
+function DriverQueueSkeleton() {
+    return (
+        <div>
+            <div className="h-3 w-12 animate-pulse rounded-full bg-muted/15" />
+            <div className="mt-4 h-10 w-40 animate-pulse rounded-full bg-muted/15" />
+            <div className="mt-3 h-3 w-36 animate-pulse rounded-full bg-muted/10" />
+
+            <ul className="mt-6 space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                    <li key={i} className="rounded-2xl border border-line bg-white p-4">
+                        <div className="flex items-baseline justify-between gap-2">
+                            <div className="h-5 w-24 animate-pulse rounded-full bg-muted/15" />
+                            <div className="h-3 w-16 animate-pulse rounded-full bg-muted/10" />
+                        </div>
+                        <div className="mt-3 h-4 w-28 animate-pulse rounded-full bg-muted/15" />
+                        <div className="mt-2 h-3 w-full animate-pulse rounded-full bg-muted/10" />
+                        <div className="mt-3 h-6 w-24 animate-pulse rounded-full bg-muted/15" />
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 }

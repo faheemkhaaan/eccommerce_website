@@ -7,6 +7,7 @@ type StaffRole = "admin" | "driver";
 
 const NAV: { href: string; label: string; roles: StaffRole[] }[] = [
     { href: "/admin", label: "Overview", roles: ["admin"] },
+    { href: "/admin/revenue", label: "Revenue", roles: ["admin"] },
     { href: "/admin/orders", label: "COD board", roles: ["admin", "driver"] },
     { href: "/admin/team", label: "Riders & roles", roles: ["admin"] },
     { href: "/admin/products", label: "Products & stock", roles: ["admin"] },
@@ -20,8 +21,6 @@ const NAV: { href: string; label: string; roles: StaffRole[] }[] = [
 export default function AdminNav({ role }: { role: StaffRole }) {
     const pathname = usePathname();
     const items = NAV.filter((item) => item.roles.includes(role));
-    console.log(role)
-    console.log(items)
 
     return (
         <ul className="flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible">

@@ -18,11 +18,13 @@ import { requireStaff } from "@/lib/roles";
 
 export const metadata: Metadata = { title: "Order — Organic Ghee" };
 
+const DRIVER_REQUIRED = new Set(["out_for_delivery", "attempted", "delivered"]);
+
 type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ status?: NotesType }> };
 
 export default function AdminOrderPage({ params, searchParams }: Props) {
     return (
-        <Suspense fallback={<p className="text-[0.85rem] text-muted">Loading order…</p>}>
+        <Suspense fallback={<OrderDetailSkeleton />}>
             <ResolvedOrder params={params} searchParams={searchParams} />
         </Suspense>
     );
@@ -41,7 +43,9 @@ async function ResolvedOrder({ params, searchParams }: Props) {
     if (!order) notFound();
     if (!isAdmin && order.driverId !== userId) notFound(); // not theirs: pretend it doesn't exist
 
-    const next = nextStatuses(order.status, role);
+    const next = nextStatuses(order.status, role).filter((status) =>
+        order.driverId || !DRIVER_REQUIRED.has(status)
+    );
     const steps = buildTracking({ status: order.status, city: order.recipient.city, events: order.events });
     const path = `/admin/orders/${order.id}`;
     return (
@@ -181,6 +185,42 @@ async function ResolvedOrder({ params, searchParams }: Props) {
                         </li>
                     ))}
                 </ol>
+            </section>
+        </div>
+    );
+}
+
+/** Shape-matched fallback for one order on the COD board. */
+function OrderDetailSkeleton() {
+    return (
+        <div className="max-w-4xl">
+            <div className="h-3 w-32 animate-pulse rounded-full bg-muted/15" />
+            <div className="mt-6 h-10 w-40 animate-pulse rounded-full bg-muted/15" />
+            <div className="mt-3 h-3 w-48 animate-pulse rounded-full bg-muted/10" />
+
+            <div className="mt-8 grid gap-6 lg:grid-cols-2">
+                {Array.from({ length: 2 }).map((_, i) => (
+                    <section key={i} className="rounded-xl border border-line bg-sand/40 p-5">
+                        <div className="h-3 w-20 animate-pulse rounded-full bg-muted/15" />
+                        <div className="mt-4 h-4 w-32 animate-pulse rounded-full bg-muted/15" />
+                        <div className="mt-2 h-3 w-full animate-pulse rounded-full bg-muted/10" />
+                        <div className="mt-2 h-3 w-3/4 animate-pulse rounded-full bg-muted/10" />
+                    </section>
+                ))}
+            </div>
+
+            <section className="mt-6 rounded-xl border border-line p-5">
+                <div className="h-3 w-24 animate-pulse rounded-full bg-muted/15" />
+                <div className="mt-4 h-11 w-full max-w-sm animate-pulse rounded-lg bg-muted/10" />
+            </section>
+
+            <section className="mt-6 rounded-xl border border-line p-5">
+                <div className="h-3 w-20 animate-pulse rounded-full bg-muted/15" />
+                <div className="mt-4 flex flex-wrap gap-2">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="h-10 w-28 animate-pulse rounded-lg bg-muted/10" />
+                    ))}
+                </div>
             </section>
         </div>
     );

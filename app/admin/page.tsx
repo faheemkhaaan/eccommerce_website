@@ -14,11 +14,15 @@ export default async function AdminOverview() {
     const live = products.filter((p) => p.is_active).length;
 
     const pending = orders.filter((o) => o.status === "pending").length;
+    const delivered = orders.filter((o) => o.status === "delivered");
+    const cashReceived = delivered.reduce((sum, o) => sum + o.total, 0);
 
     const stats = [
         { label: "Live products", value: String(live), sub: `${products.length} in the catalogue` },
         { label: "Units in stock", value: String(units), sub: "jars and tins ready to ship" },
         { label: "Pending COD", value: String(pending), sub: "waiting on a confirmation call" },
+        { label: "Delivered COD", value: String(delivered.length), sub: "parcels handed over and paid" },
+        { label: "Cash received", value: money(cashReceived), sub: "collected from delivered orders" },
         { label: "Sold out", value: String(soldOut.length), sub: soldOut.length ? soldOut.map((k) => k.label).join(", ") : "every pack is available" },
     ];
 
@@ -45,9 +49,12 @@ export default async function AdminOverview() {
                 ))}
             </dl>
 
-            <p className="mt-6 text-[0.85rem]">
+            <p className="mt-6 flex flex-wrap gap-4 text-[0.85rem]">
                 <Link href="/admin/orders" className="underline underline-offset-4 hover:text-accent">
                     Open the COD status board
+                </Link>
+                <Link href="/admin/revenue" className="underline underline-offset-4 hover:text-accent">
+                    View revenue
                 </Link>
             </p>
 

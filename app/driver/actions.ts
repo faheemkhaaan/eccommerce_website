@@ -1,6 +1,8 @@
 "use server";
 
+import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { CATALOGUE_TAG } from "@/lib/catalogue";
 import { assertRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 import { DRIVER_STATUSES, type OrderStatus } from "@/lib/orders";
@@ -35,6 +37,7 @@ export async function reportDelivery(formData: FormData) {
         back(path, "invalid");
     }
 
+    updateTag(CATALOGUE_TAG);
     back(path, "status-updated");
 }
 

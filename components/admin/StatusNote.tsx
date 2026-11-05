@@ -15,6 +15,7 @@ const NOTES: Record<string, { ok: boolean; text: string }> = {
     assigned: { ok: true, text: "Rider assigned. They will see the parcel in their queue." },
     unassigned: { ok: true, text: "Rider removed from this parcel." },
     "status-updated": { ok: true, text: "Status updated. Tracking will show the new step." },
+    "needs-driver": { ok: false, text: "Assign a rider before sending a parcel out for delivery." },
     closed: { ok: false, text: "This order is already closed." },
     denied: { ok: false, text: "You are not allowed to change that." },
     missing: { ok: false, text: "That order was not found." },
@@ -23,7 +24,7 @@ const NOTES: Record<string, { ok: boolean; text: string }> = {
     "self-demote": { ok: false, text: "You cannot take away your own admin role." },
 };
 
-export type NotesType = "saved" | "created" | "deleted" | "duplicate" | "product-created" | "duplicate-product" | "invalid" | "assigned" | "unassigned" | "status-updated" | "closed" | "denied" | "missing" |
+export type NotesType = "saved" | "created" | "deleted" | "duplicate" | "product-created" | "duplicate-product" | "invalid" | "assigned" | "unassigned" | "status-updated" | "needs-driver" | "closed" | "denied" | "missing" |
     "not-a-rider" | "role-granted" | "self-demote"
 
 /** Renders the ?status= flag a server action redirected back with. */

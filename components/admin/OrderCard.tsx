@@ -22,6 +22,8 @@ const TONE: Record<OrderStatus, string> = {
     returned: "bg-muted/15 text-muted",
 };
 
+const DRIVER_REQUIRED: OrderStatus[] = ["out_for_delivery", "attempted", "delivered"];
+
 export default function OrderCard({
     order,
     drivers,
@@ -34,7 +36,9 @@ export default function OrderCard({
     role: Exclude<AppRole, "customer">;
 }) {
     const isAdmin = role === "admin";
-    const next = nextStatuses(order.status, role);
+    const next = nextStatuses(order.status, role).filter((status) =>
+        order.driverId || !DRIVER_REQUIRED.includes(status)
+    );
     const rider = drivers.find((d) => d.id === order.driverId);
 
     return (

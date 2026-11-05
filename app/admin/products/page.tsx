@@ -17,7 +17,7 @@ type Props = { searchParams: Promise<{ status?: NotesType }> };
 
 export default function AdminProductsPage({ searchParams }: Props) {
     return (
-        <Suspense fallback={<p className="text-[0.85rem] text-muted">Loading the catalogue…</p>}>
+        <Suspense fallback={<ProductsSkeleton />}>
             <ResolvedProducts searchParams={searchParams} />
         </Suspense>
     );
@@ -163,5 +163,41 @@ function Badge({ tone = "muted", children }: { tone?: "muted" | "accent"; childr
         >
             {children}
         </span>
+    );
+}
+
+/** Shape-matched fallback for the products and stock list. */
+function ProductsSkeleton() {
+    return (
+        <div className="max-w-4xl">
+            <div className="h-3 w-20 animate-pulse rounded-full bg-muted/15" />
+            <div className="mt-4 h-10 w-56 animate-pulse rounded-full bg-muted/15" />
+            <div className="mt-3 h-3 w-full max-w-2xl animate-pulse rounded-full bg-muted/10" />
+
+            <div className="mt-8 space-y-6">
+                {Array.from({ length: 3 }).map((_, i) => (
+                    <section key={i} className="rounded-xl border border-line bg-sand/25 p-5">
+                        <div className="flex items-center gap-4">
+                            <div className="hidden h-15 w-12 animate-pulse rounded bg-muted/10 sm:block" />
+                            <div className="min-w-0 flex-1">
+                                <div className="h-6 w-40 animate-pulse rounded-full bg-muted/15" />
+                                <div className="mt-2 h-3 w-28 animate-pulse rounded-full bg-muted/10" />
+                            </div>
+                            <div className="h-10 w-24 animate-pulse rounded-lg bg-muted/10" />
+                        </div>
+
+                        <div className="mt-4 space-y-3">
+                            {Array.from({ length: 3 }).map((__, j) => (
+                                <div key={j} className="grid grid-cols-[2fr_1fr_2fr] gap-3 border-t border-line pt-3">
+                                    <div className="h-4 w-20 animate-pulse rounded-full bg-muted/15" />
+                                    <div className="h-4 w-16 animate-pulse rounded-full bg-muted/15" />
+                                    <div className="h-10 w-full animate-pulse rounded-lg bg-muted/10" />
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                ))}
+            </div>
+        </div>
     );
 }

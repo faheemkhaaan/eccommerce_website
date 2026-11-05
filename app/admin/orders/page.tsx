@@ -19,7 +19,7 @@ type Props = { searchParams: Promise<{ status?: NotesType; view?: string }> };
 
 export default function AdminOrdersPage({ searchParams }: Props) {
     return (
-        <Suspense fallback={<p className="text-[0.85rem] text-muted">Loading the COD board…</p>}>
+        <Suspense fallback={<BoardSkeleton />}>
             <ResolvedBoard searchParams={searchParams} />
         </Suspense>
     );
@@ -88,12 +88,7 @@ async function ResolvedBoard({ searchParams }: Props) {
             </header>
 
             <dl className="mt-8 grid gap-3 sm:grid-cols-4">
-                {[
-                    { label: "Waiting on a call", value: String(pending), sub: "pending confirmation" },
-                    { label: "Need a rider", value: String(unassigned), sub: "packed, unassigned" },
-                    { label: "Out with a rider", value: String(out), sub: "cash still on the road" },
-                    { label: "Cash on the road", value: money(cashOut), sub: "out for delivery + attempted" },
-                ].map((s) => (
+                {stats.map((s) => (
                     <div key={s.label} className="rounded-xl border border-line bg-sand/40 p-5">
                         <dt className="label-sm text-[10px] text-muted">{s.label}</dt>
                         <dd className="mt-2 font-serif text-3xl leading-none">{s.value}</dd>
@@ -162,6 +157,51 @@ async function ResolvedBoard({ searchParams }: Props) {
                     ))}
                 </div>
             )}
+        </div>
+    );
+}
+
+/** Shape-matched fallback while the COD board resolves behind Suspense. */
+function BoardSkeleton() {
+    return (
+        <div>
+            <div className="h-3 w-24 animate-pulse rounded-full bg-muted/15" />
+            <div className="mt-4 h-10 w-64 animate-pulse rounded-full bg-muted/15" />
+            <div className="mt-3 h-3 w-full max-w-2xl animate-pulse rounded-full bg-muted/10" />
+
+            <div className="mt-8 grid gap-3 sm:grid-cols-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="rounded-xl border border-line bg-sand/40 p-5">
+                        <div className="h-3 w-24 animate-pulse rounded-full bg-muted/15" />
+                        <div className="mt-4 h-9 w-20 animate-pulse rounded-full bg-muted/15" />
+                        <div className="mt-3 h-3 w-28 animate-pulse rounded-full bg-muted/10" />
+                    </div>
+                ))}
+            </div>
+
+            <div className="mt-8 flex gap-3 overflow-x-auto pb-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                    <section key={i} className="w-72 shrink-0">
+                        <div className="mb-3 flex items-baseline justify-between gap-2">
+                            <div className="h-3 w-24 animate-pulse rounded-full bg-muted/15" />
+                            <div className="h-3 w-6 animate-pulse rounded-full bg-muted/10" />
+                        </div>
+                        <div className="space-y-3">
+                            {Array.from({ length: 2 }).map((__, j) => (
+                                <div key={j} className="rounded-xl border border-line bg-paper p-4">
+                                    <div className="h-5 w-24 animate-pulse rounded-full bg-muted/15" />
+                                    <div className="mt-3 h-4 w-32 animate-pulse rounded-full bg-muted/15" />
+                                    <div className="mt-2 h-3 w-28 animate-pulse rounded-full bg-muted/10" />
+                                    <div className="mt-4 flex gap-2">
+                                        <div className="h-9 w-24 animate-pulse rounded-lg bg-muted/10" />
+                                        <div className="h-9 w-20 animate-pulse rounded-lg bg-muted/10" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                ))}
+            </div>
         </div>
     );
 }
