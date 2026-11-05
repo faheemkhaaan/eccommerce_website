@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { confirmPhoneVerification, startPhoneVerification } from "@/lib/auth-client";
-import { localPhone } from "@/lib/phone";
+import { localPhone, toE164 } from "@/lib/phone";
 import { inputCls } from "./Field";
 import { CheckIcon, ShieldIcon } from "../Icons";
 
@@ -38,7 +38,7 @@ export default function PhoneVerify({ phone, verifiedPhone, onVerified, id, clas
     const codeRef = useRef<HTMLInputElement>(null);
 
     // Already confirmed for this exact number? Then there is nothing left to prove.
-    const alreadyVerified = Boolean(verifiedPhone) && verifiedPhone === phone;
+    const alreadyVerified = Boolean(verifiedPhone) && toE164(verifiedPhone) === phone;
 
     const [phase, setPhase] = useState<Phase>(alreadyVerified ? "done" : "idle");
     const [code, setCode] = useState("");

@@ -1,5 +1,6 @@
 import "server-only";
 import { redirect } from "next/navigation";
+import { toE164 } from "@/lib/phone";
 import { createClient } from "@/lib/supabase/server";
 
 export type AppRole = "customer" | "admin" | "driver";
@@ -33,10 +34,10 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     // The access token may carry the phone; when it does not, fall back to the auth record —
     // but only trust it once Supabase has actually confirmed it.
     const claimPhone = (claims as { phone?: unknown }).phone;
-    let phone = typeof claimPhone === "string" ? claimPhone : undefined;
+    let phone = typeof claimPhone === "string" ? toE164(claimPhone) : undefined;
     if (!phone) {
         const { data: { user } } = await supabase.auth.getUser();
-        if (user?.phone_confirmed_at) phone = user.phone ?? undefined;
+        if (user?.phone_confirmed_at) phone = toE164(user.phone);
     }
 
     // A user with no row is an ordinary customer; only the service role can grant more.

@@ -83,7 +83,8 @@ export default function CheckoutClient({ verifiedPhone }: { verifiedPhone?: stri
     // The rider calls the number printed on the parcel, so it must be the account's SMS-confirmed
     // number. That is either what the server already knew, or what we just confirmed in this session.
     const phoneE164 = toE164(v.phone);
-    const verified = (Boolean(verifiedPhone) && verifiedPhone === phoneE164) || justVerified === phoneE164;
+    const verifiedPhoneE164 = toE164(verifiedPhone);
+    const verified = (Boolean(verifiedPhoneE164) && verifiedPhoneE164 === phoneE164) || justVerified === phoneE164;
     const shown = (k: Key) => (touched[k] || submitted ? errors[k] : undefined);
 
     const set = <K extends Key>(k: K, val: Values[K]) => setEdits((p) => ({ ...p, [k]: val }));
@@ -258,7 +259,7 @@ export default function CheckoutClient({ verifiedPhone }: { verifiedPhone?: stri
                                     key={phoneE164}
                                     id={`${uid}-verify`}
                                     phone={phoneE164}
-                                    verifiedPhone={verifiedPhone}
+                                    verifiedPhone={verifiedPhoneE164}
                                     onVerified={() => setJustVerified(phoneE164)}
                                     className="mt-2.5"
                                 />

@@ -48,7 +48,8 @@ export default function AccountProfile({ orders, verifiedPhone }: { orders: Orde
     const city = str(m.city);
     const address = str(m.address);
     const phone = toE164(m.phone);
-    const mobileVerified = Boolean(verifiedPhone);
+    const verifiedPhoneE164 = toE164(verifiedPhone);
+    const mobileVerified = Boolean(verifiedPhoneE164);
 
     return (
         <div className="grid items-start gap-6 lg:grid-cols-[6fr_6fr] lg:gap-8">
@@ -85,7 +86,7 @@ export default function AccountProfile({ orders, verifiedPhone }: { orders: Orde
                     {!mobileVerified && phone && (
                         // Nothing typed here to lose, so a refresh is the simplest way to pick up
                         // the newly confirmed number from the server.
-                        <PhoneVerify key={phone} phone={phone} verifiedPhone={verifiedPhone} onVerified={() => router.refresh()} className="mt-5" />
+                        <PhoneVerify key={phone} phone={phone} verifiedPhone={verifiedPhoneE164} onVerified={() => router.refresh()} className="mt-5" />
                     )}
 
                     <button
