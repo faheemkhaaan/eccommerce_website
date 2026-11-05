@@ -179,6 +179,11 @@ export async function getDetail(id: string): Promise<Detail | undefined> {
         short: product.short,
         packs: product.packs,
         price: preferred?.price ?? 0,
+        // Photos uploaded from the dashboard beat the stock ones written in code. Storage
+        // serves one file per size, so the thumbnail reuses the full URL.
+        gallery: product.images.length
+            ? product.images.map((url) => ({ full: url, thumb: url }))
+            : editorial.gallery,
     };
 }
 

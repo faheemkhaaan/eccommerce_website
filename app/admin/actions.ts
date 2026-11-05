@@ -3,6 +3,7 @@
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { CATALOGUE_TAG } from "@/lib/catalogue";
+import { PRODUCT_IMAGE_BUCKET, productImageUrl, type ImageResult } from "@/lib/product-images";
 import { assertRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 
@@ -35,11 +36,12 @@ export async function createProduct(formData: FormData) {
     const id = text(formData.get("id")).toLowerCase();
     const name = text(formData.get("name"));
     const short = text(formData.get("short"));
-    const image = text(formData.get("image"));
     const badge = text(formData.get("badge"));
     const sortOrder = int(formData.get("sort_order"));
+    // The browser has already put the files in storage; the form only carries their keys.
+    const paths = formData.getAll("image_paths").map(text).filter(Boolean);
 
-    if (!SLUG.test(id) || !name || !short || !image) back(path, "invalid");
+    if (!SLUG.test(id) || !name || !short || paths.length === 0) back(path, "invalid");
     if (!Number.isFinite(sortOrder)) back(path, "invalid");
 
     const supabase = await createClient();
@@ -47,7 +49,8 @@ export async function createProduct(formData: FormData) {
         id,
         name,
         short,
-        image,
+        // The first photo becomes the cover, so the listing has an image from day one.
+        image: productImageUrl(paths[0]),
         badge: badge || null,
         sort_order: sortOrder,
         // Off unless asked for: a product with no pack sizes yet has no price and
@@ -56,6 +59,12 @@ export async function createProduct(formData: FormData) {
     });
 
     if (error) back(path, isDuplicate(error.code) ? "duplicate-product" : "invalid");
+
+    const { error: imagesError } = await supabase
+        .from("product_images")
+        .insert(paths.map((p, i) => ({ product_id: id, path: p, sort_order: i })));
+
+    if (imagesError) back(path, "invalid");
 
     updateTag(CATALOGUE_TAG);
     redirect(`/admin/products/${id}?status=product-created`);
@@ -69,11 +78,11 @@ export async function saveProduct(formData: FormData) {
 
     const name = text(formData.get("name"));
     const short = text(formData.get("short"));
-    const image = text(formData.get("image"));
     const badge = text(formData.get("badge"));
     const sortOrder = int(formData.get("sort_order"));
 
-    if (!id || !name || !short || !image || !Number.isFinite(sortOrder)) back(path, "invalid");
+    // Photos are not edited here — the gallery below the listing owns products.image.
+    if (!id || !name || !short || !Number.isFinite(sortOrder)) back(path, "invalid");
 
     const supabase = await createClient();
     const { error } = await supabase
@@ -81,7 +90,6 @@ export async function saveProduct(formData: FormData) {
         .update({
             name,
             short,
-            image,
             badge: badge || null,
             sort_order: sortOrder,
             // An unchecked box sends nothing at all.
@@ -93,6 +101,126 @@ export async function saveProduct(formData: FormData) {
 
     updateTag(CATALOGUE_TAG);
     back(path, "saved");
+}
+
+/**
+ * Repoints `products.image` at the first gallery photo. Every storefront surface
+ * reads that one column, so it has to follow the gallery order.
+ */
+async function syncCover(supabase: Awaited<ReturnType<typeof createClient>>, productId: string) {
+    const { data } = await supabase
+        .from("product_images")
+        .select("path")
+        .eq("product_id", productId)
+        .order("sort_order")
+        .limit(1)
+        .maybeSingle();
+
+    // An empty gallery keeps whatever cover the product already had, which is how a
+    // product that has never been photographed still shows something.
+    if (!data) return;
+
+    await supabase.from("products").update({ image: productImageUrl(data.path) }).eq("id", productId);
+}
+
+/**
+ * Records photos the browser has already uploaded. Only the object keys reach the
+ * server, so the payload stays small however large the photos were — which is why
+ * uploads go straight to storage instead of through this action.
+ */
+export async function addProductImages(productId: string, paths: string[]): Promise<ImageResult> {
+    await assertRole("admin");
+
+    if (!productId || paths.length === 0) return { ok: false, message: "Choose at least one photo." };
+
+    const supabase = await createClient();
+
+    // Append after the existing photos so the cover never jumps around.
+    const { data: last } = await supabase
+        .from("product_images")
+        .select("sort_order")
+        .eq("product_id", productId)
+        .order("sort_order", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+    const start = (last?.sort_order ?? -1) + 1;
+    const { error } = await supabase
+        .from("product_images")
+        .insert(paths.map((path, i) => ({ product_id: productId, path, sort_order: start + i })));
+
+    if (error) return { ok: false, message: "Those photos could not be saved. Please try again." };
+
+    await syncCover(supabase, productId);
+    updateTag(CATALOGUE_TAG);
+    return { ok: true };
+}
+
+/** Drops a photo from the gallery and the file from storage. */
+export async function removeProductImage(imageId: string): Promise<ImageResult> {
+    await assertRole("admin");
+
+    const supabase = await createClient();
+    const { data: row } = await supabase
+        .from("product_images")
+        .select("product_id, path")
+        .eq("id", imageId)
+        .maybeSingle();
+
+    if (!row) return { ok: false, message: "That photo is already gone." };
+
+    // A product with no photo has nothing for the shop to show, so the last one stays.
+    const { count } = await supabase
+        .from("product_images")
+        .select("id", { count: "exact", head: true })
+        .eq("product_id", row.product_id);
+
+    if ((count ?? 0) <= 1) {
+        return { ok: false, message: "A product needs at least one photo. Upload a replacement first." };
+    }
+
+    // The file first: an orphaned row is easy to spot, an orphaned file is not.
+    await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([row.path]);
+
+    const { error } = await supabase.from("product_images").delete().eq("id", imageId);
+    if (error) return { ok: false, message: "That photo could not be removed." };
+
+    await syncCover(supabase, row.product_id);
+    updateTag(CATALOGUE_TAG);
+    return { ok: true };
+}
+
+/** Moves a photo to the front of the gallery, which is what makes it the cover. */
+export async function setProductCover(imageId: string): Promise<ImageResult> {
+    await assertRole("admin");
+
+    const supabase = await createClient();
+    const { data: row } = await supabase
+        .from("product_images")
+        .select("product_id")
+        .eq("id", imageId)
+        .maybeSingle();
+
+    if (!row) return { ok: false, message: "That photo is gone." };
+
+    const { data: first } = await supabase
+        .from("product_images")
+        .select("sort_order")
+        .eq("product_id", row.product_id)
+        .order("sort_order")
+        .limit(1)
+        .maybeSingle();
+
+    const { error } = await supabase
+        .from("product_images")
+        .update({ sort_order: (first?.sort_order ?? 0) - 1 })
+        .eq("id", imageId);
+
+    if (error) return { ok: false, message: "The cover could not be changed." };
+
+    await syncCover(supabase, row.product_id);
+    updateTag(CATALOGUE_TAG);
+    return { ok: true };
 }
 
 export async function savePack(formData: FormData) {

@@ -1,4 +1,5 @@
 import "server-only";
+import { productImageUrl, type ProductImage } from "@/lib/product-images";
 import { createClient } from "@/lib/supabase/server";
 
 // The staff view of the catalogue. Unlike lib/catalogue.ts this is deliberately
@@ -25,22 +26,45 @@ export type AdminProduct = {
     sort_order: number;
     is_active: boolean;
     packs: AdminPack[];
+    /** Gallery rows, cover first. Empty until the owner uploads a photo. */
+    images: ProductImage[];
 };
 
 type PackRow = Omit<AdminPack, "price"> & { price: number | string };
 
-type ProductRow = Omit<AdminProduct, "packs"> & { product_packs: PackRow[] | null };
+type ImageRow = {
+    id: string;
+    path: string;
+    alt: string | null;
+    sort_order: number;
+};
+
+type ProductRow = Omit<AdminProduct, "packs" | "images"> & {
+    product_packs: PackRow[] | null;
+    product_images: ImageRow[] | null;
+};
 
 const COLUMNS =
-    "id, name, short, image, badge, sort_order, is_active, product_packs (id, label, grams, price, note, stock, sort_order)";
+    "id, name, short, image, badge, sort_order, is_active, product_packs (id, label, grams, price, note, stock, sort_order), product_images (id, path, alt, sort_order)";
 
 function toProduct(row: ProductRow): AdminProduct {
+    const { product_packs, product_images, ...rest } = row;
+
     return {
-        ...row,
-        packs: [...(row.product_packs ?? [])]
+        ...rest,
+        packs: [...(product_packs ?? [])]
             .sort((a, b) => a.sort_order - b.sort_order || a.grams - b.grams)
             // PostgREST returns numeric as a string, so coerce before any arithmetic.
             .map((k) => ({ ...k, price: Number(k.price) })),
+        images: [...(product_images ?? [])]
+            .sort((a, b) => a.sort_order - b.sort_order)
+            .map((im) => ({
+                id: im.id,
+                path: im.path,
+                url: productImageUrl(im.path),
+                alt: im.alt,
+                sort_order: im.sort_order,
+            })),
     };
 }
 

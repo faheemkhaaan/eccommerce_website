@@ -1,5 +1,6 @@
 import "server-only";
 import { cacheTag } from "next/cache";
+import { imageUrls } from "@/lib/product-images";
 import { publicClient } from "@/lib/supabase/public";
 
 /** Invalidate this after any write to products or product_packs. */
@@ -17,7 +18,10 @@ export type CatalogueProduct = {
     id: string;
     name: string;
     short: string;
+    /** Cover photo — the first gallery image. */
     image: string;
+    /** The full gallery, cover first. */
+    images: string[];
     badge?: string;
     /** Cheapest pack, so listings can say "from Rs X". */
     fromPrice: number;
@@ -33,6 +37,11 @@ type PackRow = {
     sort_order: number;
 };
 
+type ImageRow = {
+    path: string;
+    sort_order: number;
+};
+
 type ProductRow = {
     id: string;
     name: string;
@@ -40,9 +49,11 @@ type ProductRow = {
     image: string;
     badge: string | null;
     product_packs: PackRow[] | null;
+    product_images: ImageRow[] | null;
 };
 
-const COLUMNS = "id, name, short, image, badge, product_packs (label, grams, price, note, stock, sort_order)";
+const COLUMNS =
+    "id, name, short, image, badge, product_packs (label, grams, price, note, stock, sort_order), product_images (path, sort_order)";
 
 function toProduct(row: ProductRow): CatalogueProduct {
     const packs: Pack[] = [...(row.product_packs ?? [])]
@@ -61,6 +72,7 @@ function toProduct(row: ProductRow): CatalogueProduct {
         name: row.name,
         short: row.short,
         image: row.image,
+        images: imageUrls(row.product_images),
         badge: row.badge ?? undefined,
         fromPrice: packs.length ? Math.min(...packs.map((k) => k.price)) : 0,
         packs,

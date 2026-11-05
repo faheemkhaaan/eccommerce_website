@@ -337,14 +337,61 @@ hook, so **none of these are needed while developing with test numbers.**
 **Convention from this session onward: every exported function and component gets a
 JSDoc header** saying what it does and, where useful, its parameters.
 
+### 2.13 Product photos moved from URLs into Supabase Storage
+
+The admin used to paste an image URL into the product form, and the seeded product
+pointed at Unsplash. Photos are now uploaded from `/admin/products/<id>` and stored
+in a Supabase Storage bucket, with any number of them per product.
+
+- `supabase/migrations/0009_product_images.sql` — creates the public
+  `product-images` bucket (5 MB cap, JPG/PNG/WebP/AVIF) with admin-only write
+  policies on `storage.objects`, plus the `public.product_images` table.
+- `lib/product-images.ts` — shared by client and server: bucket name, the public
+  URL builder, the file validator, and the object-key builder. Deliberately free of
+  `server-only` and of any Supabase client of its own.
+- `components/admin/image-upload.ts` — `uploadProductPhotos()`. **The browser
+  uploads straight to Storage**, not through a Server Action: a photo is routinely
+  larger than the 1 MB action body limit, and the storage policies already refuse
+  the write from anyone without the admin role. Only the resulting object keys are
+  sent to the server.
+- `components/admin/ProductImages.tsx` — the gallery on the product editor:
+  upload, remove, make-cover. `components/admin/NewProductImages.tsx` — the create
+  form, which uploads under the slug the owner typed and passes the keys along in
+  hidden inputs, since the product does not exist yet.
+
+**`products.image` stays the cover.** It is a denormalised copy of the first gallery
+photo, rewritten by `syncCover()` on every add / remove / make-cover, so the
+storefront keeps reading one column and nothing downstream changed. The gallery
+itself is what `lib/catalogue.ts` and `lib/admin-catalogue.ts` now select
+(`product_images (path, sort_order)`), and `lib/product-details.ts` swaps it in for
+the stock Unsplash gallery once a product has uploads.
+
+Invariants worth keeping:
+
+- **A product always has at least one photo.** `removeProductImage` refuses to
+  delete the last one, and `createProduct` requires at least one upload. Without
+  that, `products.image` would be empty and `PurchasePanel`'s `gallery[0].thumb`
+  would blow up.
+- `products.image` may be an external Unsplash URL for products that predate this
+  change. `syncCover` leaves it alone until the first upload, which is exactly how
+  the seed product graduates off Unsplash.
+- The gallery actions **return** `ImageResult` instead of redirecting, unlike the
+  rest of the admin. A redirect thrown inside a client-side `try`/`catch` is caught
+  as a failure, so these report back and the editor calls `router.refresh()`.
+- `next.config.ts` allows `*.supabase.co` under `/storage/v1/object/public/**` for
+  `next/image`.
+
+Removing a photo deletes the storage object first and the row second — an orphaned
+row is easy to spot, an orphaned file is not.
+
 ---
 
 ## 3. Database reference
 
-Six migrations, each applied by hand by pasting it into the **Supabase SQL
+Nine migrations, each applied by hand by pasting it into the **Supabase SQL
 Editor**. They were verified live after applying, so **re-running 0001–0004 will
-fail** — they are not written idempotently. `0005` and `0006` use `create or replace`,
-so they are safe to re-run.
+fail** — they are not written idempotently. `0005`–`0009` use `create or replace` /
+`if not exists` / `drop policy if exists`, so they are safe to re-run.
 
 | file | what it adds |
 | --- | --- |
@@ -356,6 +403,7 @@ so they are safe to re-run.
 | `0006_delivery_sales_stock.sql` | replaces `set_order_status` so delivered orders decrement pack stock in the same transaction |
 | `0007_require_driver_for_delivery.sql` | replaces `set_order_status` again so `out_for_delivery` / `attempted` / `delivered` require an assigned rider |
 | `0008_lock_driver_on_closed_orders.sql` | replaces `assign_driver` so delivered / cancelled / returned parcels can no longer be re-assigned |
+| `0009_product_images.sql` | the `product-images` storage bucket + `storage.objects` admin policies, and the `product_images` gallery table |
 
 ### `public.user_roles` — `0001_roles.sql`
 
@@ -592,6 +640,7 @@ request, **not** baked into the JWT.
 | `supabase/proxy.ts` | session refresh + prefix gating, called by root `proxy.ts` |
 | `auth-client.ts` | auth calls + the phone-OTP helpers |
 | `sms.ts` | `server-only`; SendPK delivery — the only file that knows the SMS vendor |
+| `product-images.ts` | product-photo rules shared by client + server: bucket name, `productImageUrl`, `productImagePath`, `imageFileError`, `MAX_IMAGE_BYTES`, `ProductImage`, `ImageResult` |
 | `cart-math.ts` | `money()`, `summarize()`, free-delivery threshold |
 | `safe-next.ts` | validates the `?next=` redirect target |
 | `images.ts` | Unsplash URL helper + photo id map |
@@ -602,7 +651,9 @@ request, **not** baked into the JWT.
 
 ### `components/`
 
-- `components/admin/` — `AdminFrame`, `AdminNav`, `OrderCard`, `StatusNote`
+- `components/admin/` — `AdminFrame`, `AdminNav`, `OrderCard`, `StatusNote`,
+  `ProductImages` (editor gallery: upload/remove/make-cover), `NewProductImages`
+  (create-form picker), `image-upload.ts` (browser → Supabase Storage uploader)
 - `components/driver/` — `RegisterSW`, `AutoRefresh`, `ParcelMap`
 - `components/auth/` — `AuthProvider`, `LoginCard`, `RegisterForm`, `AccountMenu`,
   `Field`, `PhoneVerify`
@@ -692,6 +743,13 @@ These caused real bugs. Re-read before touching pages.
 - ⛔ **`supabase/migrations/0008_lock_driver_on_closed_orders.sql` has NOT been applied yet.**
   Until it is pasted into the Supabase SQL Editor, a direct RPC call could still
   change the rider on a closed parcel even though the admin UI now blocks it.
+- ⛔ **`supabase/migrations/0009_product_images.sql` has NOT been applied yet.** Until
+  it is pasted into the Supabase SQL Editor there is no `product-images` bucket, no
+  `product_images` table, and every upload from `/admin/products/<id>` will fail —
+  the product form still needs at least one photo. Apply it before trying an upload.
+- ⛔ **No photo has been uploaded through the browser → Storage path.** That route
+  depends on the admin's JWT carrying the admin role into the `storage.objects`
+  policy, which has never been exercised.
 - ⛔ **No one has completed a real end-to-end COD order** from a verified phone
   number, nor exercised the board → rider hand-off in production.
 - ⛔ **The phone flow has not been exercised end-to-end.** Test numbers are the plan

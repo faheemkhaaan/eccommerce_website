@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createPack, deletePack, savePack, saveProduct } from "@/app/admin/actions";
+import ProductImages from "@/components/admin/ProductImages";
 import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { getProduct } from "@/lib/admin-catalogue";
 import { requireRole } from "@/lib/roles";
@@ -90,17 +91,6 @@ async function ResolvedProduct({ params, searchParams }: Props) {
                         <input name="short" defaultValue={product.short} required className="field mt-1.5" />
                     </label>
 
-                    <label className="block">
-                        <span className="label-sm text-[10px] text-muted">Image URL</span>
-                        <input
-                            name="image"
-                            type="url"
-                            defaultValue={product.image}
-                            required
-                            className="field mt-1.5"
-                        />
-                    </label>
-
                     <div className="grid gap-4 sm:grid-cols-2">
                         <label className="block">
                             <span className="label-sm text-[10px] text-muted">Badge</span>
@@ -143,6 +133,18 @@ async function ResolvedProduct({ params, searchParams }: Props) {
                         Save listing
                     </button>
                 </form>
+            </section>
+
+            <section className="mt-8 rounded-xl border border-line p-5 md:p-6">
+                <h2 className="label-sm text-[10px] text-muted">Photos</h2>
+                <div className="mt-4">
+                    <ProductImages productId={product.id} images={product.images} />
+                </div>
+                <p className="mt-4 text-[0.75rem] leading-relaxed text-muted">
+                    JPG, PNG, WebP or AVIF up to 5 MB each. Files are stored in the
+                    <span className="text-ink"> product-images </span>
+                    bucket; the cover is whichever photo sits first.
+                </p>
             </section>
 
             <section className="mt-8">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { createProduct } from "@/app/admin/actions";
+import NewProductImages from "@/components/admin/NewProductImages";
 import StatusNote, { NotesType } from "@/components/admin/StatusNote";
 import { listProducts } from "@/lib/admin-catalogue";
 import { requireRole } from "@/lib/roles";
@@ -83,19 +84,16 @@ async function ResolvedNewProduct({ searchParams }: Props) {
                         </span>
                     </label>
 
-                    <label className="block">
-                        <span className="label-sm text-[10px] text-muted">Image URL</span>
-                        <input
-                            name="image"
-                            type="url"
-                            required
-                            placeholder="https://images.unsplash.com/…"
-                            className="field mt-1.5"
-                        />
-                        <span className="mt-1.5 block text-[0.72rem] text-muted">
-                            A direct image link. Unsplash pages that end in /download will not load.
+                    <div>
+                        <span className="label-sm block text-[10px] text-muted">Photos</span>
+                        <div className="mt-2">
+                            <NewProductImages />
+                        </div>
+                        <span className="mt-2 block text-[0.72rem] text-muted">
+                            JPG, PNG, WebP or AVIF up to 5 MB each. Pick more than one — the first
+                            becomes the cover, and the rest fill the gallery on the product page.
                         </span>
-                    </label>
+                    </div>
 
                     <div className="grid gap-4 sm:grid-cols-2">
                         <label className="block">
