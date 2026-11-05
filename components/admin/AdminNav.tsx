@@ -11,6 +11,7 @@ const NAV: { href: string; label: string; roles: StaffRole[] }[] = [
     { href: "/admin/orders", label: "COD board", roles: ["admin", "driver"] },
     { href: "/admin/team", label: "Riders & roles", roles: ["admin"] },
     { href: "/admin/products", label: "Products & stock", roles: ["admin"] },
+    { href: "/admin/messages", label: "Messages", roles: ["admin"] },
     { href: "/admin/reviews", label: "Reviews", roles: ["admin"] },
 ];
 

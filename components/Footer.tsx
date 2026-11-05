@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FREE_DELIVERY_FROM, DELIVERY_FLAT, money } from "@/lib/cart-math";
+import { SUPPORT, whatsappHref } from "@/lib/contact";
 
 // Links point only at pages that exist; the rest stay as plain text rather than dead links.
 const cols = [
@@ -15,6 +16,7 @@ const cols = [
   {
     title: "Help",
     links: [
+      { label: "Contact Us", href: "/contact" },
       { label: "Track Your Order", href: "/track-order" },
       { label: "Delivery & COD", href: "/#delivery" },
       { label: "My Account", href: "/account" },
@@ -61,12 +63,35 @@ export default function Footer() {
         <div>
           <h4 className={h4}>Reach Us</h4>
           <address className="mb-4 text-[0.8rem] not-italic">
-            Dairy &amp; packing house, Sundar Estate<br />Lahore, Pakistan
+            {SUPPORT.address.map((line) => (
+              <span key={line} className="block">{line}</span>
+            ))}
           </address>
           <ul className="space-y-1 text-[0.8rem]">
-            <li>
-              <a href="tel:+923001234567" className={hover}>+92 300 1234567</a>
-            </li>
+            {/* Only the channels that are actually configured — a dead link in the
+                footer is worse than no link. */}
+            {SUPPORT.whatsapp && (
+              <li>
+                <a
+                  href={whatsappHref("Assalam o Alaikum — I have a question about my order.")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={hover}
+                >
+                  WhatsApp {SUPPORT.whatsapp.label}
+                </a>
+              </li>
+            )}
+            {SUPPORT.whatsapp && (
+              <li>
+                <a href={SUPPORT.whatsapp.tel} className={hover}>{SUPPORT.whatsapp.label}</a>
+              </li>
+            )}
+            {SUPPORT.email && (
+              <li>
+                <a href={SUPPORT.email.href} className={hover}>{SUPPORT.email.label}</a>
+              </li>
+            )}
             <li className="text-muted">
               Delivery {money(DELIVERY_FLAT)} · free above {money(FREE_DELIVERY_FROM)}
             </li>

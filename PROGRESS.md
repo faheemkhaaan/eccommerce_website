@@ -432,13 +432,64 @@ Two rules shape the feature:
 then `localhost`. The JSON-LD escapes `<` in the serialised payload so a stray
 sequence in a product name cannot close the `script` tag.
 
+### 2.15 Customers can now actually reach staff
+
+Until this, there was no way to contact the shop at all. The footer carried a
+placeholder phone number, the register and trust strips **promised WhatsApp
+support that was never wired to anything**, and contact ran one way only — an
+admin could dial a customer from the order card, but a customer could not dial
+back. A guest holding the wrong parcel had nowhere to go.
+
+There is now a `/contact` page and a staff inbox at `/admin/messages`.
+
+- `supabase/migrations/0011_contact_messages.sql` — the `contact_messages` table,
+  a `stamp_contact_sender()` trigger, and the policies. **Anyone** may insert,
+  including a signed-out guest — order tracking is a public lookup, so the person
+  most likely to need help has no account. At least one reply channel is required
+  by a CHECK, because a message with neither an email nor a phone is a dead end.
+- `lib/contact.ts` — the published channels and the message rules. Same split as
+  `lib/reviews.ts`: no `server-only`, no Supabase import, so the form and the
+  action validate against one source.
+- `lib/contact-queries.ts` — the staff inbox read. Uncached and session-bound on
+  purpose: RLS is what keeps the queue to admins, and there is nothing public to
+  invalidate, so `markHandled` deliberately calls no `updateTag`.
+- `components/contact/ContactForm.tsx` + `app/(shop)/contact-actions.ts` — the
+  form posts through `useActionState`, so a refusal keeps what was typed.
+- `app/admin/messages/` — the inbox, unhandled first, with reply links straight to
+  `mailto:`, `tel:` and WhatsApp.
+
+Design decisions worth keeping:
+
+- **`order_ref` is plain text, not a foreign key.** A customer mistyping their
+  order ID should still get through; a FK would reject the whole message with a
+  constraint error. It is context for staff, not something the app joins on. The
+  inbox links it to the order only when it matches `OG-XXXXXX`.
+- **The account is stamped by the trigger, not sent by the client** — same
+  reasoning as the review author. `user_id` is left out of the insert entirely.
+- **A honeypot, not a captcha.** A hidden `company` field that no human sees; if
+  it is filled the action reports success and files nothing. No third party, no
+  friction for the customer.
+- **The footer renders only configured channels.** `SUPPORT.whatsapp` and
+  `SUPPORT.email` are `null` when unset, so the page cannot show a link that goes
+  nowhere — the failure mode the WhatsApp promise had.
+- **The old contact dead-ends are gone.** The account page used to say "reply to
+  your confirmation email", but no email provider is configured, so that reply
+  went nowhere. It is now a real link, and order cards, the checkout receipt and
+  the public tracking result each carry a helper that arrives with the order ID
+  already filled in.
+
+Channels come from `NEXT_PUBLIC_SUPPORT_WHATSAPP` (country code first, digits
+only) and `NEXT_PUBLIC_SUPPORT_EMAIL` (blank hides the email channel). The number
+falls back to the `+92 300 1234567` placeholder the footer has always shown —
+**that placeholder is not a working line and has to be replaced before launch.**
+
 ---
 
 ## 3. Database reference
 
-Ten migrations, each applied by hand by pasting it into the **Supabase SQL
+Eleven migrations, each applied by hand by pasting it into the **Supabase SQL
 Editor**. They were verified live after applying, so **re-running 0001–0004 will
-fail** — they are not written idempotently. `0005`–`0010` use `create or replace` /
+fail** — they are not written idempotently. `0005`–`0011` use `create or replace` /
 `if not exists` / `drop policy if exists`, so they are safe to re-run.
 
 | file | what it adds |
@@ -453,6 +504,7 @@ fail** — they are not written idempotently. `0005`–`0010` use `create or rep
 | `0008_lock_driver_on_closed_orders.sql` | replaces `assign_driver` so delivered / cancelled / returned parcels can no longer be re-assigned |
 | `0009_product_images.sql` | the `product-images` storage bucket + `storage.objects` admin policies, and the `product_images` gallery table |
 | `0010_product_reviews.sql` | `review_status` enum, `product_reviews`, `reviewable_order()` / `can_review_product()`, the author-name trigger, RLS |
+| `0011_contact_messages.sql` | `contact_status` enum, `contact_messages`, the sender-stamping trigger, RLS (anyone may insert, admins read) |
 
 ### `public.user_roles` — `0001_roles.sql`
 
@@ -652,6 +704,8 @@ request, **not** baked into the JWT.
 | `app/(shop)/collections/page.tsx` | shop listing; passes `products` to `<Catalog>` |
 | `app/(shop)/products/[id]/page.tsx` | product detail; Suspense + `ProductSkeleton` |
 | `app/(shop)/login`, `register`, `account`, `checkout`, `track-order` | storefront flows |
+| `app/(shop)/contact/page.tsx` | how to reach the shop: channels + message form |
+| `app/(shop)/contact-actions.ts` | `sendMessage` — open to guests, honeypot-guarded |
 | `app/(shop)/order-actions.ts` | `placeOrder` (with the phone gate) + `lookupTrackedOrder` |
 | `app/(shop)/review-actions.ts` | `submitReview` — verified-purchase check, then insert as `pending` |
 | `app/admin/layout.tsx` | admin role gate (Suspense boundary) |
@@ -666,6 +720,8 @@ request, **not** baked into the JWT.
 | `app/admin/team/actions.ts` | `grantRole` |
 | `app/admin/reviews/page.tsx` | review moderation queue (pending first) |
 | `app/admin/reviews/actions.ts` | `approveReview` / `removeReview` + `updateTag('reviews')` |
+| `app/admin/messages/page.tsx` | customer-message inbox (unhandled first) |
+| `app/admin/messages/actions.ts` | `markHandled` / `deleteMessage` (no cache to invalidate) |
 | `app/admin/actions.ts` | catalogue + auth Server Actions |
 | `app/driver/layout.tsx` · `page.tsx` · `[id]/page.tsx` | rider PWA shell, queue, parcel |
 | `app/driver/manifest.ts` · `sw/route.ts` · `actions.ts` | PWA manifest, service worker, `reportDelivery` |
@@ -685,6 +741,8 @@ request, **not** baked into the JWT.
 | `reviews.ts` | **pure** review domain: types, `summarise`, `reviewProblem`, `fmtReviewDate` (no network) |
 | `review-queries.ts` | `server-only`; cached published reviews (`REVIEWS_TAG`) + session-bound `getReviewAccess` |
 | `seo.ts` | `SITE_URL`, `absolute`, `productSchema` (Product + conditional `aggregateRating`) |
+| `contact.ts` | **pure** support channels (`SUPPORT`, `whatsappHref`) + message rules (`TOPICS`, `messageProblem`) |
+| `contact-queries.ts` | `server-only`; the staff inbox read — uncached, admin-only via RLS |
 | `orders.ts` | **pure** order domain: types, status helpers, timeline (no network) |
 | `order-queries.ts` | `server-only`; all order DB reads + `listDrivers` / `listStaffUsers` |
 | `maps.ts` | `mapQuery` / `embedUrl` (null without a key) / `directionsUrl` |
@@ -713,6 +771,7 @@ request, **not** baked into the JWT.
 - `components/driver/` — `RegisterSW`, `AutoRefresh`, `ParcelMap`
 - `components/auth/` — `AuthProvider`, `LoginCard`, `RegisterForm`, `AccountMenu`,
   `Field`, `PhoneVerify`
+- `components/contact/` — `ContactForm` (client, `useActionState`, honeypot)
 - `components/product/` — `Gallery`, `PurchasePanel`, `ProductFacts`, `Reviews`
   (presentational list + summary), `ReviewGate` (session-bound async child),
   `ReviewForm` (client, `useActionState`)
@@ -741,6 +800,11 @@ request, **not** baked into the JWT.
 | **New products start hidden and packless** | a half-finished item must never appear in the storefront. |
 | **No client JS for admin/board feedback** | `?status=` round-trips are simpler and work without hydration. |
 | **Public browsing stays public** | only `/account` and `/checkout` require a session; tracking is open. |
+| **Contact writes to a table, not to an email** | no mail vendor is configured, so "the form emails the owner" was not buildable. A row in `contact_messages` plus an admin inbox needs no third party, no deliverability setup, and shows the owner a queue. |
+| **Anyone may write, guests included** | a customer with a problem may not be signed in; demanding an account to complain loses the complaint. The DB still files it under the session when there is one. |
+| **A message's account is stamped by a definer trigger, not sent by the client** | same reason as review authorship — a request that bypasses the action must not be able to file itself under somebody else's account, or as already handled. |
+| **A honeypot, not a captcha** | no third party and no friction for someone who is already annoyed. A bot fills the off-screen field and learns nothing from the reply. |
+| **`order_ref` is free text, not a foreign key** | a mistyped order ID must still reach the shop; a rejected insert would silently lose the message. Admins get a link only when the ref matches the `OG-XXXXXX` shape. |
 
 ---
 
@@ -777,9 +841,13 @@ These caused real bugs. Re-read before touching pages.
 
 **Verified**
 
-- `tsc --noEmit`, `eslint app components lib` and `next build` pass (25 routes,
-  Cache Components / PPR intact).
+- `tsc --noEmit`, `eslint app components lib` and `next build` pass (31 routes,
+  Cache Components / PPR intact). The only lint findings are the two long-standing
+  ones in `components/tracking/TrackOrderClient.tsx` (unused `DEMO_ORDER_ID`, and a
+  `set-state-in-effect`), which predate this work and are untouched.
 - Migrations `0001`–`0004` are live: tables exist, RLS enabled, seed rows present.
+- **`0010_product_reviews.sql` is live** — the product page prerenders with a real
+  review read, which it could not do while the table was missing.
 - The build renders the storefront from Postgres.
 - Signed-out requests to `/admin`, `/driver`, `/account` and `/checkout` redirect
   to `/login?next=…`.
@@ -805,13 +873,28 @@ These caused real bugs. Re-read before touching pages.
   it is pasted into the Supabase SQL Editor there is no `product-images` bucket, no
   `product_images` table, and every upload from `/admin/products/<id>` will fail —
   the product form still needs at least one photo. Apply it before trying an upload.
-- ⛔ **`supabase/migrations/0010_product_reviews.sql` has NOT been applied yet.** Until
-  it is pasted into the Supabase SQL Editor there is no `product_reviews` table, the
-  product page cannot prerender (`Could not find the table 'public.product_reviews'`),
-  and no review can be posted. Apply it before touching the review flow.
+- ✅ **`0010_product_reviews.sql` is applied.** Confirmed by a clean `next build`:
+  `/products/bilona-organic-ghee` prerenders, which it cannot do without the table.
 - ⛔ **No review has been written, approved or displayed.** The whole path — verified
   buyer posts → pending → admin publishes → `updateTag('reviews')` → storefront shows
   it → `aggregateRating` appears in the JSON-LD — has never run end-to-end.
+- ⛔ **`supabase/migrations/0011_contact_messages.sql` has NOT been applied yet.** Until
+  it is pasted into the Supabase SQL Editor there is no `contact_messages` table and
+  every send from `/contact` fails. The page, the form and the inbox all build — the
+  insert is what breaks.
+- ⛔ **`NEXT_PUBLIC_SUPPORT_WHATSAPP` is unset**, so the site still shows the seeded
+  placeholder `+92 300 1234567`. It is not a working line; the WhatsApp and call
+  links on `/contact`, the footer and the inbox all point at it.
+- ⛔ **`NEXT_PUBLIC_SUPPORT_EMAIL` is unset**, so no email channel is offered anywhere.
+  That is the intended behaviour when it is blank, but it does mean customers without
+  WhatsApp have only the form.
+- ⛔ **No message has been sent, read or handled.** Guest path, signed-in path, the
+  honeypot and the admin reply links are all unexercised.
+- ⛔ **No rate limiting on the contact form.** The honeypot stops naive bots and the
+  length CHECKs stop empty spam, but nothing stops a script posting repeatedly to a
+  public insert policy. Worth revisiting if it is ever abused.
+- ⛔ **The address on `/contact` and in the footer** ("Dairy & packing house, Sundar
+  Estate, Lahore") is seeded placeholder copy from the original build. Verify it.
 - ⛔ **No photo has been uploaded through the browser → Storage path.** That route
   depends on the admin's JWT carrying the admin role into the `storage.objects`
   policy, which has never been exercised.

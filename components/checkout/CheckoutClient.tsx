@@ -189,6 +189,13 @@ export default function CheckoutClient({ verifiedPhone }: { verifiedPhone?: stri
                     <p className="mt-6 text-xs text-muted">
                         We will call {placed.recipient.phone} before dispatch. Save your Order ID to track it any time.
                     </p>
+                    <p className="mt-3 text-xs text-muted">
+                        Wrong address, or something to add?{" "}
+                        <Link href={`/contact?topic=order&order=${placed.id}`} className="text-ink underline underline-offset-4">
+                            Send us a message
+                        </Link>{" "}
+                        — the order ID comes with it.
+                    </p>
                 </div>
             </motion.div>
         );

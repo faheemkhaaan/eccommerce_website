@@ -282,12 +282,22 @@ export default function TrackOrderClient({ initialId = "" }: { initialId?: strin
                                 <p className="mt-5 border-t border-line pt-4 text-[11px] leading-relaxed text-muted">
                                     Street address is kept with the shop and the assigned rider, not on this public lookup.
                                 </p>
-                                <Link
-                                    href="/collections"
-                                    className="label-sm mt-5 inline-flex h-11 items-center rounded-full bg-sand px-6 text-[10px] transition hover:bg-line"
-                                >
-                                    Continue shopping
-                                </Link>
+                                <div className="mt-5 flex flex-wrap gap-2">
+                                    <Link
+                                        href="/collections"
+                                        className="label-sm inline-flex h-11 items-center rounded-full bg-sand px-6 text-[10px] transition hover:bg-line"
+                                    >
+                                        Continue shopping
+                                    </Link>
+                                    {/* The public lookup is where a guest notices a problem,
+                                        so it has to be a way to reach us too. */}
+                                    <Link
+                                        href={`/contact?topic=order&order=${result.id}`}
+                                        className="label-sm inline-flex h-11 items-center rounded-full bg-white px-6 text-[10px] ring-1 ring-line transition hover:bg-line"
+                                    >
+                                        Something is wrong
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </motion.div>

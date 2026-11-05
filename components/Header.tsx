@@ -4,12 +4,13 @@ import AccountMenu from "./auth/AccountMenu";
 import StaffLink from "./auth/StaffLink";
 
 // Every entry maps onto a real destination — the shop, the two education
-// sections on the homepage, or the public tracking lookup.
+// sections on the homepage, the public tracking lookup, or the way to reach us.
 const links = [
   { label: "Shop", href: "/collections" },
   { label: "Why Ghee", href: "/#why" },
   { label: "Our Process", href: "/#process" },
   { label: "Track Order", href: "/track-order" },
+  { label: "Contact", href: "/contact" },
 ];
 
 type Props = { variant?: "overlay" | "solid"; active?: string };

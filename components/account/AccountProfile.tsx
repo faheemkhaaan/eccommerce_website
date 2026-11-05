@@ -175,11 +175,21 @@ export default function AccountProfile({ orders, verifiedPhone }: { orders: Orde
                                             </li>
                                         ))}
                                     </ul>
-                                    <div className="mt-4 flex items-center justify-between border-t border-line pt-4">
+                                    <div className="mt-4 flex items-center justify-between gap-4 border-t border-line pt-4">
                                         <span className="text-sm">Cash due {money(o.totals.total)}</span>
-                                        <Link href={`/track-order?id=${o.id}`} className="label-sm inline-flex items-center gap-2 text-[10px] underline underline-offset-4">
-                                            Track <ArrowIcon size={11} />
-                                        </Link>
+                                        <span className="flex items-center gap-4">
+                                            {/* Carries the order ID across, so the message
+                                                reaches staff already identified. */}
+                                            <Link
+                                                href={`/contact?topic=order&order=${o.id}`}
+                                                className="label-sm text-[10px] text-muted underline underline-offset-4 hover:text-ink"
+                                            >
+                                                Need help?
+                                            </Link>
+                                            <Link href={`/track-order?id=${o.id}`} className="label-sm inline-flex items-center gap-2 text-[10px] underline underline-offset-4">
+                                                Track <ArrowIcon size={11} />
+                                            </Link>
+                                        </span>
                                     </div>
                                 </li>
                             );
@@ -189,7 +199,11 @@ export default function AccountProfile({ orders, verifiedPhone }: { orders: Orde
 
                 <p className="mt-6 flex items-start gap-3 rounded-2xl bg-sand p-5 text-xs leading-relaxed text-muted">
                     <span className="mt-0.5 text-accent"><MailIcon size={15} /></span>
-                    Questions about an order? Reply to your confirmation email and our team will pick it up.
+                    <span>
+                        A jar that did not arrive as it should, or a parcel that has stopped moving?{" "}
+                        <Link href="/contact" className="text-ink underline underline-offset-4">Write to us</Link>{" "}
+                        and a person will pick it up — WhatsApp reaches us fastest.
+                    </span>
                 </p>
             </div>
         </div>
