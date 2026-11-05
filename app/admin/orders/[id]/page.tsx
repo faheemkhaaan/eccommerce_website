@@ -11,6 +11,7 @@ import {
     buildTracking,
     fmtDay,
     fmtTime,
+    isTerminalStatus,
     nextStatuses,
     relativeTime,
 } from "@/lib/orders";
@@ -46,6 +47,7 @@ async function ResolvedOrder({ params, searchParams }: Props) {
     const next = nextStatuses(order.status, role).filter((status) =>
         order.driverId || !DRIVER_REQUIRED.has(status)
     );
+    const canAssignDriver = isAdmin && !isTerminalStatus(order.status);
     const steps = buildTracking({ status: order.status, city: order.recipient.city, events: order.events });
     const path = `/admin/orders/${order.id}`;
     return (
@@ -114,32 +116,40 @@ async function ResolvedOrder({ params, searchParams }: Props) {
 
             <section className="mt-6 rounded-xl border border-line p-5">
                 <h2 className="label-sm text-[10px] text-muted">Assign rider</h2>
-                <form action={assignDriver} className="mt-4 flex flex-wrap gap-2">
-                    <input type="hidden" name="order_id" value={order.id} />
-                    <input type="hidden" name="next" value={path} />
-                    <select
-                        name="driver_id"
-                        defaultValue={order.driverId ?? ""}
-                        className="field max-w-sm flex-1"
-                    >
-                        <option value="">Unassigned</option>
-                        {drivers.map((d) => (
-                            <option key={d.id} value={d.id}>
-                                {d.email}
-                            </option>
-                        ))}
-                    </select>
-                    <button type="submit" className="btn btn-solid hover:opacity-85">
-                        Save assignment
-                    </button>
-                </form>
-                {drivers.length === 0 && (
-                    <p className="mt-3 text-[0.8rem] text-muted">
-                        No rider accounts.{" "}
-                        <Link href="/admin/team" className="underline">
-                            Grant the driver role
-                        </Link>{" "}
-                        first.
+                {canAssignDriver ? (
+                    <>
+                        <form action={assignDriver} className="mt-4 flex flex-wrap gap-2">
+                            <input type="hidden" name="order_id" value={order.id} />
+                            <input type="hidden" name="next" value={path} />
+                            <select
+                                name="driver_id"
+                                defaultValue={order.driverId ?? ""}
+                                className="field max-w-sm flex-1"
+                            >
+                                <option value="">Unassigned</option>
+                                {drivers.map((d) => (
+                                    <option key={d.id} value={d.id}>
+                                        {d.email}
+                                    </option>
+                                ))}
+                            </select>
+                            <button type="submit" className="btn btn-solid hover:opacity-85">
+                                Save assignment
+                            </button>
+                        </form>
+                        {drivers.length === 0 && (
+                            <p className="mt-3 text-[0.8rem] text-muted">
+                                No rider accounts.{" "}
+                                <Link href="/admin/team" className="underline">
+                                    Grant the driver role
+                                </Link>{" "}
+                                first.
+                            </p>
+                        )}
+                    </>
+                ) : (
+                    <p className="mt-4 text-[0.85rem] text-muted">
+                        Rider assignment is locked because this parcel is already closed.
                     </p>
                 )}
             </section>

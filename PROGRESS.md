@@ -355,6 +355,7 @@ so they are safe to re-run.
 | `0005_verified_phone.sql` | `verified_phone()` + the phone guard at the top of `create_order` |
 | `0006_delivery_sales_stock.sql` | replaces `set_order_status` so delivered orders decrement pack stock in the same transaction |
 | `0007_require_driver_for_delivery.sql` | replaces `set_order_status` again so `out_for_delivery` / `attempted` / `delivered` require an assigned rider |
+| `0008_lock_driver_on_closed_orders.sql` | replaces `assign_driver` so delivered / cancelled / returned parcels can no longer be re-assigned |
 
 ### `public.user_roles` — `0001_roles.sql`
 
@@ -688,6 +689,9 @@ These caused real bugs. Re-read before touching pages.
 - ⛔ **`supabase/migrations/0007_require_driver_for_delivery.sql` has NOT been applied yet.**
   Until it is pasted into the Supabase SQL Editor, the database will still allow
   delivery-route status changes on unassigned parcels if someone bypasses the UI.
+- ⛔ **`supabase/migrations/0008_lock_driver_on_closed_orders.sql` has NOT been applied yet.**
+  Until it is pasted into the Supabase SQL Editor, a direct RPC call could still
+  change the rider on a closed parcel even though the admin UI now blocks it.
 - ⛔ **No one has completed a real end-to-end COD order** from a verified phone
   number, nor exercised the board → rider hand-off in production.
 - ⛔ **The phone flow has not been exercised end-to-end.** Test numbers are the plan

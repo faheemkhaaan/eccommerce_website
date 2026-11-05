@@ -4,6 +4,7 @@ import { money } from "@/lib/cart-math";
 import type { DriverOption } from "@/lib/order-queries";
 import {
     STATUS_LABEL,
+    isTerminalStatus,
     nextStatuses,
     relativeTime,
     type OrderStatus,
@@ -40,6 +41,7 @@ export default function OrderCard({
         order.driverId || !DRIVER_REQUIRED.includes(status)
     );
     const rider = drivers.find((d) => d.id === order.driverId);
+    const canAssignDriver = isAdmin && !isTerminalStatus(order.status);
 
     return (
         <article className="rounded-xl border border-line bg-paper p-4">
@@ -75,7 +77,7 @@ export default function OrderCard({
                 </div>
             )}
 
-            {isAdmin && (
+            {canAssignDriver && (
                 <form action={assignDriver} className="mt-3">
                     <input type="hidden" name="order_id" value={order.id} />
                     <input type="hidden" name="next" value={returnTo} />
@@ -101,6 +103,11 @@ export default function OrderCard({
                         </button>
                     </div>
                 </form>
+            )}
+            {isAdmin && isTerminalStatus(order.status) && (
+                <p className="mt-3 text-[0.72rem] text-muted">
+                    Rider assignment is locked once the parcel is closed.
+                </p>
             )}
 
             {next.length > 0 && (
