@@ -805,6 +805,7 @@ request, **not** baked into the JWT.
 | **A message's account is stamped by a definer trigger, not sent by the client** | same reason as review authorship — a request that bypasses the action must not be able to file itself under somebody else's account, or as already handled. |
 | **A honeypot, not a captcha** | no third party and no friction for someone who is already annoyed. A bot fills the off-screen field and learns nothing from the reply. |
 | **`order_ref` is free text, not a foreign key** | a mistyped order ID must still reach the shop; a rejected insert would silently lose the message. Admins get a link only when the ref matches the `OG-XXXXXX` shape. |
+| **Message status is staff-only; the reply is the customer's only loop** | a public "handled" flag promises an in-app answer the shop does not actually send (handled ≠ replied), and there is no mail vendor to acknowledge with. The thank-you panel says so outright: nothing to check back on here. |
 
 ---
 
@@ -878,18 +879,21 @@ These caused real bugs. Re-read before touching pages.
 - ⛔ **No review has been written, approved or displayed.** The whole path — verified
   buyer posts → pending → admin publishes → `updateTag('reviews')` → storefront shows
   it → `aggregateRating` appears in the JSON-LD — has never run end-to-end.
-- ⛔ **`supabase/migrations/0011_contact_messages.sql` has NOT been applied yet.** Until
-  it is pasted into the Supabase SQL Editor there is no `contact_messages` table and
-  every send from `/contact` fails. The page, the form and the inbox all build — the
-  insert is what breaks.
-- ⛔ **`NEXT_PUBLIC_SUPPORT_WHATSAPP` is unset**, so the site still shows the seeded
-  placeholder `+92 300 1234567`. It is not a working line; the WhatsApp and call
-  links on `/contact`, the footer and the inbox all point at it.
-- ⛔ **`NEXT_PUBLIC_SUPPORT_EMAIL` is unset**, so no email channel is offered anywhere.
-  That is the intended behaviour when it is blank, but it does mean customers without
-  WhatsApp have only the form.
-- ⛔ **No message has been sent, read or handled.** Guest path, signed-in path, the
-  honeypot and the admin reply links are all unexercised.
+- ✅ **`0011_contact_messages.sql` is applied.** Confirmed by a real send from
+  `/contact`: the form returned the thank-you panel rather than the failure branch,
+  and the message was readable and markable in `/admin/messages`. That exercises the
+  insert policy, the `stamp_contact_sender` trigger, the admin select policy and
+  `markHandled` in one go.
+- ✅ **`NEXT_PUBLIC_SUPPORT_WHATSAPP` and `NEXT_PUBLIC_SUPPORT_EMAIL` are set**, so the
+  WhatsApp, call and email channels all render on `/contact` and in the footer. The
+  number is still the development test line — swap it before launch.
+- ✅ **A message has been sent, read and handled.** The admin reply links (mailto /
+  tel / WhatsApp) with a real address on the row are still unexercised.
+- ⛔ **The customer never sees a status, by design.** `status`/`handled_at` are staff
+  bookkeeping only; the shop's reply is the customer's sole loop. There is also no
+  acknowledgement of any kind — no email, no reference — so a customer who closes the
+  tab has nothing to point at. The confirmation panel carries a "Send another message"
+  button that brings the form back in place, so a second message needs no reload.
 - ⛔ **No rate limiting on the contact form.** The honeypot stops naive bots and the
   length CHECKs stop empty spam, but nothing stops a script posting repeatedly to a
   public insert policy. Worth revisiting if it is ever abused.

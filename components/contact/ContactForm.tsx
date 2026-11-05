@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { sendMessage } from "@/app/(shop)/contact-actions";
 import { inputCls } from "@/components/auth/Field";
 import {
@@ -43,14 +43,27 @@ export default function ContactForm({
 }: Props) {
     const [state, action, pending] = useActionState<ContactResult | null, FormData>(sendMessage, null);
 
-    if (state?.ok) {
+    // The confirmation is acknowledged once, then dismissible, so a second message
+    // does not need a page reload. Matched by object identity rather than by `ok`,
+    // so the panel comes back after the next send.
+    const [acknowledged, setAcknowledged] = useState<ContactResult | null>(null);
+
+    if (state?.ok && state !== acknowledged) {
         return (
             <div className="rounded-xl border border-leaf/40 bg-leaf/10 p-5">
                 <p className="text-[0.9rem] text-ink">Thank you — your message is with us.</p>
                 <p className="mt-1 text-[0.8rem] text-muted">
-                    We read these through the day and reply to the address you left. If it is urgent
-                    and the parcel is on its way, WhatsApp reaches us fastest.
+                    We read these through the day and reply to the email or number you left, so there
+                    is nothing to check back on here. If the parcel is already on its way, WhatsApp
+                    reaches us fastest.
                 </p>
+                <button
+                    type="button"
+                    onClick={() => setAcknowledged(state)}
+                    className="mt-4 text-[0.8rem] text-ink underline underline-offset-4"
+                >
+                    Send another message
+                </button>
             </div>
         );
     }
