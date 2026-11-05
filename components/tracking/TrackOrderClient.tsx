@@ -15,6 +15,8 @@ import {
     type TrackingStep,
 } from "@/lib/orders";
 import { lookupTrackedOrder } from "@/app/(shop)/order-actions";
+import { canReviewOrder } from "@/app/(shop)/review-actions";
+import ReviewPrompt from "@/components/product/ReviewPrompt";
 import { money } from "@/lib/cart-math";
 import { BoxIcon, CheckIcon, SearchIcon, TruckIcon } from "@/components/Icons";
 
@@ -33,16 +35,19 @@ export default function TrackOrderClient({ initialId = "" }: { initialId?: strin
     const [steps, setSteps] = useState<TrackingStep[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [reviewProductId, setReviewProductId] = useState<string | null>(null);
 
     const lookup = useCallback(async (raw: string) => {
         const q = raw.trim();
         if (!q) {
             setResult(null);
             setSteps([]);
+            setReviewProductId(null);
             setError("Enter your Order ID, or the mobile number you ordered with.");
             return;
         }
         setLoading(true);
+        setReviewProductId(null);
         try {
             const found = await lookupTrackedOrder(q);
             if (!found) {
@@ -54,6 +59,10 @@ export default function TrackOrderClient({ initialId = "" }: { initialId?: strin
             setResult(found);
             setSteps(buildTracking({ status: found.status, city: found.city, events: found.events }));
             setError(null);
+            // This lookup is public and serves anyone's parcel, so the prompt is
+            // granted by the database — the visitor's own delivered order, not yet
+            // reviewed. Failing that check must not break tracking, hence the catch.
+            setReviewProductId(await canReviewOrder(found.id).catch(() => null));
         } catch {
             setResult(null);
             setSteps([]);
@@ -300,6 +309,8 @@ export default function TrackOrderClient({ initialId = "" }: { initialId?: strin
                                 </div>
                             </div>
                         </div>
+
+                        {reviewProductId && <ReviewPrompt productId={reviewProductId} />}
                     </motion.div>
                 )}
             </div>

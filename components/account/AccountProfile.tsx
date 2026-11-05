@@ -6,6 +6,7 @@ import { useAuthStore } from "@/stores/auth-store";
 import { createClient } from "@/lib/supabase/client";
 import { localPhone, toE164 } from "@/lib/phone";
 import PhoneVerify from "@/components/auth/PhoneVerify";
+import ReviewPrompt from "@/components/product/ReviewPrompt";
 import { buildTracking, currentStep, type OrderRecord } from "@/lib/orders";
 import { money } from "@/lib/cart-math";
 import { ArrowIcon, BoxIcon, CheckIcon, MailIcon, TruckIcon } from "@/components/Icons";
@@ -30,10 +31,21 @@ function Row({ label, value }: { label: string; value: string }) {
  * @param orders The signed-in customer's own orders, already fetched on the server.
  * @param verifiedPhone The account's SMS-confirmed mobile, resolved on the server. Presence of
  *   this value is what the "Mobile verified" badge reflects.
+ * @param reviewedProductIds Products this customer has already reviewed, any state. A delivered
+ *   order holding one of these stops asking.
  */
-export default function AccountProfile({ orders, verifiedPhone }: { orders: OrderRecord[]; verifiedPhone?: string }) {
+export default function AccountProfile({
+    orders,
+    verifiedPhone,
+    reviewedProductIds = [],
+}: {
+    orders: OrderRecord[];
+    verifiedPhone?: string;
+    reviewedProductIds?: string[];
+}) {
     const user = useAuthStore((s) => s.user);
     const router = useRouter();
+    const reviewed = new Set(reviewedProductIds);
 
     const signOut = async () => {
         await createClient().auth.signOut(); // onAuthStateChange flips the store to "guest"
@@ -158,6 +170,12 @@ export default function AccountProfile({ orders, verifiedPhone }: { orders: Orde
                             const live = currentStep(
                                 buildTracking({ status: o.status, city: o.recipient.city, events: o.events }),
                             );
+                            // A delivered parcel earns the ask, and it stops the moment they
+                            // write — even before staff publish it.
+                            const reviewable =
+                                o.status === "delivered"
+                                    ? o.items.find((i) => i.productId && !reviewed.has(i.productId))?.productId
+                                    : undefined;
                             return (
                                 <li key={o.id} className="rounded-2xl bg-sand p-5">
                                     <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
@@ -175,6 +193,13 @@ export default function AccountProfile({ orders, verifiedPhone }: { orders: Orde
                                             </li>
                                         ))}
                                     </ul>
+
+                                    {reviewable && (
+                                        <div className="mt-4">
+                                            <ReviewPrompt productId={reviewable} />
+                                        </div>
+                                    )}
+
                                     <div className="mt-4 flex items-center justify-between gap-4 border-t border-line pt-4">
                                         <span className="text-sm">Cash due {money(o.totals.total)}</span>
                                         <span className="flex items-center gap-4">

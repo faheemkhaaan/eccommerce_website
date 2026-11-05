@@ -428,6 +428,29 @@ Two rules shape the feature:
   `aggregateRating` is **omitted entirely** until real reviews exist — a rating with
   nothing behind it is what gets rich results revoked.
 
+**Reaching the form.** For a while the only way to review was to scroll to the bottom
+of the product page — nothing in `/account` and nothing in the tracking lookup pointed
+at it, so a customer holding a delivered jar had no idea the form existed. The ask is
+now standing on any delivered order:
+
+- `components/product/ReviewPrompt.tsx` — the nudge, linking to
+  `/products/<id>#reviews`.
+- `/account` shows it on a delivered order card holding an unreviewed product.
+  `myReviews()` in `lib/review-queries.ts` supplies that "already written" set, so the
+  ask goes as soon as they post — even before staff publish it.
+- `/track-order` shows it as well, but only for the visitor's own delivered parcel.
+  That lookup is public, so `canReviewOrder()` — and behind it
+  `reviewableProductIn()` — answers from the database, settling ownership through RLS
+  on `orders` and eligibility through `can_review_product()`, never from what the page
+  already knows.
+- `OrderItem.productId` exists for this: `order_items` now carries `product_id` in
+  `DETAIL_COLS`. The `track_order` RPC still omits it, which is why the field is
+  optional and the tracking path re-reads the order server-side.
+
+It appears the moment a parcel is marked delivered rather than after a fixed delay:
+with no email and no push there is nothing to bring a customer back later, so the
+wording carries the "only once you have cooked with it" part instead of a timer.
+
 `SITE_URL` comes from `NEXT_PUBLIC_SITE_URL`, falling back to Vercel's own host and
 then `localhost`. The JSON-LD escapes `<` in the serialised payload so a stray
 sequence in a product name cannot close the `script` tag.
@@ -806,6 +829,7 @@ request, **not** baked into the JWT.
 | **A honeypot, not a captcha** | no third party and no friction for someone who is already annoyed. A bot fills the off-screen field and learns nothing from the reply. |
 | **`order_ref` is free text, not a foreign key** | a mistyped order ID must still reach the shop; a rejected insert would silently lose the message. Admins get a link only when the ref matches the `OG-XXXXXX` shape. |
 | **Message status is staff-only; the reply is the customer's only loop** | a public "handled" flag promises an in-app answer the shop does not actually send (handled ≠ replied), and there is no mail vendor to acknowledge with. The thank-you panel says so outright: nothing to check back on here. |
+| **Ask for a review from delivery, not on a timer** | with no email and no push there is nothing to bring a customer back later, so a delayed ask is usually never seen. The prompt starts the moment a parcel is `delivered` and stays until they write; the copy carries the "only once you have cooked with it" framing instead of a delay. |
 
 ---
 
@@ -879,6 +903,13 @@ These caused real bugs. Re-read before touching pages.
 - ⛔ **No review has been written, approved or displayed.** The whole path — verified
   buyer posts → pending → admin publishes → `updateTag('reviews')` → storefront shows
   it → `aggregateRating` appears in the JSON-LD — has never run end-to-end.
+- ⛔ **No real delivered customer has seen `ReviewPrompt` yet.** It type-checks, lints
+  and builds, and it renders on `/account` and `/track-order` by construction, but the
+  prompt has not been observed by the buyer it targets. Whether the two `delivered`
+  orders actually belong to a signed-in account is unconfirmed: if they are the seeded
+  demo (`orders.user_id` null) or were placed as a guest, `can_review_product()` is
+  permanently false and the gate keeps showing "once your jar arrives" — which looks
+  exactly like the missing feature this was meant to fix.
 - ✅ **`0011_contact_messages.sql` is applied.** Confirmed by a real send from
   `/contact`: the form returned the thank-you panel rather than the failure branch,
   and the message was readable and markable in `/admin/messages`. That exercises the

@@ -12,6 +12,9 @@ export type OrderItem = {
     qty: number;
     price: number;
     image: string;
+    /** The catalogue product this line is, when the reader fetched it. The tracking
+     * RPC omits it, so it is optional — only the review prompt needs it. */
+    productId?: string;
 };
 
 export type Totals = {

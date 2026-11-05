@@ -29,6 +29,7 @@ type ItemRow = {
     qty: number;
     price: number | string;
     image: string | null;
+    product_id?: string | null;
     sort_order?: number;
 };
 
@@ -59,7 +60,7 @@ type OrderRow = {
 const SUMMARY_COLS =
     "id, status, placed_at, eta_at, customer_name, customer_phone, city, address, notes, subtotal, shipping, total, driver_id";
 
-const DETAIL_COLS = `${SUMMARY_COLS}, order_items (name, pack_label, qty, price, image, sort_order), order_events (status, note, created_at)`;
+const DETAIL_COLS = `${SUMMARY_COLS}, order_items (name, pack_label, qty, price, image, product_id, sort_order), order_events (status, note, created_at)`;
 
 const asStatus = (v: unknown): OrderStatus =>
     ORDER_STATUSES.includes(v as OrderStatus) ? (v as OrderStatus) : "pending";
@@ -80,6 +81,7 @@ function toItems(rows: ItemRow[] | null | undefined): OrderItem[] {
             qty: Number(i.qty) || 0,
             price: moneyN(i.price),
             image: i.image ?? "",
+            productId: i.product_id ?? undefined,
         }));
 }
 

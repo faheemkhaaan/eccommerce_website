@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AccountProfile from "@/components/account/AccountProfile";
 import { listMyOrders } from "@/lib/order-queries";
+import { myReviews } from "@/lib/review-queries";
 import { getCurrentUser } from "@/lib/roles";
 
 export const metadata: Metadata = { title: "My account — Organic Ghee" };
@@ -31,8 +32,14 @@ export default function AccountPage() {
     );
 }
 
-/** Loads the customer's orders and their SMS-confirmed mobile, both behind the Suspense boundary. */
+/** Loads the customer's orders, reviewer state and SMS-confirmed mobile, all behind the Suspense boundary. */
 async function ResolvedAccount() {
-    const [orders, me] = await Promise.all([listMyOrders(), getCurrentUser()]);
-    return <AccountProfile orders={orders} verifiedPhone={me?.phone} />;
+    const [orders, me, reviews] = await Promise.all([listMyOrders(), getCurrentUser(), myReviews()]);
+    return (
+        <AccountProfile
+            orders={orders}
+            verifiedPhone={me?.phone}
+            reviewedProductIds={reviews.map((r) => r.productId)}
+        />
+    );
 }

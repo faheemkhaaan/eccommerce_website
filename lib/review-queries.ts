@@ -107,6 +107,54 @@ export async function reviewableOrder(productId: string): Promise<string | null>
     return typeof data === "string" ? data : null;
 }
 
+/**
+ * The product in one of the caller's own delivered orders that they may still
+ * review, or null.
+ *
+ * Asked by the public tracking lookup, which will happily show anybody's parcel —
+ * so this reads `orders` with the session client and lets RLS settle ownership,
+ * then defers eligibility to `can_review_product()`. Nothing the client sends can
+ * widen that answer.
+ */
+export async function reviewableProductIn(orderId: string): Promise<string | null> {
+    const user = await getCurrentUser();
+    if (!user) return null;
+
+    const supabase = await createClient();
+    const { data } = await supabase
+        .from("orders")
+        .select("status, order_items ( product_id )")
+        .eq("id", orderId)
+        .maybeSingle();
+
+    const row = data as { status: string; order_items: { product_id: string | null }[] | null } | null;
+    if (row?.status !== "delivered") return null;
+
+    const productId = (row.order_items ?? []).find((i) => i.product_id)?.product_id;
+    if (!productId) return null;
+
+    const { data: allowed } = await supabase.rpc("can_review_product", { p_product_id: productId });
+    return allowed === true ? productId : null;
+}
+
+/** The signed-in customer's own reviews, in whatever state they are in. */
+export async function myReviews(): Promise<{ productId: string; status: ReviewStatus }[]> {
+    const user = await getCurrentUser();
+    if (!user) return [];
+
+    const supabase = await createClient();
+    const { data, error } = await supabase
+        .from("product_reviews")
+        .select("product_id, status")
+        .eq("user_id", user.userId);
+
+    if (error) throw new Error(`Could not load your reviews: ${error.message}`);
+    return (data as { product_id: string; status: ReviewStatus }[]).map((r) => ({
+        productId: r.product_id,
+        status: r.status,
+    }));
+}
+
 export type QueuedReview = Review & { productName: string };
 
 /** Every review, pending first, for the moderation queue. Staff only (RLS). */

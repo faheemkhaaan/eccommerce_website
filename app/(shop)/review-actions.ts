@@ -1,6 +1,6 @@
 "use server";
 
-import { reviewableOrder } from "@/lib/review-queries";
+import { reviewableOrder, reviewableProductIn } from "@/lib/review-queries";
 import { reviewProblem, type ReviewResult } from "@/lib/reviews";
 import { getCurrentUser } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
@@ -58,4 +58,16 @@ export async function submitReview(
     // Nothing to invalidate: a new review is pending, so it is not in the public
     // list the storefront caches. That happens on approval, in the admin action.
     return { ok: true };
+}
+
+/**
+ * The product a signed-in visitor may still review against one order, or null.
+ *
+ * The public tracking lookup calls this once it has a parcel on screen, so the
+ * prompt only appears for the visitor's own delivered order. The answer comes
+ * from the database, never from what the page already knows.
+ */
+export async function canReviewOrder(orderId: string): Promise<string | null> {
+    const id = orderId.trim();
+    return id ? reviewableProductIn(id) : null;
 }
